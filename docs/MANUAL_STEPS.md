@@ -5,12 +5,15 @@ Everything else is automated by the build session. Steps appear here only when t
 ## 1. Create the GitHub App (one click flow, needed from M2)
 Available once M1 is deployed, because the manifest uses the live host. The `/setup/github-app` page builds the manifest from the host it runs on and posts it to GitHub; the app then stores the credentials itself (encrypted), so nothing is pasted.
 
-Deep link (host is filled in when M1 deploys; this file will be updated with the exact URL and the orchestrator will be told):
-`https://{{STEPCLIMB_HOST}}/setup/github-app`
+Prerequisites in the Vercel project env (set by the build session): `APP_ENCRYPTION_KEY` (the page refuses to submit without it) and `ADMIN_EMAILS` containing the founder's email (only that account can open the page; everyone else gets a 404).
 
-1. Open the link while signed in to GitHub as `ahmadkhancodes`, click **Create the Stepclimb GitHub App**, then **Create GitHub App** on the GitHub confirmation page.
-2. Nothing to paste. Manifest values used (for review): name "Stepclimb by BufferSol", public app, webhook `{{HOST}}/api/github/webhook`, callback `{{HOST}}/api/auth/callback/github`, permissions contents write, pull requests write, checks write, metadata read, events pull_request, push, issue_comment, check_run (`docs/manifests/github-app.json`).
-3. You will land on the app's Hangar page with "GitHub App connected". Then click **Install** on the target account to test.
+Exact URL to open after deploy (production host, see `NEXT_PUBLIC_APP_URL`):
+`https://stepclimb.vercel.app/setup/github-app` (becomes `https://stepclimb.buffersoltech.com/setup/github-app` once DNS is ready; the manifest uses `NEXT_PUBLIC_APP_URL`, so open the page on the host you want GitHub to call).
+
+1. Sign in to Stepclimb with the founder email, open the link, then click **Create the Stepclimb GitHub App**. GitHub shows its confirmation page: click **Create GitHub App**.
+2. Nothing to paste. GitHub redirects to `/api/github/manifest/callback`, which exchanges the code and stores app id, private key, webhook secret and OAuth client id/secret encrypted in the database. The page then shows "GitHub App connected" with an **Install on a repository** button. Setup is one time and never overwrites stored credentials.
+3. Manifest values used (for review): name "Stepclimb by BufferSol", public app, webhook `{{HOST}}/api/github/webhook`, callback `{{HOST}}/api/auth/callback/github`, setup URL `{{HOST}}/api/github/setup`, permissions contents write, pull requests write, checks write, metadata read, events pull_request, push, issue_comment, check_run (`docs/manifests/github-app.json`).
+4. Click **Install** on the target account; you land on the Hangar with the repos listed and can run a free scan on each.
 
 Organisation owned alternative: use `https://github.com/organizations/{{ORG}}/settings/apps/new` as the form target; the page has a toggle.
 

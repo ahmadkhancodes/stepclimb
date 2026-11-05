@@ -1,6 +1,6 @@
-import type { ExternalStep } from '../types.js';
-import { docUrlOf, empty, withPrefix, type Engine } from './engine-types.js';
-import { makeSquawk } from './squawk.js';
+import type { ExternalStep } from '../types';
+import { docUrlOf, empty, withPrefix, type Engine } from './engine-types';
+import { makeSquawk } from './squawk';
 
 const phpStr = (s: string) => `'${s.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}'`;
 const cls = (s: string) => `\\${s.replace(/^\\+/, '')}::class`;

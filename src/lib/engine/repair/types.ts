@@ -1,4 +1,4 @@
-import type { ExternalStep, Squawk } from '../types.js';
+import type { ExternalStep, Squawk } from '../types';
 
 export const RULE_CATEGORIES = ['composer', 'larastan', 'php', 'tests', 'build'] as const;
 export type RuleCategory = (typeof RULE_CATEGORIES)[number];

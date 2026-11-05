@@ -1,6 +1,6 @@
 import { MongoClient, type Collection, type Db as MongoDatabase, type Document } from "mongodb";
 import { uuidv7 } from "@/lib/ids";
-import { DELIVERY_TTL_DAYS, type AuditEntry, type BillingAccount, type Db, type Entitlement, type Suppression, type WebhookDelivery, type WebhookEndpoint } from "./types";
+import { DELIVERY_TTL_DAYS, type DocFilter, type DocStore, type AuditEntry, type BillingAccount, type Db, type Entitlement, type Suppression, type WebhookDelivery, type WebhookEndpoint } from "./types";
 
 // Ported from trayo server/db/mongo.ts. Changes: global singleton client (Vercel), pool 10, Date TTLs,
 // stripe events recorded after success, no sync/family/anonymous. Use only from runtime = "nodejs" routes.
@@ -31,8 +31,42 @@ export function createMongoDb(uri: string, dbName: string, app: string): Db {
     return rest as T;
   };
 
+  const dkey = (id: string) => `${app}:${id}`;
+  const dfilter = (f: DocFilter, inn?: { field: string; values: string[] }) => ({ app, ...f, ...(inn ? { [inn.field]: { $in: inn.values } } : {}) });
+  const out = <T>(d: Record<string, unknown>) => {
+    const { _id, app: _a, ...rest } = d;
+    return { ...rest, id: String(_id).slice(app.length + 1) } as T;
+  };
+  const docs: DocStore = {
+    async put(c, id, doc) {
+      await (await col<Document>(c)).updateOne({ _id: dkey(id) as never }, { $set: { ...doc, app } }, { upsert: true });
+    },
+    async insert(c, id, doc) {
+      try {
+        await (await col<Document>(c)).insertOne({ ...doc, _id: dkey(id), app } as never);
+        return true;
+      } catch (e) {
+        if ((e as { code?: number }).code === 11000) return false;
+        throw e;
+      }
+    },
+    async get(c, id) {
+      const d = await (await col<Document>(c)).findOne({ _id: dkey(id) as never });
+      return d ? out(d) : null;
+    },
+    async find(c, filter = {}, opts = {}) {
+      let cur = (await col<Document>(c)).find(dfilter(filter, opts.in) as never);
+      if (opts.sort) cur = cur.sort({ [opts.sort.field]: opts.sort.dir });
+      if (opts.limit) cur = cur.limit(opts.limit);
+      return (await cur.toArray()).map((d) => out(d)) as never;
+    },
+    async remove(c, filter, opts = {}) {
+      return (await (await col<Document>(c)).deleteMany(dfilter(filter, opts.in) as never)).deletedCount;
+    },
+  };
   return {
     app,
+    docs,
     async getBillingAccount(id) {
       return strip<BillingAccount>(await (await col<WithId<BillingAccount>>("billing_accounts")).findOne({ _id: id, app }));
     },
@@ -224,5 +258,13 @@ export async function ensureIndexes(uri: string, dbName: string) {
   await d.collection("member").createIndex({ organizationId: 1, userId: 1 }, { unique: true });
   await d.collection("organization").createIndex({ slug: 1 }, { unique: true });
   await d.collection("apikey").createIndex({ key: 1 });
+  // Product collections (docs/ARCHITECTURE.md section 4); ids are `${app}:${id}`
+  await d.collection("installations").createIndex({ app: 1, accountId: 1 });
+  await d.collection("installations").createIndex({ app: 1, accountLogin: 1 });
+  await d.collection("repos").createIndex({ app: 1, installationId: 1, fullName: 1 }, { unique: true });
+  await d.collection("repos").createIndex({ app: 1, accountId: 1, pushedAt: -1 });
+  await d.collection("apps").createIndex({ app: 1, repoId: 1, path: 1 }, { unique: true });
+  await d.collection("scans").createIndex({ app: 1, repoId: 1, createdAt: -1 });
+  await d.collection("webhook_events").createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
   return DELIVERY_TTL_DAYS;
 }

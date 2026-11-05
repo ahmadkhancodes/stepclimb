@@ -1,5 +1,5 @@
-import { docUrlOf, empty, withPrefix, type Engine } from './engine-types.js';
-import { makeSquawk } from './squawk.js';
+import { docUrlOf, empty, withPrefix, type Engine } from './engine-types';
+import { makeSquawk } from './squawk';
 
 interface Repl { type?: 'exact' | 'regex'; find: string; replace: string; flags?: string; all?: boolean; ifContains?: string; ifNotContains?: string }
 interface FileSpec { path: string; replacements: Repl[]; optional?: boolean }

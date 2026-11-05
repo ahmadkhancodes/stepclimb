@@ -2,9 +2,9 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import semver from 'semver';
-import type { VirtualFs } from '../vfs.js';
-import { validateRule } from './schema.js';
-import type { ContextGuard, Match, Rule } from './types.js';
+import type { VirtualFs } from '../vfs';
+import { validateRule } from './schema';
+import type { ContextGuard, Match, Rule } from './types';
 
 export class RuleLoadError extends Error {
   constructor(public readonly errors: string[]) {

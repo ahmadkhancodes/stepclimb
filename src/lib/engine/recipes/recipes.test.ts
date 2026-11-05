@@ -1,8 +1,8 @@
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { MemoryFs } from '../vfs.js';
-import { applyRecipe, loadRecipes, makeSquawk, planHop, planHops, runPlan, validateRecipe, buildRectorConfig, type Recipe } from './index.js';
+import { MemoryFs } from '../vfs';
+import { applyRecipe, loadRecipes, makeSquawk, planHop, planHops, runPlan, validateRecipe, buildRectorConfig, type Recipe } from './index';
 
 const RECIPES_DIR = resolve(process.cwd(), 'recipes');
 const catalog = loadRecipes(RECIPES_DIR);

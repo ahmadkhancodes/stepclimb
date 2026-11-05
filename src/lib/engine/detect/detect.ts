@@ -1,5 +1,5 @@
 import semver from 'semver';
-import type { DetectedApp, FrontendStack, TestFramework } from '../types.js';
+import type { DetectedApp, FrontendStack, TestFramework } from '../types';
 
 export interface DetectInput {
   path: string;

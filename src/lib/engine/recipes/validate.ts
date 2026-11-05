@@ -1,5 +1,5 @@
 import semver from 'semver';
-import { ENGINES, PATH_KINDS, type Recipe } from './types.js';
+import { ENGINES, PATH_KINDS, type Recipe } from './types';
 
 export type ValidationResult = { ok: true; recipe: Recipe } | { ok: false; errors: string[] };
 

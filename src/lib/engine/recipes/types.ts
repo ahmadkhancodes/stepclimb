@@ -1,4 +1,4 @@
-import type { DetectedApp, RecipeResult } from '../types.js';
+import type { DetectedApp, RecipeResult } from '../types';
 
 export const PATH_KINDS = ['laravel', 'fixer', 'slimmer', 'tailwind', 'livewire', 'pest', 'php', 'ci'] as const;
 export type PathKind = (typeof PATH_KINDS)[number];
