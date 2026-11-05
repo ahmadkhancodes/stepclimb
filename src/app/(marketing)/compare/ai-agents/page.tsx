@@ -74,7 +74,7 @@ export default function CompareAgentsPage() {
             ]}
           />
           <P>
-            General coding agents here means GitHub Copilot agent mode, Devin and similar tools. Plans and prices were read on {COMPARED.label}. Check each vendor for today's figures.
+            General coding agents here means GitHub Copilot agent mode, Devin and similar tools. Plans and prices were read on {COMPARED.label}. Check each vendor for today&apos;s figures.
           </P>
         </ArticleSection>
 
