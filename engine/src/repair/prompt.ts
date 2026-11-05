@@ -22,7 +22,7 @@ export function excerptOf(output: string, cap = EXCERPT_CAP): string {
   return clean.slice(0, head) + marker + clean.slice(clean.length - tail);
 }
 
-const FILE_RE = /((?:[A-Za-z]:)?[\w@.~/\\-]+\.(?:php|json|xml|neon|ya?ml|js|ts|vue))(?:(?::|\s+on\s+line\s+|\s+line\s+)(\d+))?/g;
+const FILE_RE = /(?<![\w:/.@~-])((?:[A-Za-z]:)?[\w@.~/\\-]+\.(?:php|json|xml|neon|ya?ml|js|ts|vue))(?:(?::|\s+on\s+line\s+|\s+line\s+)(\d+))?/g;
 
 /** File paths mentioned in failure output, in order of first appearance. Resolved against `fs` when given. */
 export function parseFileRefs(output: string, fs?: VirtualFs, max = 10): FileRef[] {

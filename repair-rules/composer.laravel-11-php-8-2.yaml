@@ -2,7 +2,7 @@ key: composer.laravel-11-php-8-2
 category: composer
 version: "11"
 title: Root php constraint allows PHP older than Laravel 11 minimum (8.2.0)
-signature: 'laravel/framework\S* requires? php \^8\.2 -> your php version \((?<php>[^)]+)\) does not satisfy that requirement'
+signature: 'laravel/framework[^\n]*? requires? php \^8\.2 -> your php version \((?<php>[^)]+)\) does not satisfy that requirement'
 contextGuard:
   kind: composer_constraint
   package: php

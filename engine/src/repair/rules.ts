@@ -77,7 +77,11 @@ export function evalGuard(guard: ContextGuard | undefined, fs: VirtualFs): { ok:
       }
       if (declared === undefined) return { ok: false, reason: `guard: ${guard.package} not declared in composer.json` };
       if (guard.satisfies !== undefined) return withinRange(declared, guard.satisfies) ? { ok: true } : { ok: false, reason: `guard: ${guard.package} ${declared} is not within ${guard.satisfies}` };
-      return withinRange(declared, guard.notSatisfies ?? '') ? { ok: false, reason: `guard: ${guard.package} ${declared} already within ${guard.notSatisfies}` } : { ok: true };
+      // fire only when no alternative ("^3.3 || ^4.0") of the declared constraint already lies within the target range
+      const target = guard.notSatisfies ?? '';
+      return toSemverRange(declared).split('||').some((alt) => withinRange(alt.trim(), target))
+        ? { ok: false, reason: `guard: ${guard.package} ${declared} already compatible with ${target}` }
+        : { ok: true };
     }
   }
 }

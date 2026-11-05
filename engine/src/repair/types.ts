@@ -8,7 +8,7 @@ export type FixKind = (typeof FIX_KINDS)[number];
 
 export type ContextGuard =
   | { kind: 'file_exists'; path: string }
-  /** declared constraint of `package` in composer.json must (or, with notSatisfies, must not) lie entirely within `range` */
+  /** declared constraint of `package` in composer.json must lie within `satisfies`, or (notSatisfies) must neither lie within nor already admit the range */
   | { kind: 'composer_constraint'; package: string; satisfies?: string; notSatisfies?: string; section?: 'require' | 'require-dev' }
   | { kind: 'file_regex'; path: string; pattern: string; flags?: string; negate?: boolean };
 
