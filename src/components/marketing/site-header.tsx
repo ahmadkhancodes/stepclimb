@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { product } from "@/config/product";
 import { ThemeToggle } from "@/components/theme";
 import { buttonClass } from "@/components/ui/button";
+import { BrandLockup } from "./demo/brand-lockup";
 import { cn } from "@/components/ui/cn";
 
 const STAGGER_MS = 60;
@@ -60,35 +61,35 @@ export function SiteHeader() {
     };
   }, [open, close]);
 
-  const isCurrent = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const isCurrent = (href: string) => (href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`));
+  const navLinks = [{ href: "/", label: "Product" }, ...product.nav];
   const linkClass = (href: string) =>
     cn(
-      "inline-flex min-h-11 items-center rounded-md px-3 button-sm transition-colors duration-300 ease-out-kit hover:bg-surface-raised hover:text-text focus-visible:focus-ring",
-      isCurrent(href) ? "text-text" : "text-text-subtle",
+      "inline-flex min-h-11 items-center px-1 button-sm transition-colors duration-300 ease-out-kit hover:text-text focus-visible:focus-ring",
+      isCurrent(href) ? "text-text shadow-[0_2px_0_0_var(--action)]" : "text-text-subtle",
     );
 
   const panelItems = [
-    ...product.nav.map((n) => ({ ...n, kind: "link" as const })),
+    ...navLinks.map((n) => ({ ...n, kind: "link" as const })),
     { href: "/sign-in", label: "Sign in", kind: "link" as const },
-    { href: "/sign-in", label: "Start free", kind: "cta" as const },
+    { href: "/sign-in", label: "Inspect a repo free", kind: "cta" as const },
   ];
 
   return (
-    <header className="fixed inset-x-0 top-3 z-50 px-4 sm:px-6">
-      <div className="relative z-50 mx-auto flex w-full max-w-7xl items-center justify-between gap-4 rounded-lg border border-border bg-surface/80 py-1 pl-4 pr-1 backdrop-blur-md">
-        <Link href="/" className="inline-flex min-h-11 items-center rounded-md title-2 text-text focus-visible:focus-ring" aria-label={`${product.name} home`}>
-          {product.name}
+    <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
+      <div className="relative z-50 flex w-full max-w-7xl items-center justify-between gap-4 rounded-xl border border-border bg-surface-raised/80 py-2 pl-4 pr-2 backdrop-blur-md md:w-fit md:justify-start md:gap-8">
+        <Link href="/" className="inline-flex min-h-11 items-center rounded-md focus-visible:focus-ring" aria-label={`${product.fullName} home`}>
+          <BrandLockup />
         </Link>
-        <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
-          {product.nav.map((n) => (
+        <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">
+          {navLinks.map((n) => (
             <Link key={n.href} href={n.href} aria-current={isCurrent(n.href) ? "page" : undefined} className={linkClass(n.href)}>
               {n.label}
             </Link>
           ))}
         </nav>
         <div className="flex items-center gap-1">
-          <Link href="/sign-in" className={cn(buttonClass("tertiary", "md"), "hidden md:inline-flex")}>Sign in</Link>
-          <Link href="/sign-in" className={cn(buttonClass("primary", "md"), "hidden md:inline-flex")}>Start free</Link>
+          <Link href="/sign-in" className={cn(buttonClass("primary", "md"), "button-sm hidden sm:inline-flex")}>Inspect a repo free</Link>
           <ThemeToggle />
           <button
             ref={toggleRef}
@@ -97,7 +98,7 @@ export function SiteHeader() {
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
             onClick={() => (open ? close() : setOpenFor(pathname))}
-            className="inline-flex size-11 items-center justify-center rounded-md text-text transition-colors duration-300 ease-out-kit hover:bg-surface-raised focus-visible:focus-ring md:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-md text-text transition-colors duration-300 ease-out-kit hover:bg-surface focus-visible:focus-ring md:hidden"
           >
             <span aria-hidden className="relative block size-6">
               <span className={cn("absolute left-1 right-1 top-2 h-0.5 rounded-sm bg-current transition-transform duration-300 ease-out-kit", open && "translate-y-1 rotate-45")} />
@@ -115,7 +116,7 @@ export function SiteHeader() {
         aria-label="Menu"
         inert={!open}
         className={cn(
-          "fixed inset-0 z-40 flex flex-col bg-surface px-4 pt-24 transition-[opacity,visibility] duration-200 ease-out-kit md:hidden",
+          "fixed inset-0 z-40 flex h-dvh flex-col bg-surface/95 px-4 pt-24 backdrop-blur-xl transition-opacity duration-300 ease-out-kit md:hidden",
           open ? "visible opacity-100" : "invisible opacity-0",
         )}
       >
@@ -124,14 +125,15 @@ export function SiteHeader() {
             <Link
               key={item.label}
               href={item.href}
+              aria-current={item.kind === "link" && isCurrent(item.href) && item.label !== "Sign in" ? "page" : undefined}
               onClick={() => setOpenFor(null)}
-              style={{ transitionDelay: open ? `${i * STAGGER_MS}ms` : "0ms" }}
+              style={{ transitionDelay: open ? `${Math.min(i * STAGGER_MS, 400)}ms` : "0ms" }}
               className={cn(
-                "transition-[opacity,transform] duration-200 ease-out-kit focus-visible:focus-ring",
+                "transition-[opacity,transform] duration-400 ease-out-kit focus-visible:focus-ring motion-reduce:transform-none",
                 open ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
                 item.kind === "cta"
                   ? cn(buttonClass("primary", "lg"), "mt-8")
-                  : "flex min-h-12 items-center border-b border-border heading-5 text-text",
+                  : "heading-5 flex min-h-12 items-center border-b border-border text-text aria-[current=page]:text-action",
               )}
             >
               {item.label}
