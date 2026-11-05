@@ -4,7 +4,7 @@ import type { LegalDoc } from "./types";
 export const security: LegalDoc = {
   slug: "security",
   title: "Security",
-  description: `How ${p.name} protects your account and your submissions.`,
+  description: `How ${p.name} protects your account and your code.`,
   sections: [
     {
       id: "overview",
@@ -31,7 +31,7 @@ export const security: LegalDoc = {
       body: [
         {
           list: [
-            "Sign in with magic link or passkey, with optional two factor authentication.",
+            "Sign in with GitHub, with optional two factor authentication.",
             "Roles limit what each team member can change.",
             "Staff access to production data is limited, logged and used only for support you request or to fix incidents.",
           ],
@@ -45,7 +45,7 @@ export const security: LegalDoc = {
         {
           list: [
             "Rate limiting on public endpoints and on the API.",
-            "Spam and abuse filtering on submissions.",
+            "Free tier abuse limits: a GitHub account at least 30 days old and one public repository pull request a month.",
             "Outbound webhooks are signed so you can verify them.",
             "Dependencies are updated regularly and checked for known vulnerabilities.",
           ],

@@ -4,18 +4,12 @@ import type { DocPage } from "./types";
 export const authentication: DocPage = {
   slug: "authentication",
   title: "Authentication",
-  description: `Sign in to ${p.name} with magic links, passkeys and two factor, and call the API with keys.`,
+  description: `Sign in to ${p.name} with GitHub, add two factor, and call the API with keys.`,
   sections: [
     {
-      heading: "Magic link",
+      heading: "GitHub sign in",
       body: [
-        "Enter your email on the sign in page and we send a one time link. The link expires after a short time and works once. Open it on the same device where you asked for it for the smoothest experience.",
-      ],
-    },
-    {
-      heading: "Passkeys",
-      body: [
-        "Add a passkey in Settings, then Security. After that you can sign in with your fingerprint, face or device PIN. Passkeys are bound to this site, so they cannot be phished. We recommend adding at least two.",
+        "Sign in uses your GitHub account, so there is no password to set. The free tier needs a GitHub account that is at least 30 days old.",
       ],
     },
     {

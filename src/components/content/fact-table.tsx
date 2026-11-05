@@ -14,7 +14,7 @@ export interface FactTableProps {
 }
 
 /** Ruled table: square corners, 1px rules, row headers, scrolls inside its own region on small screens. */
-export function FactTable({ caption, columns, rows, highlight, mono = [], minWidth = "min-w-[36rem]" }: FactTableProps) {
+export function FactTable({ caption, columns, rows, highlight, mono = [], minWidth = "min-w-144" }: FactTableProps) {
   return (
     <div role="region" aria-label={`${caption}. Scrolls sideways on small screens.`} tabIndex={0} className="overflow-x-auto rounded-none border border-border bg-surface focus-visible:focus-ring">
       <table className={cn("w-full border-collapse text-left", minWidth)}>

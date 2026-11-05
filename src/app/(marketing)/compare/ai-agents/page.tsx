@@ -63,7 +63,7 @@ export default function CompareAgentsPage() {
             caption="Stepclimb compared with Laravel Boost and general coding agents"
             columns={["", product.name, "Laravel Boost upgrade command", "General coding agents"]}
             highlight={1}
-            minWidth="min-w-[52rem]"
+            minWidth="min-w-208"
             rows={[
               ["Same result on every run", "Recipes make the known changes the same way every time", "Non deterministic", "Non deterministic, results vary"],
               ["What it aims for", "A PR proven by composer install, your build and your tests", "Aims for a compatible app", "Whatever the prompt asks for, across the whole repo"],

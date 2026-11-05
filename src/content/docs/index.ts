@@ -1,6 +1,7 @@
 import { api } from "./api";
 import { authentication } from "./authentication";
 import { billing } from "./billing";
+import { howVerificationWorks, squawks } from "./concepts";
 import { gettingStarted } from "./getting-started";
 import type { DocPage } from "./types";
 import { webhooks } from "./webhooks";
@@ -12,10 +13,11 @@ export interface DocGroup {
   docs: DocPage[];
 }
 
-export const docs: DocPage[] = [gettingStarted, authentication, billing, webhooks, api];
+export const docs: DocPage[] = [gettingStarted, authentication, howVerificationWorks, squawks, billing, webhooks, api];
 
 export const docGroups: DocGroup[] = [
   { title: "Start here", docs: [gettingStarted, authentication] },
+  { title: "How it works", docs: [howVerificationWorks, squawks] },
   { title: "Build", docs: [api, webhooks] },
   { title: "Account", docs: [billing] },
 ];

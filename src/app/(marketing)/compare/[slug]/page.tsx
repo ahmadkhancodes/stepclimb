@@ -82,7 +82,7 @@ export default async function ComparePage({ params }: Props) {
               rows={entry.priceTable.rows}
               highlight={2}
               mono={[1, 2]}
-              minWidth="min-w-[40rem]"
+              minWidth="min-w-160"
             />
             <P>
               Agency is capped at $99 a month, which is about 40% of the monthly equivalent of the Everything plan ($249.92 a month).
