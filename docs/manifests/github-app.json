@@ -1,0 +1,19 @@
+{
+  "name": "Stepclimb by BufferSol",
+  "url": "https://stepclimb.buffersoltech.com",
+  "description": "Verified Laravel upgrade pull requests. One commit per change, composer install and your tests run before the PR opens.",
+  "hook_attributes": { "url": "{{ORIGIN}}/api/github/webhook", "active": true },
+  "redirect_url": "{{ORIGIN}}/api/github/manifest/callback",
+  "callback_urls": ["{{ORIGIN}}/api/auth/callback/github"],
+  "setup_url": "{{ORIGIN}}/app/hangar?installed=1",
+  "setup_on_update": true,
+  "public": true,
+  "request_oauth_on_install": false,
+  "default_permissions": {
+    "contents": "write",
+    "pull_requests": "write",
+    "checks": "write",
+    "metadata": "read"
+  },
+  "default_events": ["pull_request", "push", "issue_comment", "check_run"]
+}
