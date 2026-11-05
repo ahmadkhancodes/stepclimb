@@ -1,5 +1,5 @@
 "use client";
-import { Fingerprint } from "@phosphor-icons/react";
+import { Fingerprint, GithubLogo } from "@phosphor-icons/react";
 import { useState } from "react";
 import { authError } from "@/components/app/api";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,8 @@ import { authClient } from "@/lib/auth/client";
 
 type Phase = "idle" | "sending" | "sent";
 
-export function SignInForm({ callbackURL, expiredLink }: { callbackURL: string; expiredLink?: boolean }) {
+export function SignInForm({ callbackURL, expiredLink, githubEnabled }: { callbackURL: string; expiredLink?: boolean; githubEnabled?: boolean }) {
+  const [githubBusy, setGithubBusy] = useState(false);
   const [email, setEmail] = useState("");
   const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -36,6 +37,16 @@ export function SignInForm({ callbackURL, expiredLink }: { callbackURL: string; 
       return;
     }
     setPhase("sent");
+  }
+
+  async function github() {
+    setGithubBusy(true);
+    setError(null);
+    const res = await authClient.signIn.social({ provider: "github", callbackURL, newUserCallbackURL: `/onboarding?next=${encodeURIComponent(callbackURL)}`, errorCallbackURL: "/sign-in" });
+    if (res?.error) {
+      setGithubBusy(false);
+      setError(authError(res.error, "GitHub sign in did not complete. Use the email link instead."));
+    }
   }
 
   async function passkey() {
@@ -65,6 +76,19 @@ export function SignInForm({ callbackURL, expiredLink }: { callbackURL: string; 
 
   return (
     <div className="flex flex-col gap-6">
+      {githubEnabled ? (
+        <>
+          <Button type="button" onClick={github} loading={githubBusy}>
+            <GithubLogo size={20} weight="regular" aria-hidden />
+            Continue with GitHub
+          </Button>
+          <div className="flex items-center gap-3" aria-hidden>
+            <div className="h-px flex-1 bg-border" />
+            <span className="caption-4 text-text-muted">or use email</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+        </>
+      ) : null}
       {expiredLink ? <Notice tone="warning" title="That link has expired">Links work once for 10 minutes. Request a new one below.</Notice> : null}
       <form onSubmit={submit} noValidate className="flex flex-col gap-4">
         <Field label="Email" htmlFor="email" error={error}>

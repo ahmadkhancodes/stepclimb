@@ -9,7 +9,7 @@ import { effectivePlan } from "@/lib/billing/entitlement";
 import { currentUsage } from "@/lib/billing/usage";
 import { getDb } from "@/lib/db";
 
-export const metadata = { title: "Overview" };
+export const metadata = { title: "Hangar" };
 
 export default async function OverviewPage() {
   const ctx = await requireOrg({ page: true });
@@ -19,7 +19,7 @@ export default async function OverviewPage() {
   const usage = await currentUsage(db, ctx.org.id, METERS_SHOWN);
   return (
     <>
-      <PageHeader title={ctx.org.name} description={`Signed in as ${ctx.user.email}.`} />
+      <PageHeader title={ctx.org.name} description={`Signed in as ${ctx.user.email}. Plan: ${plan.name}.`} />
       <div className="grid gap-6 lg:grid-cols-3">
         <section aria-labelledby="plan-h" className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6">
           <div className="flex items-center justify-between gap-2">
@@ -39,15 +39,11 @@ export default async function OverviewPage() {
           </div>
         </section>
       </div>
-      <Panel title="Workspace" description="Where your product's main screen lives.">
+      <Panel title="Hangar" description="Every repo as an airframe: Laravel version, how far behind, when support ends.">
         <EmptyState
-          title="Your product's main screen goes here"
-          body={
-            <>
-              This page is the signed-in home. Replace <code>src/app/app/page.tsx</code> with the screen people use every day, and keep the plan and usage cards above it or move them to the sidebar. Start with the one task a new member must finish to get value, and teach it here before they see anything else.
-            </>
-          }
-          action={<Link href="/app/settings/members" className={buttonClass("primary")}>Invite a teammate</Link>}
+          title="No airframes yet"
+          body="Install the Stepclimb GitHub App on the repos you choose. Each one gets a free inspection that reads composer.json and composer.lock only, so no code is cloned."
+          action={<Link href="/docs" className={buttonClass("primary")}>Read how inspection works</Link>}
         />
       </Panel>
     </>

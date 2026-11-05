@@ -9,6 +9,7 @@ import { appName, appUrl, dbDriver, env, isProd } from "@/lib/env";
 import { sendMail } from "@/lib/mail";
 import { inviteEmail, magicLinkEmail } from "@/lib/mail/templates";
 import { isDisposableEmail } from "@/lib/security/disposable";
+import { githubOAuthCreds, type GithubOAuthCreds } from "@/lib/github/credentials";
 import { ac, roles } from "./roles";
 
 // Better Auth: magic link, passkeys, TOTP, orgs + roles, API keys (hashed, prefix shown).
@@ -50,7 +51,7 @@ async function database(): Promise<BetterAuthOptions["database"]> {
   return mongodbAdapter(client.db(e.MONGODB_DB ?? appName(e)), { client, transaction: false });
 }
 
-export function createAuth(db: BetterAuthOptions["database"]) {
+export function createAuth(db: BetterAuthOptions["database"], github: GithubOAuthCreds | null = null) {
   const e = env();
   const base = appUrl(e);
   const secure = base.startsWith("https://");
@@ -68,15 +69,29 @@ export function createAuth(db: BetterAuthOptions["database"]) {
     },
     rateLimit: { enabled: true, window: 60, max: 60, storage: "database" },
     emailAndPassword: { enabled: false },
-    socialProviders:
-      e.GOOGLE_CLIENT_ID && e.GOOGLE_CLIENT_SECRET
-        ? { google: { clientId: e.GOOGLE_CLIENT_ID, clientSecret: e.GOOGLE_CLIENT_SECRET } }
-        : undefined,
+    // GitHub is the primary sign in (users map to installations). Account age feeds the free tier gate (30 days).
+    socialProviders: github
+      ? {
+          github: {
+            clientId: github.clientId,
+            clientSecret: github.clientSecret,
+            scope: ["read:user", "user:email"],
+            mapProfileToUser: (profile: { login?: string; created_at?: string }) => ({
+              githubLogin: profile.login ?? null,
+              githubCreatedAt: profile.created_at ?? null,
+            }),
+          },
+        }
+      : undefined,
     user: {
       deleteUser: { enabled: true },
-      additionalFields: { analyticsConsent: { type: "boolean", required: false, defaultValue: false, input: true } },
+      additionalFields: {
+        analyticsConsent: { type: "boolean", required: false, defaultValue: false, input: true },
+        githubLogin: { type: "string", required: false, input: false },
+        githubCreatedAt: { type: "string", required: false, input: false },
+      },
     },
-    account: { accountLinking: { enabled: true, trustedProviders: ["google"] } },
+    account: { accountLinking: { enabled: true, trustedProviders: ["github"] } },
     databaseHooks: {
       user: {
         create: {
@@ -127,5 +142,5 @@ export type Auth = ReturnType<typeof createAuth>;
 let pending: Promise<Auth> | null = null;
 export function getAuth(): Promise<Auth> {
   if (globalThis.__kitAuth) return Promise.resolve(globalThis.__kitAuth);
-  return (pending ??= database().then((db) => (globalThis.__kitAuth = createAuth(db))));
+  return (pending ??= Promise.all([database(), githubOAuthCreds()]).then(([db, gh]) => (globalThis.__kitAuth = createAuth(db, gh))));
 }
