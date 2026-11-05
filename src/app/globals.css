@@ -1,0 +1,231 @@
+@import "tailwindcss";
+
+/*
+ * Universal kit tokens (docs/factory/DESIGN_PLAYBOOK.md §3, §5, §6).
+ * PLACEHOLDER THEME: deliberately plain greys + one muted accent. Each product replaces ONLY the
+ * values in the two `:root` blocks below (from its docs/DESIGN.md). Components reference role tokens only.
+ */
+:root {
+  --font-display-family: var(--font-sc-display), ui-sans-serif, system-ui, sans-serif;
+  --font-sans-family: var(--font-sc-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono-family: var(--font-sc-mono), ui-monospace, monospace;
+
+  /* raw ramp: cool neutral, ink to paper (docs/DESIGN.md section 5) */
+  --n-0: #ffffff;
+  --n-50: #f7f9fa;
+  --n-100: #edf1f3;
+  --n-200: #d5dce0;
+  --n-300: #b8c3c9;
+  --n-400: #8a979e;
+  --n-500: #66737a;
+  --n-600: #4e5a61;
+  --n-700: #36424a;
+  --n-800: #232c31;
+  --n-900: #14191c;
+  --n-1000: #0b0f11;
+  --accent-500: #0b5d6b; /* inspection teal */
+  --accent-600: #084a55;
+
+  /* role tokens: light ("paper") */
+  --surface: var(--n-50);
+  --surface-raised: var(--n-0);
+  --surface-sunken: var(--n-100);
+  --surface-inverse: var(--n-900);
+  --text: var(--n-900);
+  --text-subtle: var(--n-600);
+  --text-muted: var(--n-500);
+  --text-inverse: var(--n-50);
+  --border: var(--n-200);
+  --border-strong: var(--n-300);
+  --action: var(--accent-500);
+  --action-hover: var(--accent-600);
+  --action-text: #ffffff;
+  --action-soft: #e6f1f3;
+  --focus: var(--accent-500);
+  --success: #1f7a3e;
+  --success-surface: #e5f2e9;
+  --warning: #7a5200;
+  --warning-surface: #fbf0d3;
+  --amber: #e8a200; /* fills only: squawk and torque tick; ink text on top, never white */
+  --danger: #b42318;
+  --danger-surface: #fbe7e5;
+  --info: #2f5c8a;
+  --info-surface: #e6eef6;
+  --hero-from: var(--text);
+  --hero-to: var(--text); /* solid hero heading: DESIGN.md section 12 override 3 */
+  --shadow-color: 205 20% 9%;
+  color-scheme: light;
+}
+
+:root[data-theme="dark"] {
+  --surface: #0f1417;
+  --surface-raised: #172026;
+  --surface-sunken: #0b0f11;
+  --surface-inverse: #e7edf0;
+  --text: #e7edf0;
+  --text-subtle: #9aa8b0;
+  --text-muted: #7f8d95;
+  --text-inverse: #0f1417;
+  --border: #2a363d;
+  --border-strong: #3a4952;
+  --action: #4fb3c3;
+  --action-hover: #79c7d3;
+  --action-text: #0f1417;
+  --action-soft: #14323a;
+  --focus: #4fb3c3;
+  --success: #4cc27a;
+  --success-surface: #14301f;
+  --warning: #f5b935;
+  --warning-surface: #3a2d0c;
+  --amber: #f5b935;
+  --danger: #f0645a;
+  --danger-surface: #3a1816;
+  --info: #7fa8d6;
+  --info-surface: #16283a;
+  --hero-from: var(--text);
+  --hero-to: var(--text);
+  --shadow-color: 0 0% 0%;
+  color-scheme: dark;
+}
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme inline {
+  --font-display: var(--font-display-family);
+  --font-sans: var(--font-sans-family);
+  --font-mono: var(--font-mono-family);
+
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-sunken: var(--surface-sunken);
+  --color-surface-inverse: var(--surface-inverse);
+  --color-text: var(--text);
+  --color-text-subtle: var(--text-subtle);
+  --color-text-muted: var(--text-muted);
+  --color-text-inverse: var(--text-inverse);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-action: var(--action);
+  --color-action-hover: var(--action-hover);
+  --color-action-text: var(--action-text);
+  --color-action-soft: var(--action-soft);
+  --color-amber: var(--amber);
+  --color-info: var(--info);
+  --color-info-surface: var(--info-surface);
+  --color-focus: var(--focus);
+  --color-success: var(--success);
+  --color-success-surface: var(--success-surface);
+  --color-warning: var(--warning);
+  --color-warning-surface: var(--warning-surface);
+  --color-danger: var(--danger);
+  --color-danger-surface: var(--danger-surface);
+
+  /* Spacing restricted to the playbook scale: 0 2 4 8 12 16 24 32 40 48 64 80 96 (+ layout widths). */
+  --spacing-*: initial;
+  --spacing: initial;
+  --spacing-0: 0px;
+  --spacing-px: 1px;
+  --spacing-0\.5: 2px;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-6: 24px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-11: 44px; /* min tap target */
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-20: 80px;
+  --spacing-24: 96px;
+
+  /* Radius personality: sharp (DESIGN.md section 7). Sheets and tables use rounded-none. */
+  --radius-xs: 2px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 4px;
+  --radius-xl: 6px;
+  --radius-2xl: 6px;
+  --radius-3xl: 6px;
+
+  --ease-out-kit: cubic-bezier(0.22, 1, 0.36, 1);
+  --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  --default-transition-duration: 300ms;
+}
+
+/* ---- Named type styles (playbook §5). Use these, never loose size+weight pairs. ---- */
+@utility heading-1 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 3.75rem; line-height: 1; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; }
+@utility heading-2 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 3rem; line-height: 1; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; }
+@utility heading-3 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; letter-spacing: -0.015em; text-wrap: balance; }
+@utility heading-4 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
+@utility heading-5 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 1.5rem; line-height: 2rem; font-weight: 700; text-wrap: balance; }
+@utility heading-6 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; text-wrap: balance; }
+@utility title-1 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; }
+@utility title-2 { font-size: 1.125rem; line-height: 1.75rem; font-weight: 500; }
+@utility title-3 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
+@utility title-4 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; }
+@utility title-5 { font-size: 0.75rem; line-height: 1rem; font-weight: 500; }
+@utility body-1 { font-size: 1rem; line-height: 1.5rem; font-weight: 600; text-wrap: pretty; }
+@utility body-2 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; text-wrap: pretty; }
+@utility body-3 { font-size: 1rem; line-height: 1.5rem; font-weight: 400; text-wrap: pretty; }
+@utility body-4 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; text-wrap: pretty; }
+@utility body-5 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; text-wrap: pretty; }
+@utility body-6 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 400; text-wrap: pretty; }
+@utility button-lg { font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; }
+@utility button-md { font-size: 1rem; line-height: 1.5rem; font-weight: 600; }
+@utility button-sm { font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; }
+@utility button-xsm { font-size: 0.75rem; line-height: 1rem; font-weight: 600; }
+@utility caption-1 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; }
+@utility caption-2 { font-size: 0.875rem; line-height: 1.25rem; font-weight: 400; }
+@utility caption-3 { font-size: 0.75rem; line-height: 1rem; font-weight: 600; }
+@utility caption-4 { font-size: 0.75rem; line-height: 1rem; font-weight: 500; }
+@utility caption-5 { font-size: 0.75rem; line-height: 1rem; font-weight: 400; }
+
+/* The only gradient allowed (playbook §6): hero heading text, left to right. */
+@utility hero-gradient-text {
+  background-image: linear-gradient(to right, var(--hero-from), var(--hero-to));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility focus-ring {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@layer base {
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-sans-family);
+    -webkit-font-smoothing: antialiased;
+  }
+  :focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+  ::selection { background: var(--action); color: var(--action-text); }
+  code, kbd, pre, samp { font-family: var(--font-mono-family); }
+}
+
+/* Scroll reveal (rise 32px + fade, once). Reduced motion: opacity only. */
+.kit-reveal { opacity: 0; transform: translateY(32px); transition: opacity 700ms var(--ease-out-kit), transform 700ms var(--ease-out-kit); }
+.kit-reveal[data-visible="true"] { opacity: 1; transform: none; }
+.kit-word { opacity: 0.3; transition: opacity 500ms var(--ease-out-kit); }
+.kit-word[data-on="true"] { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .kit-reveal { transform: none; transition: opacity 300ms var(--ease-out-kit); }
+  .kit-word { opacity: 1; transition: none; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+
+/* Stamp and numerals (signature element, DESIGN.md section 8). */
+@utility stamp-text { font-family: var(--font-display-family); font-variation-settings: "wdth" 87.5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; line-height: 1rem; }
+@utility mono-data { font-family: var(--font-mono-family); font-variant-numeric: tabular-nums; }
+@keyframes stamp-in { from { transform: rotate(-2deg) scale(1.06); opacity: 0; } to { transform: rotate(-2deg) scale(1); opacity: 1; } }
+.sc-stamp-in { animation: stamp-in 160ms cubic-bezier(0.3, 1.4, 0.6, 1) 400ms both; }
+@media (prefers-reduced-motion: reduce) { .sc-stamp-in { animation: none; } }
