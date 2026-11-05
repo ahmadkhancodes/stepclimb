@@ -1,9 +1,32 @@
 # Progress: Stepclimb by BufferSol
 
-## State (5 Nov 2026)
-- Phase 0 merged (PR #1); design approved by the orchestrator.
-- Engine modules built before kit-v1 (no UI): `engine/` with detection (22 tests), recipe engine (24 tests, hops 10 to 11, 11 to 12, 12 to 13 composer and skeleton recipes from the official upgrade guides) and repair pass (48 tests, 15 rules, redaction, signatures, loop). 94 tests green, typecheck clean.
-- Known gaps: skeleton file lists for 11 to 12 and 12 to 13 from memory (safe by construction); 3 repair rules and the Pint recipe unverified; no larastan rules; PHP minimum rules for hops 12 and 13 not confirmed.
-- DB: `DB_DRIVER=memory` until the orchestrator sends `MONGODB_URI`.
-- Waiting for: "kit-v1 ready". Next: copy kit, rename, apply DESIGN tokens, start M1.
-- Live URL: none yet.
+## State (5 Nov 2026, wind up for the day; resume 6 Nov 10:00 PKT)
+- **Merged to main:** PR #1 Phase 0 (design approved by the orchestrator), PR #2 engine modules (`detect`, `recipes`, `repair`, 94 tests).
+- **Open branch: `m1-foundation`** with a draft PR titled "WIP: M1 foundation and storefront" (kit-v1 copy, tokens, billing adaptation, GitHub sign in, app shell, landing and content pages in progress). Not merged: the landing page and content pages were still being built by two Sonnet agents when the session paused, so the checks were not re run on the final state.
+- **Kit:** copied from postslot at 03398f3 (tag kit-v1 is 35bdaa5 = 03398f3 + KIT_COPY rule updates; only rule differences: palette must not repeat another BufferSol product, deploy only to the new Vercel account, tags via workflow). No code change needed.
+- **Done in M1 so far:**
+  - Kit copied into the repo; engine moved to `src/lib/engine/*` (tests run with the kit's vitest, 139 passing at last full run); recipes in `recipes/`, repair rules in `repair-rules/`.
+  - Tokens (`src/app/globals.css`), fonts (`src/app/fonts.ts`: Archivo, Public Sans, IBM Plex Mono), sharp radius scale, solid hero heading.
+  - `src/config/product.ts`: Stepclimb plans (free, solo, legacy_solo, studio, legacy_studio, agency), meters (repos, seats, extended_verify, public_prs), `oneOffs`, interval `half` (every 6 months), per repo quantity on Solo plans (checkout adjustable quantity, entitlement `quantity`).
+  - Stripe test catalogue created through the connector: 11 products, 12 prices, ids in `docs/STRIPE.md`. Webhook endpoint and Customer Portal not set up yet.
+  - GitHub sign in wired in Better Auth (shows only when `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET` exist or the M2 manifest callback stores them).
+  - App shell renamed to Hangar with an empty state.
+  - Vercel project `stepclimb` (`prj_EhsJQAA5N2Mnbc5LNyLVJEfjMFsN`, team `team_rbOXRpz6zmliuGsw8eIh3YDw`) exists with Production and Preview env set (APP_NAME, NEXT_PUBLIC_APP_URL=https://stepclimb.vercel.app (unconfirmed host), DB_DRIVER=memory, BETTER_AUTH_SECRET, CRON_SECRET, ALTCHA_HMAC_KEY, APP_ENCRYPTION_KEY, console mailer). **No deployment yet.**
+- **Content pages agent (stopped early, compiles, never rendered or screenshotted):** done: `src/components/content/*` helpers, `src/content/compare.ts` and `src/content/dates.ts`, `/compare/laravelshift` and `/compare/ai-agents`. **Not done:** `/pricing` (still the kit page with form product FAQ), `/security`, `/guides` index, the three guides (`/guides/laravel-and-php-end-of-life-calendar`, `/laravel-12-to-13`, `/laravel-11-to-12`), docs (`src/content/docs/*`, still the form product), legal (`src/content/legal/*`), `src/app/sitemap.ts`, `llms*.txt`. `site-footer.tsx` links to removed `/compare/web3forms`: point it at `/compare/laravelshift`. Open question: brief says older jumps are "11.x at launch, 9.x and 10.x in v1" while SECTION_PLAN says 10 to 11, 11 to 12, 12 to 13 at launch; the pages use SECTION_PLAN wording (confirm).
+- **Landing agent (stopped early, compiles, never rendered):** done: `src/components/marketing/demo/*` (WorkOrderSheet, Stamp, RunwayBar, EolChip, HangarBoard, SquawkDrawer, CommitList, InspectionReport, AutopilotPr, SupportRunway, RunTimeline, PrCheck, VerifiedFragment, CustodyLines, BrandLockup, TorqueTick, sample `data.ts`), rate card `pricing-table.tsx`, floating `site-header.tsx`, `site-footer.tsx`. **Not done:** `src/app/(marketing)/page.tsx` is still a placeholder: compose Hero (with `#sample` anchor on the sheet), Problem, 5 tile bento, TaglineReveal (needs `max-w-3xl`, `heading-3 lg:heading-2`, TorqueTick), How it works, Rules not guesses, For agencies, Compare, Pricing, Security 4 lines, FAQ (10 items with JSON-LD), Final CTA (kit card is rounded: restyle). Delete unused kit `hero.tsx`, `features.tsx`, `how-it-works.tsx`, `problem.tsx`, `proof.tsx` (keep `compare-table.tsx`, `faq.tsx`, `final-cta.tsx`). Known lint risks: arbitrary values (`border-[1.5px]`, `outline-offset-[5px]`, `shadow-[...]`) and unverified `rounded` and `duration-400` utilities in Tailwind v4; run the greps.
+- **Not done:** first deploy, Stripe webhook, Playwright screenshots in `docs/qa/`, Lighthouse, design scorecard, invoices PDF, legal review.
+- DB: `DB_DRIVER=memory` until the orchestrator sends `MONGODB_URI`. Stripe key (`STRIPE_SECRET_KEY_TEST`), Resend and Cloudflare keys not yet provided.
+- Live URL: none.
+
+## Next steps tomorrow (fresh session)
+1. Read CLAUDE.md, this file, DECISIONS.md, ROADMAP.md. `git checkout m1-foundation && git pull`, `npm ci`.
+2. Finish the content pages listed above (a fresh Sonnet agent with the same brief works well: see SECTION_PLAN 'Other marketing pages'). Finish the landing page composition (see Landing agent note above). Run `npx tsc --noEmit`, `npm run lint`, `npm test`, `npm run build`; fix whatever is unfinished (`git status`, search for `TODO`).
+3. Run `npm run dev`, take Playwright screenshots at 375 and 1440, light and dark, of `/`, `/pricing`, `/security`, `/compare/laravelshift`, `/guides`, `/laravel-12-to-13`, `/sign-in`, `/app` into `docs/qa/`; compare against `docs/design/mock-1440.png`, score `docs/design-qa.md` per DESIGN_PLAYBOOK section 9, run its greps (`text-[`, `bg-gradient`, banned words, `href="#"`).
+4. Update `docs/MANUAL_STEPS.md` item 1 once the host is known; confirm the production host (`stepclimb.vercel.app` or the generated alias) and fix `NEXT_PUBLIC_APP_URL` in the Vercel env if it differs.
+5. Deploy: `scripts/deploy.sh stepclimb` (uses `VERCEL_TOKEN_NEW_ACCOUNT`, team `team_rbOXRpz6zmliuGsw8eIh3YDw`; never the old account or the Vercel MCP), then `scripts/vercel-keep-latest-3.sh stepclimb`. Smoke test `/api/health` and `/`.
+6. Stripe: create the webhook endpoint `<host>/api/stripe/webhook` with the events in KIT_COPY.md section 3 once `STRIPE_SECRET_KEY_TEST` exists (the connector can create it; put `whsec_` in Vercel env `STRIPE_WEBHOOK_SECRET`), add `STRIPE_SECRET_KEY` to Vercel env. Add the Customer Portal step to MANUAL_STEPS.md (https://dashboard.stripe.com/test/settings/billing/portal).
+7. Mongo: when the orchestrator sends `MONGODB_URI`, set `MONGODB_URI`, `MONGODB_DB=stepclimb` in Vercel, run `npm run db:indexes`, remove `DB_DRIVER=memory`.
+8. Cloudflare cron worker (`infra/cron-worker`) when `CLOUDFLARE_SAAS_TOKEN` exists; DNS record for `stepclimb.buffersoltech.com`.
+9. Add a unit test for per repo quantity in `limitFor` and for the `half` interval in `tests/unit/billing.test.ts`.
+10. Mark the PR ready, merge (squash) when checks are green, update this file, send the orchestrator the one line for M1. Then M2 per `docs/ROADMAP.md` (GitHub App manifest page `/setup/github-app`, installations sync, `detectApp` on real repos, Hangar board, free scan, runner snapshot spike for PHP 8.2 to 8.5).
+11. Tell the orchestrator for `PALETTE_REGISTRY.md`: Stepclimb primary is teal `#0B5D6B` (dark `#4FB3C3`), amber `#E8A200` for warnings only.
