@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Section } from "@/components/ui/layout";
+import { TorqueTick } from "./demo/torque-tick";
 
 /** A large statement whose words light up one by one as it scrolls through the viewport. */
 export function TaglineReveal({ text, label }: { text: string; label?: string }) {
@@ -36,8 +37,9 @@ export function TaglineReveal({ text, label }: { text: string; label?: string })
 
   return (
     <Section>
+      <TorqueTick className="mb-6" />
       {label ? <p className="caption-3 mb-6 text-text-subtle">{label}</p> : null}
-      <p ref={ref} className="heading-4 md:heading-1 max-w-5xl text-text">
+      <p ref={ref} className="heading-3 lg:heading-2 max-w-3xl text-text">
         {words.map((w, i) => (
           <span key={i} className="kit-word" data-on={i < active}>
             {w}{" "}

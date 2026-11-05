@@ -1,3 +1,5 @@
+import { compareEntries } from "@/content/compare";
+import { guides } from "@/content/guides";
 import { docs } from "@/content/docs";
 import { legalDocs } from "@/content/legal";
 import { product } from "@/config/product";
@@ -17,8 +19,18 @@ export function GET() {
     "",
     "## Product",
     "",
-    `- [Pricing](${u("/pricing")}): Plans and limits`,
+    `- [Pricing](${u("/pricing")}): Rate card, plan limits and billing questions`,
+    `- [Security and code custody](${u("/security")}): Where your code goes during an upgrade run`,
     `- [Full documentation as one file](${u("/llms-full.txt")}): All docs in markdown`,
+    "",
+    "## Guides",
+    "",
+    ...guides.map((g) => `- [${g.title}](${u(g.path)}): ${g.description}`),
+    "",
+    "## Compare",
+    "",
+    ...compareEntries.map((c) => `- [${c.title}](${u(`/compare/${c.slug}`)}): ${c.description}`),
+    `- [${product.fullName} compared with AI coding agents](${u("/compare/ai-agents")}): Repeatable results, tokens, scheduling and a fleet view`,
     "",
     "## Legal",
     "",

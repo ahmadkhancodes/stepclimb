@@ -10,7 +10,7 @@ export const dpa: LegalDoc = {
       id: "scope",
       title: "Scope and roles",
       body: [
-        `This addendum applies when ${p.legal.entity} processes personal data in form submissions on your behalf. You are the controller and we are the processor. It forms part of the terms of service.`,
+        `This addendum applies when ${p.legal.entity} processes personal data contained in your repositories on your behalf, for example author names and email addresses in commit history and code, while running an upgrade. You are the controller and we are the processor. It forms part of the terms of service.`,
       ],
     },
     {
@@ -19,10 +19,10 @@ export const dpa: LegalDoc = {
       body: [
         {
           list: [
-            "Subject matter: receiving, storing, filtering and delivering form submissions.",
+            "Subject matter: reading repository contents in an isolated sandbox to apply and verify upgrade changes, and opening pull requests on your repository. Customer code is not retained after a run.",
             "Duration: while your account is open, plus the deletion period in the privacy policy.",
-            "Data subjects: people who submit your forms.",
-            "Data types: whatever fields and files your forms collect, plus IP address and user agent for spam checks.",
+            "Data subjects: people whose personal data appears in your repositories, such as developers and, if present in code or test fixtures, your users.",
+            "Data types: whatever your repositories contain. A free inspection reads only composer.json and composer.lock. Run logs are kept for 30 days with secrets redacted.",
           ],
         },
       ],

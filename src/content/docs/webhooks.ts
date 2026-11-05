@@ -22,7 +22,7 @@ export const webhooks: DocPage = {
     {
       heading: "Verify a signature in Node",
       body: [
-        "Use the raw body, not a re-serialized one. Compare in constant time and reject old timestamps to stop replays.",
+        "Use the raw body, not a reserialized one. Compare in constant time and reject old timestamps to stop replays.",
       ],
       code: {
         lang: "js",

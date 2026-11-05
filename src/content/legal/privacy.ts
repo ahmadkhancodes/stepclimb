@@ -11,7 +11,7 @@ export const privacy: LegalDoc = {
       title: "Who we are",
       body: [
         `${p.name} is operated by ${p.legal.entity}, ${p.legal.address}. This policy explains what personal data we handle when you visit ${p.host}, create an account or use the service.`,
-        `For account and billing data we are the controller. For form submissions that your visitors send to your endpoints, you are the controller and we are your processor. The data processing addendum covers that second case.`,
+        `For account and billing data we are the controller. For the contents of repositories you ask us to upgrade, you are the controller and we are your processor. The data processing addendum covers that second case.`,
       ],
     },
     {
@@ -21,14 +21,14 @@ export const privacy: LegalDoc = {
         "We collect only what we need to run the service.",
         {
           list: [
-            "Account data: your email address, name if you give one, and sign in credentials such as passkeys or two factor settings.",
+            "Account data: your email address, name if you give one, and your GitHub account identifier and username, and two factor settings if you turn them on.",
             "Organization data: workspace name, members, roles, API keys (stored hashed) and the settings you configure.",
             "Billing data: your plan and subscription status. Card details go straight to Stripe and never touch our servers.",
-            "Form submissions: the fields and files that visitors of your sites send to your endpoints, plus delivery receipts and spam verdicts. You receive this data and we store it for you.",
+            "Repository data: a free inspection reads composer.json and composer.lock only. An upgrade run clones the repository into an isolated sandbox that is destroyed when the run ends. We do not retain customer code. Run logs are kept for 30 days with secrets redacted.",
             "Technical data: IP address, browser type and request logs, kept briefly for security, abuse prevention and debugging.",
           ],
         },
-        "We do not sell personal data and we do not use submission content for advertising or to train models.",
+        "We do not sell personal data and we do not use repository content for advertising or to train models. Nothing from your repositories is sent to an AI service.",
       ],
     },
     {
@@ -38,7 +38,7 @@ export const privacy: LegalDoc = {
         "If you are in the European Economic Area or the United Kingdom, we rely on these legal bases under the GDPR and UK GDPR.",
         {
           list: [
-            "Contract: to create your account, deliver submissions and bill you.",
+            "Contract: to create your account, run the upgrades you ask for and bill you.",
             "Legitimate interests: to secure the service, prevent abuse and spam, and keep records that let us fix problems.",
             "Legal obligation: to keep tax and accounting records.",
             "Consent: for optional communications, which you can withdraw at any time.",
@@ -60,7 +60,7 @@ export const privacy: LegalDoc = {
         {
           list: [
             "Account and organization data is kept while your account is open.",
-            "Submissions are kept for the history period of your plan, then deleted.",
+            "Customer code is not kept after a run. Run logs are deleted after 30 days.",
             "After you delete your account we remove your data within 30 days, except billing records we must keep by law, which are kept for the period the law requires.",
             "Server logs are kept for up to 30 days.",
             "Backups roll off within 35 days after deletion.",

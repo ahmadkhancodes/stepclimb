@@ -9,7 +9,7 @@ import { json, withApi } from "@/lib/http";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-/** ?refresh=1 asks Stripe directly so a plan unlocks right after checkout without waiting for the webhook (C-13). */
+/** ?refresh=1 asks Stripe directly so a plan applies right after checkout without waiting for the webhook (C-13). */
 export const GET = withApi(async (req) => {
   const ctx = await requireOrg();
   const db = await getDb();

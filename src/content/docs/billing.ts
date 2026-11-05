@@ -12,7 +12,7 @@ export const billing: DocPage = {
       heading: "Plans",
       body: p.plans.map((pl) => {
         const prices = pl.prices.length
-          ? pl.prices.map((x) => `${money(x.usd)} per ${x.interval}`).join(" or ")
+          ? pl.prices.map((x) => `${money(x.usd)} ${x.interval === "half" ? "every 6 months" : `per ${x.interval}`}${pl.perRepo ? " per repo" : ""}`).join(" or ")
           : "free";
         return `${pl.name} (${prices}): ${pl.highlights.join(", ")}.`;
       }),
@@ -26,7 +26,7 @@ export const billing: DocPage = {
     {
       heading: "Customer portal",
       body: [
-        "Use the portal to change plan, update your card, download invoices and cancel anytime. Open it from Settings, then Billing, then Manage billing. A cancelled plan stays active until the end of the period you paid for.",
+        "Use the portal to change plan, update your card, download invoices and cancel at period end. Open it from Settings, then Billing, then Manage billing. A cancelled plan stays active until the end of the period you paid for.",
       ],
     },
     {

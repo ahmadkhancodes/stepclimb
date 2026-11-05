@@ -143,6 +143,13 @@
   --spacing-16: 64px;
   --spacing-20: 80px;
   --spacing-24: 96px;
+  --spacing-32: 128px;
+  --spacing-40: 160px;
+  --spacing-96: 384px;
+  --spacing-120: 480px;
+  --spacing-144: 576px;
+  --spacing-160: 640px;
+  --spacing-176: 704px;
 
   /* Radius personality: sharp (DESIGN.md section 7). Sheets and tables use rounded-none. */
   --radius-xs: 2px;
@@ -186,13 +193,8 @@
 @utility caption-4 { font-size: 0.75rem; line-height: 1rem; font-weight: 500; }
 @utility caption-5 { font-size: 0.75rem; line-height: 1rem; font-weight: 400; }
 
-/* The only gradient allowed (playbook §6): hero heading text, left to right. */
-@utility hero-gradient-text {
-  background-image: linear-gradient(to right, var(--hero-from), var(--hero-to));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
+/* Stamp double rule (inner outline). */
+@utility stamp-rule { outline-width: 1.5px; outline-style: solid; outline-offset: -5px; border-width: 1.5px; }
 
 @utility focus-ring {
   outline: 2px solid var(--focus);

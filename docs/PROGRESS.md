@@ -1,5 +1,7 @@
 # Progress: Stepclimb by BufferSol
 
+- 2026-11-05 M1 code done on main (M1-B): landing composed, /pricing, /security, /compare/laravelshift, /guides and guides written, TODOs cleared, billing tests for per repo quantity and `half` added, QA screenshots in `docs/qa/`, scorecard in `docs/design-qa.md` (43/50). lint, typecheck, 144 tests and build green (build needs BETTER_AUTH_SECRET etc. set). **Deploy pending (orchestrator).** Next: M2 per docs/ROADMAP.md. Open: refund policy and legal placeholders in terms.ts, hop coverage wording, signed in /app screenshots.
+
 ## State (5 Nov 2026, wind up for the day; resume 6 Nov 10:00 PKT)
 - **Merged to main:** PR #1 Phase 0 (design approved by the orchestrator), PR #2 engine modules (`detect`, `recipes`, `repair`, 94 tests).
 - **Open branch: `m1-foundation`** with a draft PR titled "WIP: M1 foundation and storefront" (kit-v1 copy, tokens, billing adaptation, GitHub sign in, app shell, landing and content pages in progress). Not merged: the landing page and content pages were still being built by two Sonnet agents when the session paused, so the checks were not re run on the final state.

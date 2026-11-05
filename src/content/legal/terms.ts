@@ -35,7 +35,7 @@ export const terms: LegalDoc = {
         {
           list: p.plans.map((pl) => {
             const prices = pl.prices.length
-              ? pl.prices.map((x) => `$${(x.usd / 100).toFixed(2)} per ${x.interval}`).join(" or ")
+              ? pl.prices.map((x) => `$${(x.usd / 100).toFixed(2)} ${x.interval === "half" ? "every 6 months" : `per ${x.interval}`}${pl.perRepo ? " per repo" : ""}`).join(" or ")
               : "free";
             return `${pl.name}: ${prices}.`;
           }),
@@ -47,7 +47,7 @@ export const terms: LegalDoc = {
       id: "cancel-refunds",
       title: "Cancellation and refunds",
       body: [
-        "You can cancel anytime from the customer portal in Settings, then Billing. Your plan stays active until the end of the period you paid for.",
+        "You can cancel from the customer portal in Settings, then Billing. Your plan stays active until the end of the period you paid for.",
         "Refunds: {{refund policy}}",
       ],
     },
@@ -60,7 +60,7 @@ export const terms: LegalDoc = {
       id: "your-data",
       title: "Your data",
       body: [
-        "You own your content and submissions. You give us a limited license to host, process and deliver it to run the service. You are responsible for having a lawful basis to collect the data your forms gather and for telling your visitors how it is used.",
+        "You own your code and content. You give us a limited license to read, process and modify your repositories, in an isolated sandbox, to run the upgrades you ask for and open pull requests. You are responsible for having the right to let us work on each repository you connect. We never merge for you: every pull request waits for your review.",
       ],
     },
     {

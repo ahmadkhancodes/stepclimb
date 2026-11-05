@@ -19,8 +19,8 @@ export const acceptableUse: LegalDoc = {
           list: [
             "Break the law or help others do so.",
             "Collect data without a lawful basis or without telling the people who submit it.",
-            "Send spam, phishing or malware, or use the service to relay unsolicited bulk email.",
-            "Collect payment card numbers, government ID numbers, passwords or health records through a form unless we agree in writing.",
+            "Run code that mines cryptocurrency, sends spam or attacks other systems inside a sandbox, or use the sandbox for anything other than upgrading and verifying your own repositories.",
+            "Run upgrades on repositories you are not allowed to change, or use the free tier with accounts created to get around its limits.",
             "Infringe intellectual property or privacy rights.",
             "Probe, scan or attack the service, or bypass rate limits and quotas.",
             "Resell the service as your own without an Agency plan or written permission.",
@@ -33,13 +33,13 @@ export const acceptableUse: LegalDoc = {
       id: "enforcement",
       title: "Enforcement",
       body: [
-        "We may hold submissions, suspend forms or close accounts that break this policy. Where we can, we warn you first and give you time to fix the problem. For serious abuse we act immediately.",
+        "We may stop runs, suspend access or close accounts that break this policy. Where we can, we warn you first and give you time to fix the problem. For serious abuse we act immediately.",
       ],
     },
     {
       id: "report",
       title: "Report abuse",
-      body: [`Email ${p.supportEmail} with the form URL and what you saw.`],
+      body: [`Email ${p.supportEmail} with the repository or account involved and what you saw.`],
     },
   ],
 };

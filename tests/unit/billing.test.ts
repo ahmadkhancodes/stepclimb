@@ -3,7 +3,8 @@ import { createMemoryDb } from "@/lib/db/memory";
 import type { Db } from "@/lib/db/types";
 import { clearPriceCache } from "@/lib/billing/catalog";
 import { createCheckoutSession, createPortalSession } from "@/lib/billing/checkout";
-import { NONE, effectivePlan, invoiceSubscriptionId, lifetimeEntitlement, periodEndOf, requirePlan } from "@/lib/billing/entitlement";
+import { NONE, effectivePlan, invoiceSubscriptionId, lifetimeEntitlement, limitFor, periodEndOf, requirePlan } from "@/lib/billing/entitlement";
+import { planById } from "@/config/product";
 import { handleStripeWebhook } from "@/lib/billing/webhook";
 import { event, fakeStripe } from "./fakes";
 
@@ -183,5 +184,38 @@ describe("gating", () => {
     const e = { ...NONE(NOW), isPaid: true, status: "active" as const, plan: "agency" as const, expiresAt: NOW - 10 * 864e5 };
     expect(effectivePlan(e, NOW).id).toBe("free"); // missed webhook cannot keep a plan on forever
     expect(requirePlan({ ...e, expiresAt: NOW + 864e5 }, "studio", NOW).id).toBe("agency");
+  });
+});
+
+describe("per repo quantity and the 6 month interval", () => {
+  const solo = (quantity: number) => ({ ...NONE(NOW), isPaid: true, status: "active" as const, plan: "solo" as const, quantity, expiresAt: NOW + 864e5 });
+
+  it("limitFor uses the paid quantity as the repo limit on per repo plans", () => {
+    expect(limitFor(solo(7), "repos", NOW)).toBe(7);
+    expect(limitFor(solo(0), "repos", NOW)).toBe(1);
+    expect(limitFor({ ...solo(3), plan: "legacy_solo" }, "repos", NOW)).toBe(3);
+  });
+
+  it("limitFor ignores quantity on other meters and on flat plans", () => {
+    expect(limitFor(solo(7), "seats", NOW)).toBe(1);
+    expect(limitFor({ ...solo(7), plan: "studio" }, "seats", NOW)).toBe(5);
+    expect(limitFor({ ...solo(7), plan: "studio" }, "repos", NOW)).toBe(200);
+  });
+
+  it("an expired per repo plan falls back to the free plan limit", () => {
+    expect(limitFor({ ...solo(7), expiresAt: NOW - 10 * 864e5 }, "repos", NOW)).toBe(0);
+  });
+
+  it("the half interval is a 6 month price priced at $74 and $474", () => {
+    const l = planById("legacy_solo")!.prices[0]!;
+    expect(l).toMatchObject({ interval: "half", usd: 7400 });
+    expect(planById("legacy_studio")!.prices[0]).toMatchObject({ interval: "half", usd: 47400 });
+  });
+
+  it("legacy_solo checkout resolves the semiannual price (interval_count 6)", async () => {
+    await createCheckoutSession(f.stripe, db, subject, "legacy_solo", "half", urls);
+    const call = f.calls.find((c) => c.method === "checkout.sessions.create")!.args as Record<string, any>;
+    expect(call.line_items[0].price).toBe("price_legacy_solo_h");
+    expect(call.subscription_data.metadata).toMatchObject({ plan: "legacy_solo", interval: "half" });
   });
 });

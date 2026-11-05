@@ -47,7 +47,7 @@ export function ReturnStamp({
       aria-label={label}
       style={{ transform: "rotate(-2deg)" }}
       className={cn(
-        "inline-block rounded-sm border-[1.5px] px-3 py-2 text-center outline outline-[1.5px] -outline-offset-[5px]",
+        "inline-block rounded-sm stamp-rule px-3 py-2 text-center",
         verified ? "border-success text-success outline-success" : "border-black bg-amber text-black outline-black",
         animate && "sc-stamp-in",
         className,
