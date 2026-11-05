@@ -1,0 +1,54 @@
+# Verified against https://laravel.com/docs/11.x/upgrade ("Updating Dependencies", PHP 8.2.0 Required, Spatie Once Package, Doctrine DBAL Removal)
+key: laravel-10-to-11.composer
+version: 1.0.0
+pathKind: laravel
+from: 10
+to: 11
+engine: composer_json
+title: Update composer.json for Laravel 11
+summary: Raises the PHP minimum to 8.2, moves laravel/framework to ^11.0 and bumps the first party packages the 11.x upgrade guide lists.
+guard:
+  composer:
+    laravel/framework: "^10.0"
+params:
+  php:
+    min: "8.2"
+  packages:
+    - { name: laravel/framework, constraint: "^11.0", section: require }
+    - { name: nunomaduro/collision, constraint: "^8.1", section: require-dev }
+    - { name: laravel/breeze, constraint: "^2.0" }
+    - name: laravel/cashier
+      constraint: "^15.0"
+      note: { severity: must_fix, title: "Publish Cashier Stripe migrations", body: "Cashier Stripe 15 no longer loads its own migrations. Run `php artisan vendor:publish --tag=cashier-migrations`. See the Cashier Stripe 15.x UPGRADE.md for other breaking changes." }
+    - { name: laravel/dusk, constraint: "^8.0" }
+    - { name: laravel/jetstream, constraint: "^5.0" }
+    - { name: laravel/octane, constraint: "^2.3" }
+    - name: laravel/passport
+      constraint: "^12.0"
+      note: { severity: must_fix, title: "Publish Passport migrations and review the password grant", body: "Passport 12 no longer loads its own migrations: run `php artisan vendor:publish --tag=passport-migrations`. The password grant is disabled by default; call `Passport::enablePasswordGrant()` in AppServiceProvider::boot if you use it." }
+    - name: laravel/sanctum
+      constraint: "^4.0"
+      note: { severity: must_fix, title: "Publish Sanctum migrations and update config/sanctum.php", body: "Sanctum 4 no longer loads its own migrations: run `php artisan vendor:publish --tag=sanctum-migrations`. In config/sanctum.php set the middleware references: authenticate_session => Laravel\\Sanctum\\Http\\Middleware\\AuthenticateSession::class, encrypt_cookies => Illuminate\\Cookie\\Middleware\\EncryptCookies::class, validate_csrf_token => Illuminate\\Foundation\\Http\\Middleware\\ValidateCsrfToken::class." }
+    - { name: laravel/scout, constraint: "^10.0" }
+    - name: laravel/spark-stripe
+      constraint: "^5.0"
+      note: { severity: must_fix, title: "Publish Spark Stripe migrations", body: "Spark Stripe 5 no longer loads its own migrations: run `php artisan vendor:publish --tag=spark-migrations`." }
+    - name: laravel/telescope
+      constraint: "^5.0"
+      note: { severity: must_fix, title: "Publish Telescope migrations", body: "Telescope 5 no longer loads its own migrations: run `php artisan vendor:publish --tag=telescope-migrations`." }
+    - { name: livewire/livewire, constraint: "^3.4" }
+    - { name: inertiajs/inertia-laravel, constraint: "^1.0" }
+    # The 11.x guide gives no version for these, so they are reported, not changed.
+    - { name: laravel/tinker, unverified: true, severity: note }
+    - { name: laravel/sail, unverified: true, severity: note }
+    - { name: laravel/pint, unverified: true, severity: note }
+    - { name: phpunit/phpunit, unverified: true, severity: review }
+    - { name: pestphp/pest, unverified: true, severity: review }
+  remove:
+    - name: spatie/once
+      note: { severity: note, title: "Removed spatie/once", body: "Laravel 11 ships its own once() helper; the guide says to remove spatie/once to avoid conflicts." }
+    - name: doctrine/dbal
+      optional: true
+      note: { severity: note, title: "doctrine/dbal can be removed", body: "Laravel 11 no longer depends on doctrine/dbal. The guide says you may remove it. Stepclimb left it because your own code might use it directly." }
+sources:
+  - https://laravel.com/docs/11.x/upgrade

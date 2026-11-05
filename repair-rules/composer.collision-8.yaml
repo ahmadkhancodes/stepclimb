@@ -1,0 +1,20 @@
+key: composer.collision-8
+category: composer
+version: "11"
+title: Laravel 11 requires nunomaduro/collision ^8.1
+# Matches Composer solver output that names the package as a root requirement; the guard
+# makes sure composer.json really declares a constraint outside the supported range.
+signature: '(?:Root composer\.json requires|Root composer\.json and) nunomaduro/collision (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: nunomaduro/collision
+  notSatisfies: "^8.1"
+fix:
+  kind: composer_constraint
+  params:
+    package: nunomaduro/collision
+    constraint: "^8.1"
+    section: require-dev
+sources:
+  - https://laravel.com/docs/11.x/upgrade#updating-dependencies
+unverified: false

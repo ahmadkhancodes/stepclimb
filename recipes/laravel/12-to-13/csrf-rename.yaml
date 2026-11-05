@@ -1,0 +1,16 @@
+key: laravel-12-to-13.csrf-rename
+version: 1.0.0
+pathKind: laravel
+from: 12
+to: 13
+engine: file_patch
+title: Rename VerifyCsrfToken references to PreventRequestForgery
+summary: The 13.x guide renames the CSRF middleware to PreventRequestForgery (old names stay as deprecated aliases) and adds a preventRequestForgery(...) middleware API.
+# unverified: the guide shows the class rename but not the exact replacement for bootstrap/app.php configuration, so nothing is rewritten automatically.
+unverified: true
+params:
+  files:
+    - path: bootstrap/app.php
+      replacements: []
+sources:
+  - https://laravel.com/docs/13.x/upgrade

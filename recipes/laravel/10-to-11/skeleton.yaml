@@ -1,0 +1,29 @@
+key: laravel-10-to-11.skeleton
+version: 1.0.0
+pathKind: laravel
+from: 10
+to: 11
+engine: skeleton_diff
+title: Review skeleton and config changes for Laravel 11
+summary: Laravel 11 introduces a slimmer application structure. The upgrade guide recommends that 10.x apps do NOT migrate to it, so no automatic merge is done.
+# unverified: the 11.x guide says the new structure is not recommended for upgrading apps and does not list which skeleton files are safe to merge.
+unverified: true
+params:
+  files:
+    - artisan
+    - public/index.php
+    - bootstrap/app.php
+    - config/app.php
+    - config/auth.php
+    - config/cache.php
+    - config/database.php
+    - config/filesystems.php
+    - config/logging.php
+    - config/mail.php
+    - config/queue.php
+    - config/services.php
+    - config/session.php
+    - config/hashing.php
+sources:
+  - https://laravel.com/docs/11.x/upgrade
+  - https://github.com/laravel/laravel/compare/10.x...11.x

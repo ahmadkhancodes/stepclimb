@@ -1,0 +1,30 @@
+# Verified: https://laravel.com/docs/13.x/upgrade (framework ^13.0, boost ^2.0, tinker ^3.0, phpunit ^12.0, pest ^4.0)
+# Verified: https://laravel.com/docs/13.x/releases ("Laravel 13.x requires a minimum PHP version of 8.3")
+key: laravel-12-to-13.composer
+version: 1.0.0
+pathKind: laravel
+from: 12
+to: 13
+engine: composer_json
+title: Update composer.json for Laravel 13
+summary: Raises the PHP minimum to 8.3, moves laravel/framework to ^13.0 and bumps boost, tinker, phpunit and pest to the versions the 13.x upgrade guide lists.
+guard:
+  composer:
+    laravel/framework: "^12.0"
+params:
+  php:
+    min: "8.3"
+  packages:
+    - { name: laravel/framework, constraint: "^13.0", section: require }
+    - { name: laravel/boost, constraint: "^2.0" }
+    - { name: laravel/tinker, constraint: "^3.0" }
+    - { name: phpunit/phpunit, constraint: "^12.0", section: require-dev }
+    - { name: pestphp/pest, constraint: "^4.0", section: require-dev }
+    # Not listed in the 13.x guide: reported, not changed.
+    - { name: laravel/sail, unverified: true, severity: note }
+    - { name: laravel/pint, unverified: true, severity: note }
+    - { name: laravel/sanctum, unverified: true, severity: note }
+    - { name: nunomaduro/collision, unverified: true, severity: note }
+sources:
+  - https://laravel.com/docs/13.x/upgrade
+  - https://laravel.com/docs/13.x/releases

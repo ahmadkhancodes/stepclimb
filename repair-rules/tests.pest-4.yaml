@@ -1,0 +1,20 @@
+key: tests.pest-4
+category: tests
+version: "13"
+title: Laravel 13 requires pestphp/pest ^4.0
+# Matches Composer solver output that names the package as a root requirement; the guard
+# makes sure composer.json really declares a constraint outside the supported range.
+signature: '(?:Root composer\.json requires|Root composer\.json and) pestphp/pest (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: pestphp/pest
+  notSatisfies: "^4.0"
+fix:
+  kind: composer_constraint
+  params:
+    package: pestphp/pest
+    constraint: "^4.0"
+    section: require-dev
+sources:
+  - https://laravel.com/docs/13.x/upgrade#updating-dependencies
+unverified: false

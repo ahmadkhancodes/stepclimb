@@ -1,0 +1,17 @@
+key: php.csrf-middleware-renamed
+category: php
+version: "13"
+title: Rename VerifyCsrfToken references to PreventRequestForgery (Laravel 13)
+# Failure text is a guess; the old names remain as deprecated aliases in 13.x per the upgrade guide.
+signature: 'Illuminate\\Foundation\\Http\\Middleware\\(?:VerifyCsrfToken|ValidateCsrfToken)[^\n]*(?:deprecated|not found)'
+fix:
+  kind: rector_rule
+  params:
+    rule: Rector\Renaming\Rector\Name\RenameClassRector
+    paths: [app, bootstrap, tests]
+    config:
+      Illuminate\Foundation\Http\Middleware\VerifyCsrfToken: Illuminate\Foundation\Http\Middleware\PreventRequestForgery
+      Illuminate\Foundation\Http\Middleware\ValidateCsrfToken: Illuminate\Foundation\Http\Middleware\PreventRequestForgery
+sources:
+  - https://laravel.com/docs/13.x/upgrade#request-forgery-protection
+unverified: true
