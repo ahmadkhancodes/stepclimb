@@ -1,0 +1,18 @@
+key: composer.spatie-once-remove
+category: composer
+version: "11"
+title: Remove spatie/once, Laravel 11 ships its own once() helper
+# Failure text is a guess (redeclared function or Composer conflict naming the package).
+signature: '(?:Cannot redeclare once\(\)|Root composer\.json requires spatie/once)'
+contextGuard:
+  kind: composer_constraint
+  package: spatie/once
+  satisfies: "*"
+fix:
+  kind: composer_constraint
+  params:
+    package: spatie/once
+    remove: true
+sources:
+  - https://laravel.com/docs/11.x/upgrade#spatie-once-package
+unverified: true

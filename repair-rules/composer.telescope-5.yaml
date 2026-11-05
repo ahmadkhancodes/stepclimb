@@ -1,0 +1,19 @@
+key: composer.telescope-5
+category: composer
+version: "11"
+title: Laravel 11 requires laravel/telescope ^5.0
+# Matches Composer solver output that names the package as a root requirement; the guard
+# makes sure composer.json really declares a constraint outside the supported range.
+signature: '(?:Root composer\.json requires|Root composer\.json and) laravel/telescope (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: laravel/telescope
+  notSatisfies: "^5.0"
+fix:
+  kind: composer_constraint
+  params:
+    package: laravel/telescope
+    constraint: "^5.0"
+sources:
+  - https://laravel.com/docs/11.x/upgrade#telescope
+unverified: false

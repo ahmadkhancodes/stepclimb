@@ -1,0 +1,22 @@
+key: build.sanctum-middleware-config
+category: build
+version: "11"
+title: Point config/sanctum.php middleware at the framework classes (Sanctum 4)
+# Failure text is a guess: Laravel 11 apps have no App\\Http\\Middleware classes, so the old references fail at runtime.
+signature: 'Class "App\\Http\\Middleware\\(?<cls>VerifyCsrfToken|EncryptCookies)" not found'
+contextGuard:
+  kind: file_regex
+  path: config/sanctum.php
+  pattern: 'App\\Http\\Middleware'
+fix:
+  kind: config_patch
+  params:
+    file: config/sanctum.php
+    replace:
+      - pattern: '''encrypt_cookies''\s*=>\s*[^,\n]+,'
+        replacement: '''encrypt_cookies'' => Illuminate\Cookie\Middleware\EncryptCookies::class,'
+      - pattern: '''(?:verify|validate)_csrf_token''\s*=>\s*[^,\n]+,'
+        replacement: '''validate_csrf_token'' => Illuminate\Foundation\Http\Middleware\ValidateCsrfToken::class,'
+sources:
+  - https://laravel.com/docs/11.x/upgrade#sanctum
+unverified: true

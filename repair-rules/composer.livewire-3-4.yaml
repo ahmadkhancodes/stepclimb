@@ -1,0 +1,19 @@
+key: composer.livewire-3-4
+category: composer
+version: "11"
+title: Laravel 11 requires livewire/livewire ^3.4
+# Matches Composer solver output that names the package as a root requirement; the guard
+# makes sure composer.json really declares a constraint outside the supported range.
+signature: '(?:Root composer\.json requires|Root composer\.json and) livewire/livewire (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: livewire/livewire
+  notSatisfies: "^3.4"
+fix:
+  kind: composer_constraint
+  params:
+    package: livewire/livewire
+    constraint: "^3.4"
+sources:
+  - https://laravel.com/docs/11.x/upgrade#updating-dependencies
+unverified: false

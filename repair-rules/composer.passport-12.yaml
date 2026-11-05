@@ -1,0 +1,20 @@
+key: composer.passport-12
+category: composer
+version: "11"
+title: Laravel 11 requires laravel/passport ^12.0
+# Matches Composer solver output that names the package as a root requirement; the guard
+# makes sure composer.json really declares a constraint outside the supported range.
+signature: '(?:Root composer\.json requires|Root composer\.json and) laravel/passport (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: laravel/passport
+  notSatisfies: "^12.0"
+fix:
+  kind: composer_constraint
+  params:
+    package: laravel/passport
+    constraint: "^12.0"
+    section: require
+sources:
+  - https://laravel.com/docs/11.x/upgrade#passport
+unverified: false

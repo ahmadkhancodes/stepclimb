@@ -1,0 +1,29 @@
+# Verified: https://laravel.com/docs/12.x/upgrade (laravel/framework ^12.0, phpunit/phpunit ^11.0, pestphp/pest ^3.0)
+# Verified: https://laravel.com/docs/13.x/releases support table (PHP 8.2 - 8.5 for Laravel 12)
+key: laravel-11-to-12.composer
+version: 1.0.0
+pathKind: laravel
+from: 11
+to: 12
+engine: composer_json
+title: Update composer.json for Laravel 12
+summary: Moves laravel/framework to ^12.0, phpunit/phpunit to ^11.0 and pestphp/pest to ^3.0, and makes sure the PHP minimum is at least 8.2.
+guard:
+  composer:
+    laravel/framework: "^11.0"
+params:
+  php:
+    min: "8.2"
+  packages:
+    - { name: laravel/framework, constraint: "^12.0", section: require }
+    - { name: phpunit/phpunit, constraint: "^11.0", section: require-dev }
+    - { name: pestphp/pest, constraint: "^3.0", section: require-dev }
+    # Not listed in the 12.x guide: reported, not changed.
+    - { name: laravel/tinker, unverified: true, severity: note }
+    - { name: laravel/sail, unverified: true, severity: note }
+    - { name: laravel/pint, unverified: true, severity: note }
+    - { name: laravel/sanctum, unverified: true, severity: note }
+    - { name: nunomaduro/collision, unverified: true, severity: note }
+sources:
+  - https://laravel.com/docs/12.x/upgrade
+  - https://laravel.com/docs/13.x/releases

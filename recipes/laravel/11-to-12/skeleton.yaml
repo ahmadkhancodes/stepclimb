@@ -1,0 +1,36 @@
+# The 12.x guide says skeleton changes are optional and points at https://github.com/laravel/laravel/compare/11.x...12.x.
+# The file list below is the standard skeleton layout (not individually verified); a 3 way merge only touches files where
+# upstream changed, and conflicts are kept as the repo version plus a must_fix squawk.
+key: laravel-11-to-12.skeleton
+version: 1.0.0
+pathKind: laravel
+from: 11
+to: 12
+engine: skeleton_diff
+title: Sync skeleton and config files with Laravel 12
+summary: Three way merges the laravel/laravel 11.x to 12.x skeleton changes into the repo. Conflicts keep your version and are listed as squawks.
+guard:
+  requiresFiles: [artisan, bootstrap/app.php]
+params:
+  files:
+    - artisan
+    - .editorconfig
+    - .gitattributes
+    - phpunit.xml
+    - vite.config.js
+    - bootstrap/app.php
+    - bootstrap/providers.php
+    - public/index.php
+    - config/app.php
+    - config/auth.php
+    - config/cache.php
+    - config/database.php
+    - config/filesystems.php
+    - config/logging.php
+    - config/mail.php
+    - config/queue.php
+    - config/services.php
+    - config/session.php
+sources:
+  - https://laravel.com/docs/12.x/upgrade
+  - https://github.com/laravel/laravel/compare/11.x...12.x

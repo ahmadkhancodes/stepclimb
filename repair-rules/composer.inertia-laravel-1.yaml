@@ -1,0 +1,20 @@
+key: composer.inertia-laravel-1
+category: composer
+version: "11"
+title: Laravel 11 requires inertiajs/inertia-laravel ^1.0
+# Matches Composer solver output that names the package as a root requirement; the guard
+# makes sure composer.json really declares a constraint outside the supported range.
+signature: '(?:Root composer\.json requires|Root composer\.json and) inertiajs/inertia-laravel (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: inertiajs/inertia-laravel
+  notSatisfies: "^1.0"
+fix:
+  kind: composer_constraint
+  params:
+    package: inertiajs/inertia-laravel
+    constraint: "^1.0"
+    section: require
+sources:
+  - https://laravel.com/docs/11.x/upgrade#updating-dependencies
+unverified: false

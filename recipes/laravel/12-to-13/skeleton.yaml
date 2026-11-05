@@ -1,0 +1,43 @@
+# Skeleton changes are optional per the 13.x guide (compare/12.x...13.x). File list is the standard layout, not individually verified.
+key: laravel-12-to-13.skeleton
+version: 1.0.0
+pathKind: laravel
+from: 12
+to: 13
+engine: skeleton_diff
+title: Sync skeleton and config files with Laravel 13
+summary: Three way merges the laravel/laravel 12.x to 13.x skeleton changes into the repo. Conflicts keep your version and are listed as squawks.
+guard:
+  requiresFiles: [artisan, bootstrap/app.php]
+params:
+  files:
+    - artisan
+    - .editorconfig
+    - .gitattributes
+    - phpunit.xml
+    - vite.config.js
+    - bootstrap/app.php
+    - bootstrap/providers.php
+    - public/index.php
+    - config/app.php
+    - config/auth.php
+    - config/cache.php
+    - config/database.php
+    - config/filesystems.php
+    - config/logging.php
+    - config/mail.php
+    - config/queue.php
+    - config/services.php
+    - config/session.php
+  notes:
+    config/session.php:
+      severity: review
+      title: "Session serialization changed to json"
+      body: "The 13.x skeleton sets the session `serialization` option to `json`. Changing it from `php` invalidates all active sessions and requires users to sign in again. Set it back to `php` to keep sessions alive, or keep `json` for the security hardening if that is acceptable."
+    config/cache.php:
+      severity: review
+      title: "Cache serializable_classes added"
+      body: "The 13.x skeleton adds `serializable_classes => false`. If your app intentionally stores PHP objects in the cache, list the allowed classes in `serializable_classes` or move to array payloads."
+sources:
+  - https://laravel.com/docs/13.x/upgrade
+  - https://github.com/laravel/laravel/compare/12.x...13.x
