@@ -1,7 +1,7 @@
 import { RunwayBar } from "./runway-bar";
 import { EolChip } from "./eol-chip";
 import { securityEnd } from "@/lib/engine/detect/eol";
-import { LATEST_MAJOR, majorsBehind } from "./data";
+import { majorsBehind } from "./data";
 
 const fmt = (iso: string | null) =>
   iso ? new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric", timeZone: "UTC" }) : "Current release";
@@ -31,7 +31,7 @@ export function SupportRunway() {
         </tbody>
       </table>
       <figcaption className="caption-5 border-t border-border px-3 py-2 text-text-subtle">
-        Dates from the Laravel release notes, checked 3 Nov 2026. Day counts as of 5 Nov 2026. Latest major in this sample: {LATEST_MAJOR}.
+        Dates from the Laravel release notes, checked 3 Nov 2026. Day counts as of 5 Nov 2026.
       </figcaption>
     </figure>
   );
