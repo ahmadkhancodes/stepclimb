@@ -1,6 +1,6 @@
 import { Skeleton } from "@/components/ui/states";
 
-/** Skeleton shaped like the overview: header, plan card, usage card, panel. */
+/** Skeleton shaped like the overview: header, bulletin, stats, airframes table, plan and usage cards. */
 export default function Loading() {
   return (
     <div aria-busy="true" aria-label="Loading" className="flex flex-col gap-6">
@@ -8,11 +8,13 @@ export default function Loading() {
         <Skeleton className="h-8 w-1/3" />
         <Skeleton className="h-4 w-1/2" />
       </div>
+      <Skeleton className="h-12 w-full" />
+      <Skeleton className="h-20 w-full" />
+      <Skeleton className="h-64 w-full" />
       <div className="grid gap-6 lg:grid-cols-3">
         <Skeleton className="h-24 w-full" />
         <Skeleton className="h-24 w-full lg:col-span-2" />
       </div>
-      <Skeleton className="h-24 w-full" />
     </div>
   );
 }

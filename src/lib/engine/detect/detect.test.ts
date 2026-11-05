@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectApp, eolStatus, securityEnd, effortBand, majorsBehind, LATEST_LARAVEL_MAJOR, findAppPaths, EOL_CALENDAR } from './index.js';
+import { detectApp, eolStatus, securityEnd, effortBand, majorsBehind, LATEST_LARAVEL_MAJOR, findAppPaths, EOL_CALENDAR } from './index';
 
 const composer = (require: Record<string, string>, dev: Record<string, string> = {}) =>
   JSON.stringify({ name: 'acme/app', require: { php: '^8.2', ...require }, 'require-dev': dev });

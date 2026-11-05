@@ -1,6 +1,6 @@
-import type { ExternalStep, Squawk } from '../types.js';
-import type { VirtualFs } from '../vfs.js';
-import type { Recipe, RecipeContext } from './types.js';
+import type { ExternalStep, Squawk } from '../types';
+import type { VirtualFs } from '../vfs';
+import type { Recipe, RecipeContext } from './types';
 
 export interface EngineOutput {
   changedFiles: string[];

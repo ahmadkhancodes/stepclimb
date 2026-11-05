@@ -1,11 +1,11 @@
-import type { RecipeResult } from '../types.js';
-import type { VirtualFs } from '../vfs.js';
-import { applyComposerJson, satisfiesTarget } from './composer.js';
-import { empty, withPrefix, type Engine } from './engine-types.js';
-import { applyNpmCodemod, applyPhpParser, applyRector } from './external.js';
-import { applyFilePatch } from './patch.js';
-import { applySkeletonDiff } from './skeleton.js';
-import type { Recipe, RecipeContext } from './types.js';
+import type { RecipeResult } from '../types';
+import type { VirtualFs } from '../vfs';
+import { applyComposerJson, satisfiesTarget } from './composer';
+import { empty, withPrefix, type Engine } from './engine-types';
+import { applyNpmCodemod, applyPhpParser, applyRector } from './external';
+import { applyFilePatch } from './patch';
+import { applySkeletonDiff } from './skeleton';
+import type { Recipe, RecipeContext } from './types';
 
 const ENGINE_IMPLS: Record<Recipe['engine'], Engine> = {
   composer_json: applyComposerJson,

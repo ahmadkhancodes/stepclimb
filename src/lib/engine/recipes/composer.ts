@@ -1,8 +1,8 @@
 import semver from 'semver';
-import type { Severity } from '../types.js';
-import { docUrlOf, empty, withPrefix, type Engine } from './engine-types.js';
-import { makeSquawk } from './squawk.js';
-import { normalizeRange } from './validate.js';
+import type { Severity } from '../types';
+import { docUrlOf, empty, withPrefix, type Engine } from './engine-types';
+import { makeSquawk } from './squawk';
+import { normalizeRange } from './validate';
 
 type Json = Record<string, unknown>;
 const SECTIONS = ['require', 'require-dev'] as const;

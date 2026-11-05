@@ -1,7 +1,7 @@
-import type { Squawk } from '../types.js';
-import type { VirtualFs } from '../vfs.js';
-import { redactSecrets } from './redact.js';
-import type { VerifyResult } from './types.js';
+import type { Squawk } from '../types';
+import type { VirtualFs } from '../vfs';
+import { redactSecrets } from './redact';
+import type { VerifyResult } from './types';
 
 export const EXCERPT_CAP = 4000;
 

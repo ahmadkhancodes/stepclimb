@@ -1,4 +1,4 @@
-import { FIX_KINDS, RULE_CATEGORIES, type ContextGuard, type Rule } from './types.js';
+import { FIX_KINDS, RULE_CATEGORIES, type ContextGuard, type Rule } from './types';
 
 export type ValidationResult = { ok: true; rule: Rule } | { ok: false; errors: string[] };
 

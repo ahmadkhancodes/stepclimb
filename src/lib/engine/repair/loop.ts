@@ -1,11 +1,11 @@
 import { createHash } from 'node:crypto';
-import type { VirtualFs } from '../vfs.js';
-import type { ExternalStep } from '../types.js';
-import { fixTargets, planFix } from './fix.js';
-import { squawksFromFailure, type Hop } from './prompt.js';
-import { matchFailure } from './rules.js';
-import { signatureOf } from './signature.js';
-import type { CommitDescriptor, LoopRecord, RepairOutcome, Rule, StopReason, VerifyResult } from './types.js';
+import type { VirtualFs } from '../vfs';
+import type { ExternalStep } from '../types';
+import { fixTargets, planFix } from './fix';
+import { squawksFromFailure, type Hop } from './prompt';
+import { matchFailure } from './rules';
+import { signatureOf } from './signature';
+import type { CommitDescriptor, LoopRecord, RepairOutcome, Rule, StopReason, VerifyResult } from './types';
 
 export interface RepairLoopOptions {
   verify: (fs: VirtualFs) => Promise<VerifyResult>;

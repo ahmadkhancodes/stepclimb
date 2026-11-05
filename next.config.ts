@@ -7,6 +7,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   pageExtensions: ["ts", "tsx", "md", "mdx"],
   serverExternalPackages: ["mongodb"],
+  // recipe YAML is read from disk at scan time
+  outputFileTracingIncludes: { "/api/repos/[id]/scan": ["./recipes/**/*"], "/api/dev/seed-github": ["./recipes/**/*"] },
   turbopack: {
     rules: {
       "*.css": {

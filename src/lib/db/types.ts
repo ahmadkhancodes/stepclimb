@@ -87,8 +87,24 @@ export interface Suppression {
   at: Date;
 }
 
+export type DocValue = string | number | boolean | null;
+export type DocFilter = Record<string, DocValue>;
+
+/** Small document store for the product collections (installations, repos, apps, scans, webhook_events...). */
+export interface DocStore {
+  /** Upsert: shallow merge into the document with this id. */
+  put(coll: string, id: string, doc: Record<string, unknown>): Promise<void>;
+  /** Insert only; returns false when the id already exists (idempotency). */
+  insert(coll: string, id: string, doc: Record<string, unknown>): Promise<boolean>;
+  get<T = Record<string, unknown>>(coll: string, id: string): Promise<(T & { id: string }) | null>;
+  /** Equality filter; `in` matches any of the listed values for a field. */
+  find<T = Record<string, unknown>>(coll: string, filter?: DocFilter, opts?: { in?: { field: string; values: string[] }; sort?: { field: string; dir: 1 | -1 }; limit?: number }): Promise<(T & { id: string })[]>;
+  remove(coll: string, filter: DocFilter, opts?: { in?: { field: string; values: string[] } }): Promise<number>;
+}
+
 export interface Db {
   readonly app: string;
+  readonly docs: DocStore;
 
   // billing
   getBillingAccount(orgId: string): Promise<BillingAccount | null>;

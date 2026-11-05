@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { redactSecrets } from './redact.js';
+import { redactSecrets } from './redact';
 
 const MAX_LINES = 8;
 

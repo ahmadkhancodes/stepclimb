@@ -1,6 +1,6 @@
 import { diff3Merge } from 'node-diff3';
-import { docUrlOf, empty, withPrefix, type Engine } from './engine-types.js';
-import { makeSquawk } from './squawk.js';
+import { docUrlOf, empty, withPrefix, type Engine } from './engine-types';
+import { makeSquawk } from './squawk';
 
 interface Note { title: string; body: string; severity?: 'review' | 'note' | 'must_fix' }
 

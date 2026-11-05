@@ -1,7 +1,7 @@
-import type { ExternalStep } from '../types.js';
-import type { VirtualFs } from '../vfs.js';
-import { evalGuard, readComposerJson } from './rules.js';
-import type { FixPlan, Match } from './types.js';
+import type { ExternalStep } from '../types';
+import type { VirtualFs } from '../vfs';
+import { evalGuard, readComposerJson } from './rules';
+import type { FixPlan, Match } from './types';
 
 /** Replace ${name} placeholders (deeply) with capture group values; unknown names are left as is. */
 export function expandParams<T>(value: T, vars: Record<string, string>): T {

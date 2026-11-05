@@ -1,8 +1,8 @@
 import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import YAML from 'yaml';
-import { validateRecipe } from './validate.js';
-import type { Recipe } from './types.js';
+import { validateRecipe } from './validate';
+import type { Recipe } from './types';
 
 export class RecipeLoadError extends Error {
   constructor(public readonly problems: { file: string; errors: string[] }[]) {

@@ -1,5 +1,5 @@
 import { uuidv7 } from "@/lib/ids";
-import type { AuditEntry, BillingAccount, Db, Entitlement, Suppression, WebhookDelivery, WebhookEndpoint } from "./types";
+import type { DocFilter, DocStore, AuditEntry, BillingAccount, Db, Entitlement, Suppression, WebhookDelivery, WebhookEndpoint } from "./types";
 
 /** In-memory Db for tests, local dev and stub mode. Same semantics as the Mongo driver (dbContract.ts). */
 export function createMemoryDb(app: string, config: Record<string, string> = {}): Db {
@@ -16,8 +16,45 @@ export function createMemoryDb(app: string, config: Record<string, string> = {})
   const clone = <T>(x: T): T => structuredClone(x);
   const sKey = (email: string, scope = "all") => `${email.toLowerCase()}|${scope}`;
 
+  const colls = new Map<string, Map<string, Record<string, unknown>>>();
+  const coll = (n: string) => colls.get(n) ?? colls.set(n, new Map()).get(n)!;
+  const matches = (d: Record<string, unknown>, f: DocFilter, inn?: { field: string; values: string[] }) =>
+    Object.entries(f).every(([k, v]) => d[k] === v) && (!inn || inn.values.includes(String(d[inn.field])));
+  const docs: DocStore = {
+    async put(c, id, doc) {
+      const m = coll(c);
+      m.set(id, { ...clone(m.get(id) ?? {}), ...clone(doc) });
+    },
+    async insert(c, id, doc) {
+      const m = coll(c);
+      if (m.has(id)) return false;
+      m.set(id, clone(doc));
+      return true;
+    },
+    async get(c, id) {
+      const d = coll(c).get(id);
+      return d ? ({ ...clone(d), id } as never) : null;
+    },
+    async find(c, filter = {}, opts = {}) {
+      let out = [...coll(c).entries()].filter(([, d]) => matches(d, filter, opts.in)).map(([id, d]) => ({ ...clone(d), id }));
+      const s = opts.sort;
+      if (s) out = out.sort((a, b) => {
+        const x = (a as Record<string, unknown>)[s.field] as never, y = (b as Record<string, unknown>)[s.field] as never;
+        return (x < y ? -1 : x > y ? 1 : 0) * s.dir;
+      });
+      return (opts.limit ? out.slice(0, opts.limit) : out) as never;
+    },
+    async remove(c, filter, opts = {}) {
+      const m = coll(c);
+      let n = 0;
+      for (const [id, d] of [...m.entries()]) if (matches(d, filter, opts.in)) { m.delete(id); n++; }
+      return n;
+    },
+  };
+
   return {
     app,
+    docs,
     async getBillingAccount(id) {
       const a = accounts.get(id);
       return a ? clone(a) : null;

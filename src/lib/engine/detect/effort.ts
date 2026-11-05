@@ -1,4 +1,4 @@
-import type { DetectedApp, EffortBand } from '../types.js';
+import type { DetectedApp, EffortBand } from '../types';
 
 /** Latest Laravel major Stepclimb knows about. */
 export const LATEST_LARAVEL_MAJOR = 13;

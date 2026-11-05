@@ -1,4 +1,4 @@
-import type { Severity, Squawk } from '../types.js';
+import type { Severity, Squawk } from '../types';
 
 export interface MakeSquawkInput {
   severity: Severity;

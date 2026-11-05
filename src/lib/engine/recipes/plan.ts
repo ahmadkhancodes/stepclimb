@@ -1,5 +1,5 @@
 import semver from 'semver';
-import { ENGINES, type AppLike, type Recipe } from './types.js';
+import { ENGINES, type AppLike, type Recipe } from './types';
 
 export class PlanError extends Error {}
 export interface Hop { from: number; to: number; recipes: Recipe[] }

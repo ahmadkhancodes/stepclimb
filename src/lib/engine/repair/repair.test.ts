@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { resolve } from 'node:path';
-import { MemoryFs } from '../vfs.js';
+import { MemoryFs } from '../vfs';
 import {
   expandParams, loadRules, matchFailure, planFix, redactSecrets, runRepairLoop, shannonEntropy,
   signatureOf, squawksFromFailure, validateRule, EXCERPT_CAP, parseFileRefs,
   type Rule, type VerifyResult,
-} from './index.js';
+} from './index';
 
 const RULES_DIR = resolve(process.cwd(), 'repair-rules');
 const rules = loadRules(RULES_DIR);
