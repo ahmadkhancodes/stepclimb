@@ -21,6 +21,11 @@ export interface RepoDoc {
   archived: boolean;
   pushedAt: string | null;
   updatedAt: Date;
+  /** autopilot settings (repo settings page); all optional so synced repos stay valid */
+  autopilotWeekly?: boolean;
+  /** IANA zone for the Monday 06:00 window; default America/New_York */
+  timezone?: string;
+  quietMode?: boolean;
 }
 
 export const repoDocId = (installationId: string, fullName: string) => `${installationId}:${fullName}`;

@@ -18,7 +18,7 @@ export const TRANSITIONS: Record<RunStatus, readonly RunStatus[]> = {
   canceled: [],
 };
 
-export type RunKind = "upgrade" | "noop";
+export type RunKind = "upgrade" | "noop" | "autopilot";
 export type CheckConclusion = "success" | "failure" | "neutral";
 export type CreditKind = "to_latest" | "to_previous" | "older_hop" | "side_task" | "small_converter" | "extended_verify";
 export type StepStatus = "pending" | "running" | "passed" | "failed" | "skipped" | "blocked_host";
@@ -46,8 +46,14 @@ export interface RunDoc {
   computeSeconds: number;
   sandboxId: string | null;
   /** how the run is paid: plan entitlement or a one time credit */
-  billing: { via: "plan" | "credit"; creditId: string | null; creditKind: CreditKind | null };
+  billing: { via: "plan" | "credit" | "free"; creditId: string | null; creditKind: CreditKind | null };
   idempotencyKey: string | null;
+  /** catch up: after this run succeeds, start the next hop on top of its branch until this major */
+  /** the credit (or payment) of this run was handed back: automatic on nothing delivered, or by the founder refund tool */
+  creditRefunded?: boolean;
+  chainTo?: number | null;
+  /** why a catch up chain stopped before its target (payment_required, too_many_runs, ...) */
+  chainStopped?: string;
   extendedVerify: boolean;
   /** per run HMAC secret for runner events; useless after the run */
   eventSecret: string;

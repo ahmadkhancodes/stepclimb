@@ -20,9 +20,12 @@ function Action({ r }: { r: HangarRow }) {
   if (r.kind === "unscanned") return <ScanButton repoId={r.repoId} />;
   if (r.kind === "not_laravel") return <ScanButton repoId={r.repoId} label="Rescan" variant="tertiary" />;
   return (
-    <Link href={`/app/inspections/${encodeURIComponent(r.scanId!)}`} className="button-sm inline-flex min-h-8 items-center gap-1 text-action focus-visible:focus-ring">
-      Open inspection<ArrowRight size={16} weight="regular" aria-hidden />
-    </Link>
+    <span className="inline-flex flex-wrap items-center gap-x-4">
+      <Link href={`/app/inspections/${encodeURIComponent(r.scanId!)}`} className="button-sm inline-flex min-h-8 items-center gap-1 text-action focus-visible:focus-ring">
+        Open inspection<ArrowRight size={16} weight="regular" aria-hidden />
+      </Link>
+      <Link href={`/app/repos/${encodeURIComponent(r.repoId)}`} className="button-sm inline-flex min-h-8 items-center text-text-subtle hover:text-text focus-visible:focus-ring">Autopilot</Link>
+    </span>
   );
 }
 

@@ -42,6 +42,14 @@ export function simulatedComposer(fs: VirtualFs): VerifyResult {
     }
     for (const pkg of REMOVED[m] ?? []) if (deps[pkg]) problems.push(`- Root composer.json requires ${pkg} ${deps[pkg]} -> Cannot redeclare once() (conflicts with the framework helper).`);
   }
+  if (problems.length === 0) {
+    // `composer update` rewrites the lockfile: stacked catch up hops detect the version from it
+    try {
+      const lock = JSON.parse(fs.read("composer.lock") ?? "") as { packages?: { name: string; version: string }[] };
+      for (const p of lock.packages ?? []) if (p.name === "laravel/framework") p.version = `v${target}.0.0`;
+      fs.write("composer.lock", JSON.stringify(lock));
+    } catch { /* no lockfile in this fixture */ }
+  }
   if (problems.length === 0) return { passed: true, stage: "composer", output: `Updating dependencies\nGenerating autoload files\nlaravel/framework upgraded to ${target}.x` };
   return { passed: false, stage: "composer", output: `Your requirements could not be resolved to an installable set of packages.\n\n  Problem ${1}\n    ${problems.join("\n    ")}` };
 }
@@ -49,4 +57,25 @@ export function simulatedComposer(fs: VirtualFs): VerifyResult {
 export function simulatedVerify(stage: VerifyResult["stage"], fs: VirtualFs): VerifyResult {
   if (stage === "composer") return simulatedComposer(fs);
   return { passed: true, stage, output: `${stage} ok (simulated)` };
+}
+
+/**
+ * Stand in for `composer update` inside constraints: raises the minor of caret constraints of third party packages by one
+ * (never the framework, never php), so two weeks in a row produce two different diffs. Used by the fake runner only.
+ */
+export async function simulatedUpdateDeps(fs: VirtualFs): Promise<{ updates: import("./events").DepUpdate[]; changedFiles: string[] }> {
+  const raw = fs.read("composer.json");
+  if (!raw) return { updates: [], changedFiles: [] };
+  const j = JSON.parse(raw) as { require?: Record<string, string> };
+  const updates: import("./events").DepUpdate[] = [];
+  for (const [name, range] of Object.entries(j.require ?? {})) {
+    const m = /^\^(\d+)\.(\d+)(?:\.(\d+))?$/.exec(range);
+    if (!m || name === "php" || name === "laravel/framework" || name.startsWith("ext-")) continue;
+    const to = `^${m[1]}.${Number(m[2]) + 1}${m[3] !== undefined ? ".0" : ""}`;
+    j.require![name] = to;
+    updates.push({ ecosystem: "composer", name, from: range, to });
+  }
+  if (updates.length === 0) return { updates, changedFiles: [] };
+  fs.write("composer.json", JSON.stringify(j, null, 2));
+  return { updates, changedFiles: ["composer.json"] };
 }

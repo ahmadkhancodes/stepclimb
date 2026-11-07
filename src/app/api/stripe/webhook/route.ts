@@ -5,6 +5,8 @@ import { getDb } from "@/lib/db";
 import { env } from "@/lib/env";
 import { json } from "@/lib/http";
 import { log } from "@/lib/logger";
+import { mailReceipt, creditDescription } from "@/lib/mail/notify";
+import { recordWebhookFailure } from "@/lib/ops/alerts";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -24,10 +26,14 @@ export async function POST(req: Request) {
         const ent = await db.getEntitlement(orgId);
         await emitEvent(orgId, "billing.updated", { stripeEvent: type, plan: ent?.plan, status: ent?.status }, { db }).catch(() => []);
       },
+      receipt: async (r) => {
+        await mailReceipt(db, r.orgId, { description: r.creditKind ? creditDescription(r.creditKind) : r.description, amountUsd: r.amountUsd, reference: r.reference, invoiceUrl: r.invoiceUrl ?? null, date: new Date() });
+      },
     });
   } catch (e) {
     // 500 => Stripe retries; the event was NOT recorded, so the retry reprocesses it.
     log.error("stripe_webhook_failed", { message: (e as Error).message });
+    await getDb().then((db) => recordWebhookFailure(db, "stripe", (e as Error).message)).catch(() => undefined);
     return json({ error: "server_error" }, 500);
   }
 }

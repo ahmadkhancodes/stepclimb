@@ -3,7 +3,8 @@ import { applyRecipe, planHops, type Recipe, type RecipeContext } from "@/lib/en
 import { excerptOf, redactSecrets, runRepairLoop, type Rule, type VerifyResult } from "@/lib/engine/repair";
 import type { ExternalStep, Squawk } from "@/lib/engine/types";
 import type { VirtualFs } from "@/lib/engine/vfs";
-import type { RunnerEvent, RunResult } from "./events";
+import type { DepUpdate, RunnerEvent, RunResult } from "./events";
+import { applyPins, type Pins } from "./pins";
 import { LIMITS } from "./types";
 
 /**
@@ -18,6 +19,8 @@ export interface RunEnv {
   verifyStage: (stage: "composer" | "build" | "tests" | "larastan", fs: VirtualFs) => Promise<VerifyResult>;
   /** run an engine ExternalStep (rector, php parser, codemod); a failure becomes a log line, not a crash */
   runExternal?: (step: ExternalStep, fs: VirtualFs) => Promise<{ ok: boolean; output: string }>;
+  /** autopilot: update dependencies within their constraints (composer update, npm update); returns what moved */
+  updateDeps?: (fs: VirtualFs) => Promise<{ updates: DepUpdate[]; changedFiles: string[] }>;
   commit: (message: string, files: string[]) => Promise<string>;
   push: (branch: string) => Promise<string>;
   emit: (e: RunnerEvent) => Promise<void> | void;
@@ -34,6 +37,10 @@ export interface AgentSpec {
   deadlineAt: number;
   recipes: Recipe[];
   rules: Rule[];
+  mode?: "upgrade" | "deps";
+  /** fixed branch name (autopilot) */
+  branch?: string;
+  pins?: Pins;
 }
 
 class DeadlineError extends Error {}
@@ -71,7 +78,10 @@ export async function runAgent(spec: AgentSpec, env: RunEnv): Promise<RunResult>
   let repair: RunResult["repair"] = { passes: 0, rulesApplied: [], unmatchedSignatures: [], stopReason: "not_run" };
   let verified = false;
   let timedOut = false;
-  const branch = branchName(spec.hopTo, spec.runId);
+  const branch = spec.branch ?? branchName(spec.hopTo, spec.runId);
+  const recipes = applyPins(spec.recipes, spec.pins?.recipes);
+  const rules = applyPins(spec.rules, spec.pins?.rules);
+  let updates: DepUpdate[] | undefined;
 
   try {
     const app = await step("detect", async () => detectApp({
@@ -82,9 +92,15 @@ export async function runAgent(spec: AgentSpec, env: RunEnv): Promise<RunResult>
     }), (a) => a.isLaravel && a.supported);
     if (!app.isLaravel || !app.supported) return base({ aborted: app.unsupportedReason ?? "not_a_supported_laravel_app" });
     hasTests = app.testFramework !== "none";
-    if (app.laravelMajor !== spec.hopFrom) return base({ aborted: `app_is_on_${app.laravelMajor ?? "unknown"}_not_${spec.hopFrom}` });
+    if (spec.mode === "deps") {
+      const u = await step("update-deps", async () => (env.updateDeps ? env.updateDeps(env.fs) : { updates: [], changedFiles: [] }));
+      updates = u.updates;
+      if (u.updates.length === 0) return base({ updates: [], hasTests });
+      u.changedFiles.forEach((f) => changed.add(f));
+      await env.commit(`Stepclimb autopilot: update ${u.updates.length} dependenc${u.updates.length === 1 ? "y" : "ies"}`, u.changedFiles);
+    } else if (app.laravelMajor !== spec.hopFrom) return base({ aborted: `app_is_on_${app.laravelMajor ?? "unknown"}_not_${spec.hopFrom}` });
 
-    const hops = planHops(app, spec.hopFrom, spec.hopTo, spec.recipes);
+    const hops = spec.mode === "deps" ? [] : planHops(app, spec.hopFrom, spec.hopTo, recipes);
     for (const hop of hops) {
       const skeleton = await env.skeleton?.(hop);
       for (const recipe of hop.recipes) {
@@ -128,7 +144,7 @@ export async function runAgent(spec: AgentSpec, env: RunEnv): Promise<RunResult>
     };
 
     const outcome = await runRepairLoop({
-      verify, rules: spec.rules, fs: env.fs, hop: { from: spec.hopFrom, to: spec.hopTo },
+      verify, rules, fs: env.fs, hop: { from: spec.hopFrom, to: spec.hopTo },
       maxLoops: spec.extendedVerify ? LIMITS.extendedRepairLoops : LIMITS.repairLoops,
     });
     // the loop applied its fixes to the fs: record them as `Repair:` commits (external steps first)
@@ -150,5 +166,5 @@ export async function runAgent(spec: AgentSpec, env: RunEnv): Promise<RunResult>
   }
   const head = await env.push(branch);
   await env.emit({ type: "pushed", branch, headSha: head });
-  return base({ verified, hasTests, repair, timedOut, changedFileCount: changed.size });
+  return base({ verified, hasTests, repair, timedOut, changedFileCount: changed.size, ...(updates ? { updates } : {}) });
 }

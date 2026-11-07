@@ -7,12 +7,14 @@ import { HttpError, json, readJson, withApi } from "@/lib/http";
 import { dispatchRun, RunError, startRun } from "@/lib/runs/service";
 import { getRunDeps } from "@/lib/runs/runtime";
 import { listRuns } from "@/lib/runs/store";
+import { githubAccountCreatedAt } from "@/lib/runs/free-tier";
+import { saveContact } from "@/lib/mail/notify";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-const Body = z.object({ repoId: z.string().min(1), hopFrom: z.number().int().min(10).max(12), appPath: z.string().max(200).optional(), extendedVerify: z.boolean().optional(), kind: z.enum(["upgrade", "noop"]).optional() });
+const Body = z.object({ catchUpTo: z.number().int().min(11).max(13).optional(), repoId: z.string().min(1), hopFrom: z.number().int().min(10).max(12), appPath: z.string().max(200).optional(), extendedVerify: z.boolean().optional(), kind: z.enum(["upgrade", "noop"]).optional() });
 
 const view = (r: Awaited<ReturnType<typeof listRuns>>[number]) => ({ id: r.id, status: r.status, fullName: r.fullName, hopFrom: r.hopFrom, hopTo: r.hopTo, prUrl: r.prUrl, checkConclusion: r.checkConclusion, createdAt: r.createdAt });
 
@@ -30,10 +32,14 @@ export const POST = withApi(async (req) => {
   if ((await db.hitRateLimit(`runs:${ctx.org.id}`, 60_000)) > 10) throw new HttpError(429, "rate_limited");
   const repo = await db.docs.get<RepoDoc>("repos", body.repoId);
   if (!repo || repo.accountId !== ctx.org.id) throw new HttpError(404, "not_found");
+  await saveContact(db, ctx.org.id, ctx.user.email); // run mail goes to whoever last started a work order
   const deps = await getRunDeps(db);
   if (!deps) throw new HttpError(503, "runner_unavailable"); // checked before any credit is taken
+  const inst = await db.docs.get<{ accountLogin?: string }>("installations", repo.installationId);
+  const githubCreatedAt = await githubAccountCreatedAt(db, inst?.accountLogin ?? "");
+  if (body.catchUpTo !== undefined && body.catchUpTo <= body.hopFrom + 1) throw new HttpError(400, "bad_hop");
   try {
-    const { run, created } = await startRun(deps, { accountId: ctx.org.id, repo, appPath: body.appPath ?? "", hopFrom: body.hopFrom, hopTo: body.hopFrom + 1, extendedVerify: body.extendedVerify, kind: body.kind, idempotencyKey: req.headers.get("idempotency-key") });
+    const { run, created } = await startRun(deps, { accountId: ctx.org.id, repo, githubCreatedAt, ...(body.catchUpTo ? { chainTo: body.catchUpTo } : {}), appPath: body.appPath ?? "", hopFrom: body.hopFrom, hopTo: body.hopFrom + 1, extendedVerify: body.extendedVerify, kind: body.kind, idempotencyKey: req.headers.get("idempotency-key") });
     if (created) after(async () => { await dispatchRun(deps, run.id).catch(() => undefined); });
     return json({ id: run.id, status: run.status }, created ? 201 : 200);
   } catch (e) {

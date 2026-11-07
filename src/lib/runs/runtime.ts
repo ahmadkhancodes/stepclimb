@@ -9,7 +9,7 @@ import { FakeRunner } from "./fake-runner";
 import { createFixtureHost } from "./fixture-host";
 import { createGithubHost, FINALIZE_TOKEN_PERMISSIONS, mintScopedToken, RUN_TOKEN_PERMISSIONS } from "./git-host";
 import type { RunDeps } from "./service";
-import { simulatedVerify } from "./simulated-verify";
+import { simulatedUpdateDeps, simulatedVerify } from "./simulated-verify";
 
 const g = globalThis as unknown as { __stepclimbFixtureRun?: { runner: FakeRunner; host: ReturnType<typeof createFixtureHost> } };
 
@@ -22,6 +22,7 @@ function fixtureRun() {
       recipes: loadRecipes(join(process.cwd(), "recipes")),
       rules: loadRules(join(process.cwd(), "repair-rules")),
       verify: (stage, fs) => simulatedVerify(stage, fs),
+      updateDeps: simulatedUpdateDeps,
     });
     g.__stepclimbFixtureRun = { runner, host: createFixtureHost() };
   }

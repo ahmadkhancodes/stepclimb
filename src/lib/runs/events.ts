@@ -22,7 +22,11 @@ export interface RunResult {
   timedOut?: boolean;
   /** the agent could not start work (not Laravel, unsupported, no recipe) */
   aborted?: string;
+  /** autopilot: dependencies that moved (empty means nothing to do and no PR) */
+  updates?: DepUpdate[];
 }
+
+export interface DepUpdate { ecosystem: "composer" | "npm"; name: string; from: string; to: string }
 
 export interface SignedEvent { seq: number; event: RunnerEvent }
 

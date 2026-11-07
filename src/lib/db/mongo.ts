@@ -266,5 +266,15 @@ export async function ensureIndexes(uri: string, dbName: string) {
   await d.collection("apps").createIndex({ app: 1, repoId: 1, path: 1 }, { unique: true });
   await d.collection("scans").createIndex({ app: 1, repoId: 1, createdAt: -1 });
   await d.collection("webhook_events").createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
+  // Runs, credits, autopilot, ops (M3 and M4)
+  await d.collection("runs").createIndex({ app: 1, accountId: 1, createdAt: -1 });
+  await d.collection("runs").createIndex({ app: 1, status: 1 });
+  await d.collection("runs").createIndex({ app: 1, accountId: 1, idempotencyKey: 1 });
+  await d.collection("run_steps").createIndex({ app: 1, runId: 1, seq: 1 });
+  await d.collection("run_logs").createIndex({ app: 1, runId: 1, seq: 1 });
+  await d.collection("squawks").createIndex({ app: 1, runId: 1 });
+  await d.collection("credits").createIndex({ app: 1, accountId: 1, kind: 1 });
+  await d.collection("autopilot_state").createIndex({ app: 1, fullName: 1, prNumber: 1 });
+  await d.collection("webhook_failures").createIndex({ expireAt: 1 }, { expireAfterSeconds: 0 });
   return DELIVERY_TTL_DAYS;
 }

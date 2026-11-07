@@ -1,6 +1,6 @@
 import { product } from "@/config/product";
 import { appUrl, env } from "@/lib/env";
-import { getDb } from "@/lib/db";
+import { getDb, type Db } from "@/lib/db";
 import { hmacSha256Hex } from "@/lib/ids";
 import { consoleTransport, resendTransport, smtpTransport } from "./transports";
 import type { MailMessage, MailTransport, SendResult } from "./types";
@@ -32,11 +32,12 @@ export async function unsubscribeUrl(email: string, scope: string) {
  * The one way to send mail. Checks the suppression list (transactional mail skips marketing scopes),
  * adds List-Unsubscribe + List-Unsubscribe-Post for non-transactional mail.
  */
-export async function sendMail(msg: MailMessage, transport: MailTransport = transportFromEnv()): Promise<SendResult> {
-  const db = await getDb();
+export async function sendMail(msg: MailMessage, transport: MailTransport = transportFromEnv(), dbOverride?: Db): Promise<SendResult> {
+  const db = dbOverride ?? (await getDb());
   const category = msg.category ?? "transactional";
   const scope = category === "transactional" ? "transactional" : category;
-  if (category !== "transactional" && (await db.isSuppressed(msg.to, scope)))
+  // hard bounces and complaints sit on scope "all" and block every category; unsubscribes are per scope
+  if (await db.isSuppressed(msg.to, scope))
     return { id: "", provider: transport.name, accepted: false, suppressed: true };
   const headers = { ...msg.headers };
   if (category !== "transactional") {

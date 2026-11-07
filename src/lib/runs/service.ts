@@ -2,14 +2,21 @@ import type { Db } from "@/lib/db";
 import { LATEST_LARAVEL_MAJOR } from "@/lib/engine/detect";
 import { redactSecrets } from "@/lib/engine/repair";
 import { audit } from "@/lib/audit";
+import { getFlags } from "@/lib/flags";
+import { mailRunFailed, mailRunFinished } from "@/lib/mail/notify";
+import { isRepoDenied } from "@/lib/security/denylist";
+import { finalizeAutopilot } from "./autopilot-finalize";
+import { checkFreeTier, freeTierMessage } from "./free-tier";
+import { loadPins } from "./pins";
 import type { RunResult, RunnerEvent, SignedEvent } from "./events";
 import { verifyEvent } from "./events";
+import { AUTOPILOT_BRANCH } from "./autopilot-finalize";
 import { creditKindFor } from "./credit-kind";
 import type { GitHost } from "./git-host";
 import type { RunnerBackend } from "./runner";
 import { addStep, appendLog, consumeCredit, createRun, getRun, patchRun, refundCredit, saveSquawks, transition } from "./store";
 import { LIMITS, isTerminal, type RunDoc } from "./types";
-import { buildWorkOrderBody, checkOutput, conclusionFor, prTitle, reviewComments, stampFor } from "./work-order";
+import { buildWorkOrderBody, checkOutput, conclusionFor, prTitle, reviewComments, stampFor, workOrderNo } from "./work-order";
 
 type RunWithId = RunDoc & { id: string };
 
@@ -31,10 +38,17 @@ export class RunError extends Error {
 export { creditKindFor };
 
 const SUBSCRIPTION_PLANS = ["solo", "legacy_solo", "studio", "legacy_studio", "agency"];
+export const isSubscriber = (ent: { isPaid: boolean; plan: string } | null | undefined) => !!ent?.isPaid && SUBSCRIPTION_PLANS.includes(ent.plan);
 
 export interface StartInput {
   accountId: string;
-  repo: { id: string; installationId: string; fullName: string; defaultBranch: string };
+  repo: { id: string; installationId: string; fullName: string; defaultBranch: string; private?: boolean };
+  /** branch the work starts from (catch up stacks each hop on the previous PR branch); default is the repo default branch */
+  baseBranch?: string;
+  /** catch up: keep going hop by hop until this Laravel major */
+  chainTo?: number;
+  /** GitHub account creation date of the owner, for the free tier */
+  githubCreatedAt?: Date | null;
   appPath?: string;
   hopFrom: number;
   hopTo: number;
@@ -46,13 +60,20 @@ export interface StartInput {
 /** Plan check, credit reservation, concurrency guard. Throws RunError(402, ...) with the credit kind when payment is needed. */
 export async function startRun(d: RunDeps, i: StartInput): Promise<{ run: RunWithId; created: boolean }> {
   const { db } = d;
-  if (i.kind !== "noop" && (i.hopTo !== i.hopFrom + 1 || i.hopTo > LATEST_LARAVEL_MAJOR || i.hopFrom < 10)) throw new RunError("bad_hop");
+  const kind = i.kind ?? "upgrade";
+  if (kind === "upgrade" && (i.hopTo !== i.hopFrom + 1 || i.hopTo > LATEST_LARAVEL_MAJOR || i.hopFrom < 10)) throw new RunError("bad_hop");
+  if (i.chainTo !== undefined && (kind !== "upgrade" || i.chainTo < i.hopTo || i.chainTo > LATEST_LARAVEL_MAJOR)) throw new RunError("bad_hop");
   if (i.idempotencyKey) {
     const [hit] = await db.docs.find<RunDoc>("runs", { accountId: i.accountId, idempotencyKey: i.idempotencyKey }, { limit: 1 });
     if (hit) return { run: hit, created: false };
   }
+  if (isRepoDenied(i.repo.fullName)) throw new RunError("repo_denied", 403);
+  if (kind === "upgrade") {
+    const flags = await getFlags(db);
+    if (flags[`path_laravel_${i.hopFrom}_to_${i.hopTo}`] === "off") throw new RunError("path_disabled", 503);
+  }
   const open = (await db.docs.find<RunDoc>("runs", { accountId: i.accountId })).filter((r) => !isTerminal(r.status));
-  if (open.some((r) => r.repoId === i.repo.id && r.hopTo === i.hopTo && r.appPath === (i.appPath ?? ""))) throw new RunError("run_already_open", 409);
+  if (open.some((r) => r.repoId === i.repo.id && r.hopTo === i.hopTo && r.appPath === (i.appPath ?? "") && r.kind === kind)) throw new RunError("run_already_open", 409);
   if (open.length >= LIMITS.perAccountConcurrency) throw new RunError("too_many_runs", 429);
   if ((await db.docs.find<RunDoc>("runs")).filter((r) => !isTerminal(r.status)).length >= LIMITS.globalConcurrency) throw new RunError("busy", 503);
 
@@ -60,10 +81,17 @@ export async function startRun(d: RunDeps, i: StartInput): Promise<{ run: RunWit
   const covered = !!ent?.isPaid && SUBSCRIPTION_PLANS.includes(ent.plan);
   const creditKind = creditKindFor(i.hopTo);
   let billing: RunDoc["billing"] = { via: "plan", creditId: null, creditKind: null };
-  if (!covered && i.kind !== "noop") {
+  if (kind === "autopilot") {
+    if (!covered) throw new RunError("plan_required", 402);
+  } else if (!covered && kind !== "noop") {
     const creditId = await consumeCredit(db, i.accountId, creditKind, nowOf(d));
-    if (!creditId) throw new RunError("payment_required", 402, { creditKind });
-    billing = { via: "credit", creditId, creditKind };
+    if (creditId) billing = { via: "credit", creditId, creditKind };
+    else {
+      // free tier: the first PR a month on a public repo, GitHub account 30 days or older
+      const free = await checkFreeTier(db, { accountId: i.accountId, repoPrivate: i.repo.private ?? true, githubCreatedAt: i.githubCreatedAt ?? null, now: nowOf(d) });
+      if (!free.ok) throw new RunError("payment_required", 402, { creditKind, freeTier: { reason: free.reason, message: freeTierMessage(free.reason) } });
+      billing = { via: "free", creditId: null, creditKind: null };
+    }
   }
   if (i.extendedVerify) {
     const ext = await consumeCredit(db, i.accountId, "extended_verify", nowOf(d));
@@ -72,9 +100,10 @@ export async function startRun(d: RunDeps, i: StartInput): Promise<{ run: RunWit
       throw new RunError("payment_required", 402, { creditKind: "extended_verify" });
     }
   }
-  const { run, created } = await createRun(db, { accountId: i.accountId, repoId: i.repo.id, installationId: i.repo.installationId, fullName: i.repo.fullName, baseBranch: i.repo.defaultBranch, ...(i.appPath !== undefined ? { appPath: i.appPath } : {}), hopFrom: i.hopFrom, hopTo: i.hopTo, kind: i.kind ?? "upgrade", billing, idempotencyKey: i.idempotencyKey ?? null, extendedVerify: !!i.extendedVerify, now: nowOf(d) });
+  const { run, created } = await createRun(db, { accountId: i.accountId, repoId: i.repo.id, installationId: i.repo.installationId, fullName: i.repo.fullName, baseBranch: i.baseBranch ?? i.repo.defaultBranch, ...(i.appPath !== undefined ? { appPath: i.appPath } : {}), hopFrom: i.hopFrom, hopTo: i.hopTo, kind, billing, idempotencyKey: i.idempotencyKey ?? null, extendedVerify: !!i.extendedVerify, now: nowOf(d) });
+  if (i.chainTo !== undefined && i.chainTo > i.hopTo) await patchRun(db, run.id, { chainTo: i.chainTo });
   await audit({ orgId: i.accountId, actorId: null, action: "run.created", target: run.id }).catch(() => undefined);
-  return { run, created };
+  return { run: { ...run, ...(i.chainTo !== undefined && i.chainTo > i.hopTo ? { chainTo: i.chainTo } : {}) }, created };
 }
 
 /** Moves queued -> starting -> running by handing the spec to the backend. A failed start refunds the credit. */
@@ -90,7 +119,8 @@ export async function dispatchRun(d: RunDeps, runId: string, callbackUrl = `${d.
       await openNoopPr(d, { ...run, status: "starting" });
       return (await getRun(d.db, runId))!;
     }
-    const spec = { runId, fullName: run.fullName, baseBranch: run.baseBranch, appPath: run.appPath, hopFrom: run.hopFrom, hopTo: run.hopTo, extendedVerify: run.extendedVerify, deadlineAt: now.getTime() + wall, eventSecret: run.eventSecret, callbackUrl, gitToken: await d.gitToken(run) };
+    const pins = await loadPins(d.db);
+    const spec = { runId, ...(run.kind === "autopilot" ? { mode: "deps" as const, branch: AUTOPILOT_BRANCH } : {}), pins, fullName: run.fullName, baseBranch: run.baseBranch, appPath: run.appPath, hopFrom: run.hopFrom, hopTo: run.hopTo, extendedVerify: run.extendedVerify, deadlineAt: now.getTime() + wall, eventSecret: run.eventSecret, callbackUrl, gitToken: await d.gitToken(run) };
     const handle = await d.runner.start(spec, (e, sig) => ingestEvent(d, runId, e, sig).then(() => undefined));
     await patchRun(d.db, runId, { sandboxId: handle.id });
   } catch (e) {
@@ -103,9 +133,15 @@ async function failRun(d: RunDeps, runId: string, error: string, to: "failed" | 
   const run = await getRun(d.db, runId);
   if (!run || isTerminal(run.status)) return;
   if (run.sandboxId) await d.runner.cancel({ backend: d.runner.name, id: run.sandboxId }).catch(() => undefined);
-  if (run.billing.creditId && !run.branch) await refundCredit(d.db, run.billing.creditId); // nothing delivered, nothing charged
-  await transition(d.db, runId, to, { error: redactSecrets(error), ...extra }, nowOf(d));
+  const giveBack = !!run.billing.creditId && !run.branch; // nothing delivered, nothing charged
+  if (giveBack) await refundCredit(d.db, run.billing.creditId!);
+  const failed = await transition(d.db, runId, to, { error: redactSecrets(error), ...(giveBack ? { creditRefunded: true } : {}), ...extra }, nowOf(d));
+  if (run.kind === "upgrade" && to !== "canceled") {
+    await mailRunFailed(d.db, run.accountId, { workOrderNo: workOrderNo(runId), fullName: run.fullName, hopTo: run.hopTo, runUrl: `${d.appUrl}/app/work-orders/${runId}`, detail: `Laravel ${run.hopFrom} to ${run.hopTo} on ${run.fullName}.`, reason: friendlyReason(failed.error ?? error), credited: !!(run.billing.creditId && !run.branch) });
+  }
 }
+
+const friendlyReason = (e: string) => e.replace(/^app_is_on_(\w+)_not_(\d+)$/, "the app is on Laravel $1, not $2").replace(/_/g, " ");
 
 /** Verifies and applies one runner event. Returns false for replays and bad signatures (never throws on those). */
 export async function ingestEvent(d: RunDeps, runId: string, e: SignedEvent, signature: string | null): Promise<"ok" | "bad_signature" | "replay" | "not_found" | "closed"> {
@@ -156,6 +192,7 @@ export async function finalizeRun(d: RunDeps, runId: string, result: RunResult):
       await failRun(d, runId, result.aborted, "failed");
       return (await getRun(d.db, runId))!;
     }
+    if (run.kind === "autopilot") return (await finalizeAutopilot(d, run, result)) as RunWithId;
     const host = await d.host(run);
     const input = { runId, fullName: run.fullName, hopFrom: run.hopFrom, hopTo: run.hopTo, result, appUrl: d.appUrl };
     const draft = !!result.timedOut;
@@ -167,6 +204,8 @@ export async function finalizeRun(d: RunDeps, runId: string, result: RunResult):
     const comments = reviewComments(result);
     if (comments.length > 0) await host.postReview(run.fullName, pr.number, { headSha: head, body: `Stepclimb squawks: ${comments.length} on exact lines.`, comments });
     const done = await transition(d.db, runId, result.timedOut ? "timed_out" : "succeeded", { prNumber: pr.number, prUrl: pr.url, prDraft: draft, checkConclusion: conclusion, error: result.timedOut ? "wall_clock" : null });
+    await mailRunFinished(d.db, run.accountId, { workOrderNo: workOrderNo(runId), fullName: run.fullName, hopTo: run.hopTo, stamp: stampFor(result), prUrl: pr.url, runUrl: `${d.appUrl}/app/work-orders/${runId}`, detail: `${result.recipes.filter((x) => !x.noop).length} recipes changed ${result.changedFileCount} files. ${result.verified ? "Composer, build and tests passed." : result.hasTests ? "Verification did not pass: read the squawks." : "No test suite was found, so review the PR before merging."}` });
+    if (!result.timedOut) await continueChain(d, done as RunWithId);
     return done as RunWithId;
   } catch (e) {
     await failRun(d, runId, e instanceof Error ? e.message : "finalize_failed", "failed");
@@ -174,6 +213,19 @@ export async function finalizeRun(d: RunDeps, runId: string, result: RunResult):
   } finally {
     const r = await getRun(d.db, runId);
     if (r?.sandboxId) await d.runner.cancel({ backend: d.runner.name, id: r.sandboxId }).catch(() => undefined);
+  }
+}
+
+/** Catch up: a verified hop starts the next one on top of its branch (stacked PRs) until `chainTo`. Stops, and says why, on any problem. */
+async function continueChain(d: RunDeps, run: RunWithId): Promise<void> {
+  if (!run.chainTo || run.chainTo <= run.hopTo || !run.branch) return;
+  try {
+    const next = await startRun(d, { accountId: run.accountId, repo: { id: run.repoId, installationId: run.installationId, fullName: run.fullName, defaultBranch: run.baseBranch }, baseBranch: run.branch, appPath: run.appPath, hopFrom: run.hopTo, hopTo: run.hopTo + 1, chainTo: run.chainTo, idempotencyKey: `chain:${run.id}`, extendedVerify: run.extendedVerify });
+    if (next.created) await dispatchRun(d, next.run.id);
+  } catch (e) {
+    const why = e instanceof RunError ? e.code : e instanceof Error ? e.message : "chain_failed";
+    await patchRun(d.db, run.id, { chainStopped: why });
+    await audit({ orgId: run.accountId, actorId: null, action: "run.chain_stopped", target: run.id, meta: { reason: why } }).catch(() => undefined);
   }
 }
 

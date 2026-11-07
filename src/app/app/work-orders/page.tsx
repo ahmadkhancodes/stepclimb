@@ -37,7 +37,7 @@ export default async function WorkOrdersPage() {
                   <tr key={r.id}>
                     <td className={td}><Link href={`/app/work-orders/${r.id}`} className="mono-data text-action focus-visible:focus-ring">#{workOrderNo(r.id)}</Link></td>
                     <td className={`${td} body-4`}>{r.fullName}</td>
-                    <td className={`${td} body-6`}>Laravel {r.hopFrom} to {r.hopTo}</td>
+                    <td className={`${td} body-6`}>{r.kind === "autopilot" ? "Dependency update" : `Laravel ${r.hopFrom} to ${r.hopTo}`}</td>
                     <td className={td}><Stamp tone={tone}>{label[0]!.toUpperCase() + label.slice(1)}</Stamp></td>
                     <td className={`${td} body-6 text-text-subtle`}>{new Date(r.createdAt).toISOString().slice(0, 16).replace("T", " ")} UTC</td>
                   </tr>

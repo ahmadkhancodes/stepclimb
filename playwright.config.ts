@@ -4,6 +4,8 @@ const PORT = 3100;
 export default defineConfig({
   testDir: "tests/e2e",
   timeout: 60_000,
+  // the specs share one server with a process wide memory DB and one fixture GitHub account (seed-github reclaims it)
+  workers: 1,
   use: { baseURL: process.env.BASE_URL ?? `http://localhost:${PORT}` },
   webServer: process.env.BASE_URL
     ? undefined
