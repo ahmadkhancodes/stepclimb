@@ -18,6 +18,8 @@ export interface WebhookDeps {
   secret: string;
   now?: () => number;
   onChange?: (orgId: string, type: string) => Promise<void>;
+  /** a payment settled (one time credit or subscription invoice): send the receipt. Failures never fail the webhook. */
+  receipt?: (r: { orgId: string; description: string; amountUsd: number; reference: string; invoiceUrl?: string | null; creditKind?: string }) => Promise<void>;
 }
 
 export async function handleStripeWebhook(rawBody: string, signature: string | null, deps: WebhookDeps): Promise<Response> {
@@ -39,6 +41,10 @@ export async function handleStripeWebhook(rawBody: string, signature: string | n
     refunded?: boolean;
     mode?: string;
     payment_status?: string;
+    amount_total?: number | null;
+    amount_paid?: number | null;
+    hosted_invoice_url?: string | null;
+    number?: string | null;
   };
   let customerId = typeof obj.customer === "string" ? obj.customer : (obj.customer?.id ?? null);
   // Old (2022-11-15) and new invoice payloads keep the subscription in different places; fall back to it.
@@ -83,7 +89,8 @@ export async function handleStripeWebhook(rawBody: string, signature: string | n
 
   // pay per run: a paid one time Checkout grants one credit (idempotent per session id)
   if (event.type === "checkout.session.completed" && obj.mode === "payment" && obj.payment_status === "paid" && obj.metadata?.app === app && obj.metadata.credit_kind && obj.id) {
-    await grantCredit(db, orgId, obj.metadata.credit_kind as CreditKind, obj.id, new Date(now));
+    const granted = await grantCredit(db, orgId, obj.metadata.credit_kind as CreditKind, obj.id, new Date(now));
+    if (granted) await deps.receipt?.({ orgId, description: "One time credit", amountUsd: obj.amount_total ?? 0, reference: obj.id, creditKind: obj.metadata.credit_kind }).catch((e) => log.error("receipt_failed", { message: (e as Error).message }));
     await db.markStripeEvent(event.id, event.type);
     await deps.onChange?.(orgId, event.type);
     return json({ received: true, credit: true });
@@ -98,6 +105,8 @@ export async function handleStripeWebhook(rawBody: string, signature: string | n
     await db.setEntitlement(orgId, await computeEntitlement(stripe, app, customerId, prev?.status === "lifetime" ? prev : null, now));
     await deps.onChange?.(orgId, event.type);
   }
+  if (event.type === "invoice.paid" && (obj.amount_paid ?? 0) > 0)
+    await deps.receipt?.({ orgId, description: "Stepclimb subscription", amountUsd: obj.amount_paid ?? 0, reference: obj.number ?? obj.id ?? event.id, invoiceUrl: obj.hosted_invoice_url ?? null }).catch((e) => log.error("receipt_failed", { message: (e as Error).message }));
   await db.markStripeEvent(event.id, event.type); // only after success
   return json({ received: true });
 }

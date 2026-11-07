@@ -12,7 +12,10 @@
     "stripe:setup": "tsx scripts/stripe-setup.ts",
     "db:indexes": "tsx scripts/ensure-indexes.ts",
     "screenshots": "tsx scripts/screenshots.ts",
-    "deploy": "scripts/deploy.sh"
+    "deploy": "scripts/deploy.sh",
+    "deny": "tsx scripts/deny-deps.ts",
+    "backup": "tsx scripts/backup.ts",
+    "restore-drill": "tsx scripts/restore-drill.ts"
   },
   "dependencies": {
     "@better-auth/api-key": "^1.7.17",

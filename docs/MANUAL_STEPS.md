@@ -35,3 +35,14 @@ Formal trademark clearance for "Stepclimb" (USPTO, UKIPO, CIPO classes 9 and 42)
 4. Cron: call `/api/cron/reap` every minute (Cloudflare worker with `CRON_SECRET`).
 5. Mongo (when `MONGODB_URI` exists): run `npm run db:indexes` after adding indexes for `runs` (accountId+createdAt, status), `run_steps` (runId+seq), `run_logs` (runId+seq), `credits` (accountId+kind).
 
+
+## 6. Turn on M4 pieces (autopilot, mail, backups, alerts)
+1. **Cloudflare cron worker** (needs `CLOUDFLARE_SAAS_TOKEN`): `cd infra/cron-worker && npx wrangler secret put CRON_SECRET && npx wrangler deploy`. `wrangler.toml` now lists every minute jobs (`reap,heartbeat,alerts,webhook-retries`), `HOURLY_JOBS=autopilot` and `DAILY_JOBS=backup`. Without it only the two daily Vercel crons run and autopilot never fires.
+2. **Resend webhook** (bounces and complaints): https://resend.com/webhooks. Add endpoint `<host>/api/mail/webhook` with events `email.bounced` and `email.complained`, copy the signing secret (`whsec_...`) into the Vercel env `MAIL_WEBHOOK_SECRET`. Until then hard bounces are not suppressed.
+3. **Alert recipient**: set `ALERT_EMAILS` (or keep `ADMIN_EMAILS`) in Vercel. Alerts need `RESEND_API_KEY` to leave the console mailer.
+4. **Founder two-factor**: the admin console at `/admin` refuses founder accounts without TOTP in production. Turn it on at `/app/settings/security` before first use.
+5. **Backups to R2**: needs the R2 bucket (created with the Cloudflare token). Write an R2 `BackupSink` next to `backupSink()` in `src/lib/cron/jobs.ts` and set its keys; until then the nightly job records only a manifest (counts and checksum), which the admin overview shows as "manifest only". Run the drill monthly: `MONGODB_URI=... npx tsx scripts/backup.ts` then `npx tsx scripts/restore-drill.ts backups/<file>.json.gz backups/<file>.json.gz.sha256` (restores into a scratch database and drops it).
+6. **Mongo indexes**: run `npm run db:indexes` again (new indexes for runs, credits, autopilot_state, webhook_failures).
+7. **Real autopilot runs** need the same sandbox adapter as item 5.1: `RunEnv.updateDeps` must run `composer update --no-scripts` inside the constraints and `npm update`, and `push` must force push `stepclimb/autopilot` so a refresh moves the open PR.
+8. **Stripe webhook events**: add `invoice.paid` to the endpoint (receipts for subscriptions) next to `checkout.session.completed`: https://dashboard.stripe.com/test/webhooks
+9. **GitHub App events**: the app must receive `pull_request` events (closed autopilot PRs feed quiet mode). They are already in `docs/manifests/github-app.json`; apps created before M4 need the event ticked at the app's settings page.

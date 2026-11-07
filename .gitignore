@@ -43,3 +43,6 @@ next-env.d.ts
 playwright-report
 test-results
 .lighthouseci
+
+# local backup exports (scripts/backup.ts)
+/backups

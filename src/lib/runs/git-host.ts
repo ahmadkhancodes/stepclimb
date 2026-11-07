@@ -10,6 +10,8 @@ export interface GitHost {
   openPr(fullName: string, input: { head: string; base: string; title: string; body: string; draft: boolean }): Promise<{ number: number; url: string }>;
   updatePr(fullName: string, number: number, input: { title?: string; body?: string; draft?: boolean }): Promise<void>;
   branchHead(fullName: string, branch: string): Promise<string | null>;
+  /** state of a PR we opened (autopilot refreshes an open one instead of duplicating) */
+  prState(fullName: string, number: number): Promise<"open" | "closed" | "merged" | "unknown">;
   createCheckRun(fullName: string, input: { headSha: string; conclusion: "success" | "failure" | "neutral"; title: string; summary: string; text: string }): Promise<number>;
   postReview(fullName: string, number: number, input: { headSha: string; body: string; comments: { path: string; line: number; body: string }[] }): Promise<void>;
 }
@@ -59,6 +61,10 @@ export function createGithubHost(getToken: () => Promise<string>, fetchImpl: typ
       return { number: r!.number, url: r!.html_url };
     },
     async updatePr(f, n, i) { await call("PATCH", `${repo(f)}/pulls/${n}`, i); },
+    async prState(f, n) {
+      const r = await call<{ state: string; merged_at?: string | null }>("GET", `${repo(f)}/pulls/${n}`, undefined, [404]);
+      return !r ? "unknown" : r.merged_at ? "merged" : r.state === "open" ? "open" : "closed";
+    },
     async branchHead(f, branch) {
       const r = await call<{ object: { sha: string } }>("GET", `${repo(f)}/git/ref/heads/${branch.split("/").map(encodeURIComponent).join("/")}`, undefined, [404]);
       return r?.object.sha ?? null;

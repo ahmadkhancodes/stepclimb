@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { Notice } from "@/components/ui/states";
 import { authClient } from "@/lib/auth/client";
+import { solveAltchaPayload } from "@/lib/security/altcha-client";
 
 type Phase = "idle" | "sending" | "sent";
 
@@ -25,11 +26,13 @@ export function SignInForm({ callbackURL, expiredLink, githubEnabled }: { callba
     }
     setError(null);
     setPhase("sending");
+    const altcha = await solveAltchaPayload();
     const { error: err } = await authClient.signIn.magicLink({
       email: value,
       callbackURL,
       newUserCallbackURL: `/onboarding?next=${encodeURIComponent(callbackURL)}`,
       errorCallbackURL: "/sign-in",
+      fetchOptions: { headers: altcha ? { "x-altcha": altcha } : {} },
     });
     if (err) {
       setPhase("idle");

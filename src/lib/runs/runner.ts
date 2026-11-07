@@ -14,6 +14,12 @@ export interface RunSpec {
   eventSecret: string;
   callbackUrl: string;
   gitToken: string;
+  /** `deps`: autopilot dependency update instead of a hop */
+  mode?: "upgrade" | "deps";
+  /** fixed branch (autopilot refreshes one branch instead of opening a new one) */
+  branch?: string;
+  /** founder pins: recipes and rules switched off or held to a version */
+  pins?: import("./pins").Pins;
 }
 export interface RunnerHandle { backend: string; id: string }
 /** In process delivery of a signed event (the HTTP callback does the same through /api/runner/events). */

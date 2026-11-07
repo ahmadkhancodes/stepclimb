@@ -2,9 +2,9 @@ import { product } from "@/config/product";
 
 // Plain, accessible HTML email templates (no external CSS, no images). Each returns {subject, text, html}.
 // Kept dependency free instead of react-email to stay small; the shape matches react-email's render output.
-const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+export const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-function layout(title: string, bodyHtml: string, footer = `${product.fullName} · ${product.company}`) {
+export function layout(title: string, bodyHtml: string, footer = `${product.fullName} · ${product.company}`) {
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>${esc(title)}</title></head>
 <body style="margin:0;padding:24px;background:#f7f7f7;font-family:ui-sans-serif,system-ui,sans-serif;color:#181818">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:520px;margin:0 auto;background:#ffffff;border:1px solid #e2e2e2;border-radius:8px">
@@ -16,7 +16,7 @@ ${bodyHtml}
 </body></html>`;
 }
 
-const button = (href: string, label: string) =>
+export const button = (href: string, label: string) =>
   `<p style="margin:24px 0"><a href="${esc(href)}" style="display:inline-block;padding:12px 16px;background:#181818;color:#ffffff;border-radius:6px;text-decoration:none;font-weight:600">${esc(label)}</a></p>`;
 
 export function magicLinkEmail(url: string) {

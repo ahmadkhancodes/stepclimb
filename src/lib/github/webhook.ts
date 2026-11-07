@@ -9,6 +9,7 @@ export async function verifySignature(secret: string, rawBody: string | Uint8Arr
 }
 
 import type { Db } from "@/lib/db";
+import { handlePullRequestEvent } from "@/lib/autopilot/state";
 import { applyGithubEvent } from "./sync";
 
 export interface WebhookInput { secret: string; raw: string; signature: string | null; event: string | null; delivery: string | null }
@@ -26,6 +27,12 @@ export async function processWebhook(db: Db, i: WebhookInput): Promise<WebhookRe
   if (await db.docs.get("webhook_events", key)) return { status: 200, body: { ok: true, duplicate: true } };
   let payload: unknown;
   try { payload = JSON.parse(i.raw); } catch { return { status: 400, body: { error: "bad_json" } }; }
+  if (i.event === "pull_request") {
+    // closing our autopilot PR feeds the quiet mode suggestion; nothing else to apply
+    const handled = await handlePullRequestEvent(db, payload as never);
+    await db.docs.insert("webhook_events", key, { provider: "github", eventId: i.delivery, event: i.event, processedAt: new Date(), expireAt: new Date(Date.now() + EVENT_TTL_MS) });
+    return { status: 200, body: { ok: true, ...(handled ? {} : { ignored: true }) } };
+  }
   const applied = await applyGithubEvent(db, i.event, payload as never);
   await db.docs.insert("webhook_events", key, { provider: "github", eventId: i.delivery, event: i.event, processedAt: new Date(), expireAt: new Date(Date.now() + EVENT_TTL_MS) });
   if (!applied) return { status: 200, body: { ok: true, ignored: true } };

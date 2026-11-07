@@ -1,12 +1,12 @@
 import { product } from "@/config/product";
-import { getDb } from "@/lib/db";
+import { getDb, type Db } from "@/lib/db";
 import { envFlags } from "@/lib/env";
 
 /** Remote flags: product defaults < Mongo `config` < APP_FLAGS env (ported trayo /config, D45). */
-export async function getFlags(): Promise<Record<string, string>> {
+export async function getFlags(db?: Db): Promise<Record<string, string>> {
   let fromDb: Record<string, string> = {};
   try {
-    fromDb = await (await getDb()).getConfig();
+    fromDb = await (db ?? (await getDb())).getConfig();
   } catch {
     fromDb = {};
   }

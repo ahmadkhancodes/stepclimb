@@ -36,7 +36,7 @@ test("work order page: empty list, pay per run prompt, then a verified run with 
   await expect(view).toBeVisible();
   await expect(view).toHaveAttribute("data-status", "succeeded", { timeout: 20_000 });
   await expect(view.getByText("Verified").first()).toBeVisible();
-  await expect(view.getByRole("link", { name: /Open PR #1/ })).toBeVisible();
+  await expect(view.getByRole("link", { name: /Open PR #\d+/ })).toBeVisible();
   await expect(view.getByRole("region", { name: "Steps" })).toContainText("verify:tests");
   await expect(view.getByRole("log", { name: "Log output" })).toContainText("laravel/framework upgraded to 12.x");
   await expect(view.getByRole("heading", { name: /^Squawks/ })).toBeVisible();

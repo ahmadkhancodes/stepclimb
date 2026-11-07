@@ -9,7 +9,7 @@ const secrets = () => {
   const base = env().ALTCHA_HMAC_KEY ?? env().BETTER_AUTH_SECRET ?? "dev-altcha-secret-change-me";
   return { sig: `${base}:sig`, key: `${base}:key` };
 };
-const COST = 5_000;
+const COST = 1_000;
 const TTL_S = 10 * 60;
 
 export async function newChallenge(): Promise<Challenge> {
@@ -17,7 +17,7 @@ export async function newChallenge(): Promise<Challenge> {
   return createChallenge({
     algorithm: "PBKDF2/SHA-256",
     cost: COST,
-    counter: randomInt(5_000, 10_000),
+    counter: randomInt(500, 2_000),
     deriveKey,
     expiresAt: Math.floor(Date.now() / 1000) + TTL_S,
     hmacSignatureSecret: s.sig,

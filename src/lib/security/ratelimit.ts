@@ -1,6 +1,6 @@
 import { getDb } from "@/lib/db";
 import type { Db } from "@/lib/db/types";
-import { HttpError } from "@/lib/http";
+import { clientIp, HttpError } from "@/lib/http";
 
 // Mongo sliding-window rate limiter (new code: neither app had one; BACKEND_REUSE 1.9).
 export interface Rule { limit: number; windowMs: number }
@@ -25,4 +25,9 @@ export async function enforceRateLimit(key: string, rule: Rule, db?: Db) {
   const r = await rateLimit(key, rule, db);
   if (!r.ok) throw new HttpError(429, "rate_limited", { retryAfterSeconds: Math.ceil(rule.windowMs / 1000) });
   return r;
+}
+
+/** Throws 429 when this client is over `rule` for `name` (per IP). For public routes without a session. */
+export async function limitByIp(req: Request, name: string, rule: Rule, db?: Db) {
+  return enforceRateLimit(`ip:${name}:${clientIp(req)}`, rule, db);
 }

@@ -2,6 +2,7 @@ import { after } from "next/server";
 import { getDb } from "@/lib/db";
 import { json } from "@/lib/http";
 import { log } from "@/lib/logger";
+import { recordWebhookFailure } from "@/lib/ops/alerts";
 import { loadAppCredentials } from "@/lib/github/app-store";
 import { getGithubApi } from "@/lib/github/client";
 import { syncInstallation } from "@/lib/github/sync";
@@ -18,12 +19,18 @@ export async function POST(req: Request) {
   const db = await getDb();
   const secret = process.env.GITHUB_FIXTURES === "1" ? (process.env.GITHUB_WEBHOOK_SECRET ?? "") : ((await loadAppCredentials(db))?.webhookSecret ?? "");
   if (!secret) return json({ error: "not_configured" }, 503);
-  const r = await processWebhook(db, {
-    secret, raw,
-    signature: req.headers.get("x-hub-signature-256"),
-    event: req.headers.get("x-github-event"),
-    delivery: req.headers.get("x-github-delivery"),
-  });
+  let r: Awaited<ReturnType<typeof processWebhook>>;
+  try {
+    r = await processWebhook(db, {
+      secret, raw,
+      signature: req.headers.get("x-hub-signature-256"),
+      event: req.headers.get("x-github-event"),
+      delivery: req.headers.get("x-github-delivery"),
+    });
+  } catch (e) {
+    await recordWebhookFailure(db, "github", (e as Error).message).catch(() => undefined);
+    return json({ error: "server_error" }, 500);
+  }
   if (r.status === 200 && r.syncInstallationId) {
     const id = r.syncInstallationId;
     after(async () => {

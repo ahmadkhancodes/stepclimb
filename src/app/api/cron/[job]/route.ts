@@ -2,7 +2,7 @@ import { env } from "@/lib/env";
 import { json } from "@/lib/http";
 import { safeEqual } from "@/lib/ids";
 import { log } from "@/lib/logger";
-import { cronJobs } from "@/lib/cron/jobs";
+import { cronJobs, reportCronFailure } from "@/lib/cron/jobs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,6 +26,7 @@ async function run(req: Request, { params }: { params: Promise<{ job: string }> 
     return json({ ok: true, job, result, ms: Date.now() - started });
   } catch (e) {
     log.error("cron_failed", { route: `cron/${job}`, message: (e as Error).message });
+    if (job !== "alerts") await reportCronFailure(job, (e as Error).message);
     return json({ error: "job_failed", job }, 500);
   }
 }

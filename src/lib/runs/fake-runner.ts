@@ -13,6 +13,8 @@ export interface FakeRunnerOptions {
   /** scripted verification; `n` counts calls per stage starting at 1 */
   verify?: (stage: "composer" | "build" | "tests" | "larastan", fs: VirtualFs, n: number) => VerifyResult;
   skeleton?: RunEnv["skeleton"];
+  /** autopilot dependency update; the default moves nothing */
+  updateDeps?: RunEnv["updateDeps"];
   /** the sandbox never reports back (watchdog tests) */
   hang?: boolean;
   /** start() throws */
@@ -37,7 +39,9 @@ export class FakeRunner implements RunnerBackend {
     const handle = { backend: this.name, id: `fake-${++this.n}` };
     this.active.add(handle.id);
     if (this.opts.hang) return handle;
-    const fs = new MemoryFs(this.opts.repo); // a fresh "microVM" per run: nothing carries over
+    // a fresh "microVM" per run: nothing carries over. A base branch Stepclimb pushed earlier is the stacked PR base (catch up).
+    const stacked = [...this.pushed].reverse().find((p) => p.branch === spec.baseBranch);
+    const fs = new MemoryFs(stacked ? stacked.fs : this.opts.repo);
     const counts: Record<string, number> = {};
     let seq = 0;
     let clock = Date.now();
@@ -49,6 +53,7 @@ export class FakeRunner implements RunnerBackend {
     const env: RunEnv = {
       fs,
       ...(this.opts.skeleton ? { skeleton: this.opts.skeleton } : {}),
+      ...(this.opts.updateDeps ? { updateDeps: this.opts.updateDeps } : {}),
       verifyStage: async (stage, f) => {
         counts[stage] = (counts[stage] ?? 0) + 1;
         return this.opts.verify?.(stage, f, counts[stage]!) ?? { passed: true, output: `${stage} ok`, stage };
@@ -59,7 +64,7 @@ export class FakeRunner implements RunnerBackend {
       now: () => (clock += this.opts.tickMs ?? 10),
     };
     await send({ type: "started", sandboxId: handle.id });
-    const result = await runAgent({ runId: spec.runId, appPath: spec.appPath, hopFrom: spec.hopFrom, hopTo: spec.hopTo, extendedVerify: spec.extendedVerify, deadlineAt: spec.deadlineAt, recipes: this.opts.recipes, rules: this.opts.rules }, env);
+    const result = await runAgent({ runId: spec.runId, appPath: spec.appPath, hopFrom: spec.hopFrom, hopTo: spec.hopTo, extendedVerify: spec.extendedVerify, deadlineAt: spec.deadlineAt, recipes: this.opts.recipes, rules: this.opts.rules, ...(spec.mode ? { mode: spec.mode } : {}), ...(spec.branch ? { branch: spec.branch } : {}), ...(spec.pins ? { pins: spec.pins } : {}) }, env);
     await send({ type: "result", result });
     this.active.delete(handle.id);
     return handle;
