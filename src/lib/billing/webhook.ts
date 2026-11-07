@@ -3,6 +3,8 @@ import { planForLookupKey } from "@/config/product";
 import type { Db } from "@/lib/db/types";
 import { json } from "@/lib/http";
 import { log } from "@/lib/logger";
+import { grantCredit } from "@/lib/runs/store";
+import type { CreditKind } from "@/lib/runs/types";
 import { NONE, cancelAppSubscriptions, computeEntitlement, invoiceSubscriptionId, lifetimeEntitlement } from "./entitlement";
 
 // Ported from trayo server/handler.ts webhook(). Changes:
@@ -35,6 +37,8 @@ export async function handleStripeWebhook(rawBody: string, signature: string | n
     id?: string;
     payment_intent?: string | null;
     refunded?: boolean;
+    mode?: string;
+    payment_status?: string;
   };
   let customerId = typeof obj.customer === "string" ? obj.customer : (obj.customer?.id ?? null);
   // Old (2022-11-15) and new invoice payloads keep the subscription in different places; fall back to it.
@@ -75,6 +79,14 @@ export async function handleStripeWebhook(rawBody: string, signature: string | n
       return json({ received: true });
     }
     await cancelAppSubscriptions(stripe, app, customerId);
+  }
+
+  // pay per run: a paid one time Checkout grants one credit (idempotent per session id)
+  if (event.type === "checkout.session.completed" && obj.mode === "payment" && obj.payment_status === "paid" && obj.metadata?.app === app && obj.metadata.credit_kind && obj.id) {
+    await grantCredit(db, orgId, obj.metadata.credit_kind as CreditKind, obj.id, new Date(now));
+    await db.markStripeEvent(event.id, event.type);
+    await deps.onChange?.(orgId, event.type);
+    return json({ received: true, credit: true });
   }
 
   const relevant =

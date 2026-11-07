@@ -27,3 +27,11 @@ Click **Upgrade to Pro** and add the card. You will see the plan as Pro on that 
 
 ## 4. Before public launch (legal, M5)
 Formal trademark clearance for "Stepclimb" (USPTO, UKIPO, CIPO classes 9 and 42) and a counsel check of the "not affiliated with Laravel" footer line. Not a blocker for the build.
+
+## 5. Turn on real runs (before the first paid run)
+1. Add `@vercel/sandbox` (named in ARCHITECTURE.md) and write the `SandboxDriver` adapter (`create`, `runDetached`, `stop`, `list`) next to `src/lib/runs/sandbox-runner.ts`; return it from `getRunDeps` in `src/lib/runs/runtime.ts` using `realTokens(creds)`. Until then `POST /api/runs` answers 503 `runner_unavailable` before any credit is taken.
+2. Build the runner snapshot `stepclimb-runner-v1` (PHP 8.2 to 8.5 from packages.sury.org or static PHP, Composer, Node 24, Rector, Pint, the `stepclimb-agent` entrypoint). It needs the Vercel token (`VERCEL_TOKEN_NEW_ACCOUNT`) and Pro plan (item 2).
+3. Stripe: create the webhook endpoint for `<host>/api/stripe/webhook` with `checkout.session.completed` included, so paid one time work orders grant their credit. Link: https://dashboard.stripe.com/test/webhooks
+4. Cron: call `/api/cron/reap` every minute (Cloudflare worker with `CRON_SECRET`).
+5. Mongo (when `MONGODB_URI` exists): run `npm run db:indexes` after adding indexes for `runs` (accountId+createdAt, status), `run_steps` (runId+seq), `run_logs` (runId+seq), `credits` (accountId+kind).
+

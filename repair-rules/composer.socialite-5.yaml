@@ -1,0 +1,20 @@
+key: composer.socialite-5
+category: composer
+version: "11"
+title: Laravel 11 needs laravel/socialite ^5.0
+# Failure text follows Composer's solver format. Constraint taken from the package's own release notes, not the Laravel guide: confirm against a real run.
+signature: '(?:Root composer\.json requires|Root composer\.json and) laravel/socialite (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: laravel/socialite
+  notSatisfies: "^5.0"
+  section: require
+fix:
+  kind: composer_constraint
+  params:
+    package: laravel/socialite
+    constraint: "^5.0"
+    section: require
+sources:
+  - https://laravel.com/docs/11.x/upgrade
+unverified: true

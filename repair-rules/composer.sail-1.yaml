@@ -1,0 +1,20 @@
+key: composer.sail-1
+category: composer
+version: "11"
+title: Laravel 11 needs laravel/sail ^1.26
+# Failure text follows Composer's solver format. Constraint taken from the package's own release notes, not the Laravel guide: confirm against a real run.
+signature: '(?:Root composer\.json requires|Root composer\.json and) laravel/sail (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: laravel/sail
+  notSatisfies: "^1.26"
+  section: require-dev
+fix:
+  kind: composer_constraint
+  params:
+    package: laravel/sail
+    constraint: "^1.26"
+    section: require-dev
+sources:
+  - https://laravel.com/docs/11.x/upgrade
+unverified: true

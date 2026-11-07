@@ -22,7 +22,7 @@ export default async function InspectionPage({ params }: { params: Promise<{ id:
         <ArrowLeft size={16} weight="regular" aria-hidden />Hangar
       </Link>
       <PageHeader title={`Inspection: ${scan.report.repo}`} description={scan.report.reads} actions={<ScanButton repoId={scan.repoId} label="Scan again" />} />
-      <InspectionReport report={scan.report} />
+      <InspectionReport report={scan.report} repoId={scan.repoId} returnTo={`/app/inspections/${encodeURIComponent(id)}`} />
     </>
   );
 }

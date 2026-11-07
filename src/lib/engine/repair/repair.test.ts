@@ -66,9 +66,9 @@ const goldens: Golden[] = [
 ];
 
 describe('rule library', () => {
-  it('loads 12 to 15 valid rules with sources and a version', () => {
-    expect(rules.length).toBeGreaterThanOrEqual(12);
-    expect(rules.length).toBeLessThanOrEqual(15);
+  it('loads the first 30 valid rules with sources and a version', () => {
+    expect(rules.length).toBeGreaterThanOrEqual(30);
+    expect(rules.length).toBeLessThanOrEqual(30);
     for (const r of rules) {
       expect(r.sources.length).toBeGreaterThan(0);
       expect(r.sources.every((s) => s.startsWith('https://laravel.com/docs/'))).toBe(true);

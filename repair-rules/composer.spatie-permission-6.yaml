@@ -1,0 +1,20 @@
+key: composer.spatie-permission-6
+category: composer
+version: "11"
+title: Laravel 11 needs spatie/laravel-permission ^6.0
+# Failure text follows Composer's solver format. Constraint taken from the package's own release notes, not the Laravel guide: confirm against a real run.
+signature: '(?:Root composer\.json requires|Root composer\.json and) spatie/laravel-permission (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: spatie/laravel-permission
+  notSatisfies: "^6.0"
+  section: require
+fix:
+  kind: composer_constraint
+  params:
+    package: spatie/laravel-permission
+    constraint: "^6.0"
+    section: require
+sources:
+  - https://laravel.com/docs/11.x/upgrade
+unverified: true

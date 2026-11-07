@@ -1,0 +1,20 @@
+key: tests.pest-plugin-laravel-3
+category: tests
+version: "12"
+title: Laravel 12 needs pestphp/pest-plugin-laravel ^3.0
+# Failure text follows Composer's solver format. Constraint taken from the package's own release notes, not the Laravel guide: confirm against a real run.
+signature: '(?:Root composer\.json requires|Root composer\.json and) pestphp/pest-plugin-laravel (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: pestphp/pest-plugin-laravel
+  notSatisfies: "^3.0"
+  section: require-dev
+fix:
+  kind: composer_constraint
+  params:
+    package: pestphp/pest-plugin-laravel
+    constraint: "^3.0"
+    section: require-dev
+sources:
+  - https://laravel.com/docs/12.x/upgrade
+unverified: true

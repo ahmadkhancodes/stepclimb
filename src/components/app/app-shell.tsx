@@ -14,8 +14,8 @@ import { OrgSwitcher } from "./org-switcher";
 type IconType = typeof User;
 interface NavItem { href: string; label: string; icon: IconType }
 
-// Work orders, Inspections and Recipes are added with their screens (M2, M3): no dead links.
-const MAIN: NavItem[] = [{ href: "/app", label: "Hangar", icon: AirplaneTilt }];
+// Recipes is added with its screen (M5): no dead links.
+const MAIN: NavItem[] = [{ href: "/app", label: "Hangar", icon: AirplaneTilt }, { href: "/app/work-orders", label: "Work orders", icon: ClipboardText }];
 const SETTINGS: NavItem[] = [
   { href: "/app/settings/profile", label: "Profile", icon: User },
   { href: "/app/settings/security", label: "Security", icon: ShieldCheck },
