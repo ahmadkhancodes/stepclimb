@@ -78,7 +78,7 @@ export function SiteHeader() {
   return (
     <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
       <div className="relative z-50 flex w-full max-w-7xl items-center justify-between gap-4 rounded-xl border border-border bg-surface-raised/80 py-2 pl-4 pr-2 backdrop-blur-md md:w-fit md:justify-start md:gap-8">
-        <Link href="/" className="inline-flex min-h-11 items-center rounded-md focus-visible:focus-ring" aria-label={`${product.fullName} home`}>
+        <Link href="/" className="inline-flex min-h-11 items-center rounded-md focus-visible:focus-ring">
           <BrandLockup />
         </Link>
         <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">

@@ -14,7 +14,7 @@ export function ArticleLayout({ toc, children }: { toc: TocItem[]; children: Rea
             <ul className="flex flex-col">
               {toc.map((t) => (
                 <li key={t.id}>
-                  <a href={`#${t.id}`} className="body-6 flex min-h-8 items-center text-text-subtle hover:text-text focus-visible:focus-ring">{t.label}</a>
+                  <a href={`#${t.id}`} className="body-6 flex min-h-11 items-center text-text-subtle hover:text-text focus-visible:focus-ring">{t.label}</a>
                 </li>
               ))}
             </ul>

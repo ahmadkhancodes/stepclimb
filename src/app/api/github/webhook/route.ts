@@ -1,3 +1,4 @@
+import { fixturesMode } from "@/lib/env";
 import { after } from "next/server";
 import { getDb } from "@/lib/db";
 import { json } from "@/lib/http";
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
   const raw = await req.text();
   if (raw.length > 5_000_000) return json({ error: "body_too_large" }, 413);
   const db = await getDb();
-  const secret = process.env.GITHUB_FIXTURES === "1" ? (process.env.GITHUB_WEBHOOK_SECRET ?? "") : ((await loadAppCredentials(db))?.webhookSecret ?? "");
+  const secret = fixturesMode() ? (process.env.GITHUB_WEBHOOK_SECRET ?? "") : ((await loadAppCredentials(db))?.webhookSecret ?? "");
   if (!secret) return json({ error: "not_configured" }, 503);
   let r: Awaited<ReturnType<typeof processWebhook>>;
   try {

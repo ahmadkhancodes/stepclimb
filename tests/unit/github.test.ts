@@ -164,19 +164,22 @@ describe("installation and repository sync", () => {
     expect(await db.docs.find("repos")).toHaveLength(0);
   });
 
-  it("claims by GitHub login, by a fresh explicit id, and never takes another org's installation", async () => {
+  it("claims what GitHub lists for the user, and never takes another org's installation", async () => {
     await applyGithubEvent(db, "installation", fixtureInstallationPayload());
     await syncInstallation(db, createFixtureApi(), FIXTURE_INSTALLATION_ID);
     expect(await claimInstallations(db, "org-x", { githubLogin: "someone-else" })).toEqual([]);
-    expect(await claimInstallations(db, "org-a", { githubLogin: FIXTURE_LOGIN })).toEqual([FIXTURE_INSTALLATION_ID]);
+    // an organisation install is never claimed by a login match alone
+    expect(await claimInstallations(db, "org-x", { githubLogin: FIXTURE_LOGIN })).toEqual([]);
+    expect(await claimInstallations(db, "org-a", { githubLogin: FIXTURE_LOGIN, visibleIds: [FIXTURE_INSTALLATION_ID] })).toEqual([FIXTURE_INSTALLATION_ID]);
     expect((await db.docs.find<RepoDoc>("repos", { accountId: "org-a" })).length).toBe(FIXTURE_REPOS.length);
     expect(await claimInstallations(db, "org-b", { installationId: FIXTURE_INSTALLATION_ID, githubLogin: FIXTURE_LOGIN })).toEqual([]);
   });
 
-  it("refuses an explicit id that is stale and not the user's", async () => {
+  it("refuses an explicit id the user cannot see on GitHub, even right after install (P0-1)", async () => {
     await applyGithubEvent(db, "installation", fixtureInstallationPayload());
-    expect(await claimInstallations(db, "org-z", { installationId: FIXTURE_INSTALLATION_ID, now: new Date(Date.now() + 3_600_000) })).toEqual([]);
-    expect(await claimInstallations(db, "org-z", { installationId: FIXTURE_INSTALLATION_ID })).toEqual([FIXTURE_INSTALLATION_ID]);
+    expect(await claimInstallations(db, "org-z", { installationId: FIXTURE_INSTALLATION_ID })).toEqual([]);
+    expect(await claimInstallations(db, "org-z", { installationId: FIXTURE_INSTALLATION_ID, githubLogin: "attacker", visibleIds: ["123"] })).toEqual([]);
+    expect(await claimInstallations(db, "org-z", { installationId: FIXTURE_INSTALLATION_ID, visibleIds: [FIXTURE_INSTALLATION_ID] })).toEqual([FIXTURE_INSTALLATION_ID]);
   });
 });
 
@@ -200,7 +203,7 @@ describe("scan report and Hangar", () => {
   beforeEach(async () => {
     db = createMemoryDb("stepclimb");
     await applyGithubEvent(db, "installation", fixtureInstallationPayload());
-    await claimInstallations(db, "org-a", { githubLogin: FIXTURE_LOGIN });
+    await claimInstallations(db, "org-a", { githubLogin: FIXTURE_LOGIN, visibleIds: [FIXTURE_INSTALLATION_ID] });
     await syncInstallation(db, createFixtureApi(), FIXTURE_INSTALLATION_ID);
   });
   const repoByName = async (n: string) => (await db.docs.find<RepoDoc>("repos", { fullName: `${FIXTURE_LOGIN}/${n}` }))[0]!;

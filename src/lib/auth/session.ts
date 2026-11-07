@@ -1,6 +1,6 @@
 import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-import { adminEmails, isProd } from "@/lib/env";
+import { notFound, redirect } from "next/navigation";
+import { adminEmails, isProd, e2eMode } from "@/lib/env";
 import { HttpError } from "@/lib/http";
 import { getAuth } from "./index";
 import { can, type OrgRole } from "./roles";
@@ -78,13 +78,24 @@ export function requirePermission(ctx: OrgContext, resource: keyof typeof statem
 export const isFounderAdmin = (email: string | null | undefined) => !!email && adminEmails().includes(email.toLowerCase());
 
 /** Founder console needs TOTP in production (off only for the e2e suite, which sets E2E_OUTBOX=1 and never runs on Vercel). */
-export const founderNeeds2fa = (u: { twoFactorEnabled?: boolean | null }) => isProd() && process.env.E2E_OUTBOX !== "1" && !u.twoFactorEnabled;
+export const founderNeeds2fa = (u: { twoFactorEnabled?: boolean | null }) => isProd() && !e2eMode() && !u.twoFactorEnabled;
 
 /** Founder only API guard: 404 for everyone else (the console does not exist for them), 403 until TOTP is on. */
 export async function requireFounder() {
   const s = await requireUser();
   if (!isFounderAdmin(s.user.email)) throw new HttpError(404, "not_found");
   if (founderNeeds2fa(s.user)) throw new HttpError(403, "two_factor_required");
+  return s;
+}
+
+/**
+ * Founder only page guard. Every admin PAGE calls it itself: a layout check alone is not enough, because Next renders only the
+ * changed segments on client navigation (a crafted router state header can ask for the page segment without the layout).
+ * Same rules as the layout: 404 for everyone else, and in production the page body needs TOTP.
+ */
+export async function requireFounderPage(path = "/admin") {
+  const s = await requireUser({ redirectTo: path });
+  if (!isFounderAdmin(s.user.email) || founderNeeds2fa(s.user)) notFound();
   return s;
 }
 

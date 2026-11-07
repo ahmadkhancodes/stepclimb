@@ -5,7 +5,7 @@ import { memoryAdapter } from "better-auth/adapters/memory";
 import { passkey } from "@better-auth/passkey";
 import { apiKey } from "@better-auth/api-key";
 import { product } from "@/config/product";
-import { appName, appUrl, dbDriver, env, isProd } from "@/lib/env";
+import { appName, appUrl, dbDriver, env, isProd, e2eMode } from "@/lib/env";
 import { sendMail } from "@/lib/mail";
 import { inviteEmail, magicLinkEmail } from "@/lib/mail/templates";
 import { isDisposableEmail } from "@/lib/security/disposable";
@@ -68,7 +68,7 @@ export function createAuth(db: BetterAuthOptions["database"], github: GithubOAut
       cookieCache: { enabled: true, maxAge: 300 },
     },
     // e2e signs in many times within a minute from one IP; E2E_OUTBOX is never set on Vercel
-    rateLimit: { enabled: process.env.E2E_OUTBOX !== "1", window: 60, max: 60, storage: "database" },
+    rateLimit: { enabled: !e2eMode(), window: 60, max: 60, storage: "database" },
     emailAndPassword: { enabled: false },
     // GitHub is the primary sign in (users map to installations). Account age feeds the free tier gate (30 days).
     socialProviders: github

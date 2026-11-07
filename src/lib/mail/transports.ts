@@ -3,7 +3,9 @@ import { log } from "@/lib/logger";
 import type { MailMessage, MailTransport, SendResult } from "./types";
 
 /** Dev/test/stub transport: keeps messages in memory and logs the subject (never the body). */
-export const outbox: (MailMessage & { from: string; id: string; at: Date })[] = [];
+// process wide (globalThis): Next can load this module once per route bundle, and the e2e outbox route must see every message
+type OutboxItem = MailMessage & { from: string; id: string; at: Date };
+export const outbox: OutboxItem[] = ((globalThis as unknown as { __stepclimbOutbox?: OutboxItem[] }).__stepclimbOutbox ??= []);
 
 export function consoleTransport(): MailTransport {
   return {

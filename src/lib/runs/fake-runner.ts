@@ -21,6 +21,8 @@ export interface FakeRunnerOptions {
   failStart?: boolean;
   /** advancing clock for deadline tests */
   tickMs?: number;
+  /** the git host that sees the pushes (fixture host), so the orchestrator can resolve branch heads like on GitHub */
+  host?: { moveBranch(fullName: string, branch: string, sha: string): Promise<void> };
 }
 
 /** Deterministic backend for tests: runs the real agent in process on a MemoryFs. No network, no processes. */
@@ -59,7 +61,12 @@ export class FakeRunner implements RunnerBackend {
         return this.opts.verify?.(stage, f, counts[stage]!) ?? { passed: true, output: `${stage} ok`, stage };
       },
       commit: async (message, files) => { this.commits.push({ message, files }); return `sha${String(this.commits.length).padStart(4, "0")}`; },
-      push: async (branch) => { this.pushed.push({ branch, fs: fs.snapshot() }); return `head${this.commits.length}`; },
+      push: async (branch) => {
+        this.pushed.push({ branch, fs: fs.snapshot() });
+        const head = `head${this.commits.length}`;
+        await this.opts.host?.moveBranch(spec.fullName, branch, head);
+        return head;
+      },
       emit: send,
       now: () => (clock += this.opts.tickMs ?? 10),
     };

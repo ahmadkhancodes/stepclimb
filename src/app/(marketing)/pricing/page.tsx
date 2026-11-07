@@ -33,7 +33,7 @@ const publicCell = (p: Plan) => `${p.limits.public_prs} a month`;
 const faq: FaqItem[] = [
   {
     q: "What does the free inspection include?",
-    a: "Unlimited inspection reports, and one upgrade pull request a month on public open source repos. The inspection reads composer.json and composer.lock only, so no code is cloned.",
+    a: "Unlimited inspection reports, and one upgrade pull request a month on public open source repos. The inspection reads composer.json, composer.lock and package.json only, so no code is cloned.",
   },
   {
     q: "What is the difference between Solo and Legacy Solo?",
@@ -105,7 +105,7 @@ export default function PricingPage() {
       <Faq title="Pricing questions" items={faq} />
       <FinalCta
         title="Find out how far behind your repos are"
-        body="The free inspection reads composer.json and composer.lock only. No code is cloned."
+        body="The free inspection reads composer.json, composer.lock and package.json only. No code is cloned."
         cta={{ href: "/sign-in", label: "Inspect a repo free" }}
         note="Free inspection first. Cancel at period end. Pause up to 3 months."
       />

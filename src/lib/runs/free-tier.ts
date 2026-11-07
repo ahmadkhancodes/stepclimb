@@ -1,3 +1,4 @@
+import { fixturesMode } from "@/lib/env";
 import type { Db } from "@/lib/db";
 import type { RunDoc } from "./types";
 import { isTerminal } from "./types";
@@ -29,7 +30,7 @@ export const freeTierMessage = (r: FreeTierReason) => NOT_FREE[r];
 /** GitHub account creation date for the installation owner (public endpoint, cached 7 days in `github_users`). Fixture mode returns an old date. */
 export async function githubAccountCreatedAt(db: Db, login: string, fetchImpl: typeof fetch = fetch): Promise<Date | null> {
   if (!login) return null;
-  if (process.env.GITHUB_FIXTURES === "1") return new Date("2015-01-01T00:00:00Z");
+  if (fixturesMode()) return new Date("2015-01-01T00:00:00Z");
   const key = login.toLowerCase();
   const hit = await db.docs.get<{ createdAt: string; checkedAt: number }>("github_users", key);
   if (hit && Date.now() - hit.checkedAt < 7 * 86_400_000) return new Date(hit.createdAt);

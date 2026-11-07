@@ -16,8 +16,8 @@ import { getDb } from "@/lib/db";
 
 export const metadata = { title: "Hangar" };
 
-export default async function OverviewPage({ searchParams }: { searchParams: Promise<{ installed?: string }> }) {
-  const { installed } = await searchParams;
+export default async function OverviewPage({ searchParams }: { searchParams: Promise<{ installed?: string; link?: string }> }) {
+  const { installed, link } = await searchParams;
   const ctx = await requireOrg({ page: true });
   const db = await getDb();
   const ent = await db.getEntitlement(ctx.org.id);
@@ -41,7 +41,8 @@ export default async function OverviewPage({ searchParams }: { searchParams: Pro
         description={`${ctx.org.name}. Every repo as an airframe: Laravel version, how far behind, when support ends.`}
         actions={installHref ? <Link href={installHref} className={buttonClass("secondary", "md")}>Add repositories</Link> : null}
       />
-      {installed ? <div className="mb-6"><Notice tone="success" title="GitHub App installed">Repositories sync in the background. Run a free scan on any airframe.</Notice></div> : null}
+      {installed && link === "github" ? <div className="mb-6"><Notice tone="warning" title="Sign in with GitHub to link this installation">We link an installation only when GitHub confirms you can see it. Sign in with GitHub, then open the app on GitHub and press Configure: GitHub sends you back here and we link it.</Notice></div> : null}
+      {installed && link !== "github" ? <div className="mb-6"><Notice tone="success" title="GitHub App installed">Repositories sync in the background. Run a free scan on any airframe.</Notice></div> : null}
       <div className="mb-6">
         {hangar === null ? (
           <ErrorState
@@ -52,7 +53,7 @@ export default async function OverviewPage({ searchParams }: { searchParams: Pro
         ) : hangar.rows.length === 0 ? (
           <EmptyState
             title="No airframes yet"
-            body="Install the Stepclimb GitHub App on the repos you choose. Each one gets a free inspection that reads composer.json and composer.lock only, so no code is cloned."
+            body="Install the Stepclimb GitHub App on the repos you choose. Each one gets a free inspection that reads composer.json, composer.lock and package.json only, so no code is cloned."
             action={
               installHref ? <Link href={installHref} className={buttonClass("primary")}>Install the GitHub App</Link>
               : founder ? <Link href="/setup/github-app" className={buttonClass("primary")}>Set up the GitHub App</Link>

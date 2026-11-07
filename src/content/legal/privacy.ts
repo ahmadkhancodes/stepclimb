@@ -24,7 +24,7 @@ export const privacy: LegalDoc = {
             "Account data: your email address, name if you give one, and your GitHub account identifier and username, and two factor settings if you turn them on.",
             "Organization data: workspace name, members, roles, API keys (stored hashed) and the settings you configure.",
             "Billing data: your plan and subscription status. Card details go straight to Stripe and never touch our servers.",
-            "Repository data: a free inspection reads composer.json and composer.lock only. An upgrade run clones the repository into an isolated sandbox that is destroyed when the run ends. We do not retain customer code. Run logs are kept for 30 days with secrets redacted.",
+            "Repository data: a free inspection reads composer.json, composer.lock and package.json only. An upgrade run clones the repository into an isolated sandbox that is destroyed when the run ends. We do not retain customer code. Run logs are kept for 30 days with secrets redacted.",
             "Technical data: IP address, browser type and request logs, kept briefly for security, abuse prevention and debugging.",
           ],
         },

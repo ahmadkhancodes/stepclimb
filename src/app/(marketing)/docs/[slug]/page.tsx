@@ -60,7 +60,7 @@ export default async function DocPageRoute({ params }: Props) {
             <ul className="flex flex-col">
               {doc.sections.map((s) => (
                 <li key={s.heading}>
-                  <a href={`#${sectionId(s.heading)}`} className="body-6 flex min-h-8 items-center text-text-subtle hover:text-text focus-visible:focus-ring">
+                  <a href={`#${sectionId(s.heading)}`} className="body-6 flex min-h-11 items-center text-text-subtle hover:text-text focus-visible:focus-ring">
                     {s.heading}
                   </a>
                 </li>

@@ -22,7 +22,7 @@ export const gettingStarted: DocPage = {
     {
       heading: "Read the inspection report",
       body: [
-        "Each repo gets a free inspection from composer.json and composer.lock only. No code is cloned. The report shows the Laravel version, the PHP constraint, how many majors behind the repo is, when support ends, the recipes that apply and an effort band from S to XL.",
+        "Each repo gets a free inspection from composer.json, composer.lock and package.json only. No code is cloned. The report shows the Laravel version, the PHP constraint, how many majors behind the repo is, when support ends, the recipes that apply and an effort band from S to XL.",
       ],
     },
     {

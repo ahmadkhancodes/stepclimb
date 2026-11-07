@@ -1,3 +1,4 @@
+import { requireFounderPage } from "@/lib/auth/session";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/app/page-header";
@@ -12,6 +13,7 @@ export const metadata = { title: "Admin run" };
 export const dynamic = "force-dynamic";
 
 export default async function AdminRunPage({ params }: { params: Promise<{ id: string }> }) {
+  await requireFounderPage("/admin/runs");
   const { id } = await params;
   const d = await adminRunDetail(await getDb(), id);
   if (!d) notFound();

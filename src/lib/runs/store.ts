@@ -65,6 +65,16 @@ export async function appendLog(db: Db, runId: string, stream: RunLogDoc["stream
   await db.docs.put("run_logs", `${runId}:${String(seq).padStart(6, "0")}`, { runId, seq, stream, text: text.slice(0, LIMITS.maxLogChunk), at: new Date() } satisfies RunLogDoc);
   return true;
 }
+/** Retention (security page: "logs are kept 30 days"): deletes log chunks of runs that finished more than `days` ago. */
+export async function purgeOldLogs(db: Db, now = new Date(), days = LIMITS.logRetentionDays): Promise<{ runs: number }> {
+  const cutoff = now.getTime() - days * 86_400_000;
+  const old = (await db.docs.find<RunDoc & { logsPurged?: boolean }>("runs")).filter((r) => isTerminal(r.status) && !r.logsPurged && new Date(r.finishedAt ?? r.updatedAt).getTime() < cutoff);
+  for (const r of old) {
+    await db.docs.remove("run_logs", { runId: r.id });
+    await db.docs.put("runs", r.id, { logsPurged: true });
+  }
+  return { runs: old.length };
+}
 export async function listLogs(db: Db, runId: string, afterSeq = 0): Promise<Id<RunLogDoc>[]> {
   return (await db.docs.find<RunLogDoc>("run_logs", { runId })).filter((l) => l.seq > afterSeq).sort((a, b) => a.seq - b.seq);
 }
@@ -86,11 +96,20 @@ export async function availableCredit(db: Db, accountId: string, kind: CreditKin
   const list = (await db.docs.find<CreditDoc>("credits", { accountId, kind })).filter((c) => c.remaining > 0 && new Date(c.expiresAt).getTime() > now.getTime());
   return list.sort((a, b) => new Date(a.expiresAt).getTime() - new Date(b.expiresAt).getTime())[0] ?? null;
 }
+/**
+ * Spends one unit. Race safe without transactions: each spend first inserts a unique claim `<credit>:<spent>`, so two
+ * parallel starts that read the same credit cannot both win it (the loser retries on the next credit or gets null).
+ */
 export async function consumeCredit(db: Db, accountId: string, kind: CreditKind, now = new Date()): Promise<string | null> {
-  const c = await availableCredit(db, accountId, kind, now);
-  if (!c) return null;
-  await db.docs.put("credits", c.id, { remaining: c.remaining - 1 });
-  return c.id;
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const c = await availableCredit(db, accountId, kind, now);
+    if (!c) return null;
+    const spent = (c as CreditDoc & { spent?: number }).spent ?? 0;
+    if (!(await db.docs.insert("credit_claims", `${c.id}:${spent}`, { creditId: c.id, accountId, at: now }))) continue;
+    await db.docs.put("credits", c.id, { remaining: c.remaining - 1, spent: spent + 1 });
+    return c.id;
+  }
+  return null;
 }
 export async function refundCredit(db: Db, creditId: string): Promise<void> {
   const c = await db.docs.get<CreditDoc>("credits", creditId);

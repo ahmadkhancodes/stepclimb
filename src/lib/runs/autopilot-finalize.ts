@@ -61,11 +61,13 @@ export async function finalizeAutopilot(d: Deps, run: RunWithId, result: RunResu
     } else await recordPrClosed(d.db, run.repoId, st === "merged");
   }
   if (!refreshed) {
-    const pr = await host.openPr(run.fullName, { head: run.branch ?? AUTOPILOT_BRANCH, base: run.baseBranch, title, body, draft: false });
+    const pr = await host.openPr(run.fullName, { head: AUTOPILOT_BRANCH, base: run.baseBranch, title, body, draft: false });
     number = pr.number;
     url = pr.url;
   }
-  const head = run.headSha ?? (await host.branchHead(run.fullName, run.branch ?? AUTOPILOT_BRANCH)) ?? "";
+  // finalizeRun resolved the head of AUTOPILOT_BRANCH through GitHub; a sandbox reported sha is never used
+  const head = run.headSha ?? (await host.branchHead(run.fullName, AUTOPILOT_BRANCH));
+  if (!head) throw new Error("branch_missing");
   const conclusion = conclusionFor(result);
   const out = checkOutput({ runId: run.id, fullName: run.fullName, hopFrom: run.hopFrom, hopTo: run.hopTo, result, appUrl: d.appUrl });
   await host.createCheckRun(run.fullName, { headSha: head, conclusion, title: out.title, summary: `Weekly dependency update: ${updates.length} moved. ${out.summary}`, text: body });
