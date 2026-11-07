@@ -67,7 +67,8 @@ export function createAuth(db: BetterAuthOptions["database"], github: GithubOAut
       updateAge: 60 * 60 * 24,
       cookieCache: { enabled: true, maxAge: 300 },
     },
-    rateLimit: { enabled: true, window: 60, max: 60, storage: "database" },
+    // e2e signs in many times within a minute from one IP; E2E_OUTBOX is never set on Vercel
+    rateLimit: { enabled: process.env.E2E_OUTBOX !== "1", window: 60, max: 60, storage: "database" },
     emailAndPassword: { enabled: false },
     // GitHub is the primary sign in (users map to installations). Account age feeds the free tier gate (30 days).
     socialProviders: github

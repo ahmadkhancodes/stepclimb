@@ -4,6 +4,7 @@ import { RunwayBar } from "@/components/marketing/demo/runway-bar";
 import type { ScanReport } from "@/lib/github/scan";
 import { eolText, formatDate, TEST_LABEL } from "@/lib/github/hangar";
 import type { EffortBand } from "@/lib/engine/types";
+import { StartRunButton } from "./start-run-button";
 
 const EFFORT_TEXT: Record<EffortBand, string> = {
   S: "Small: at most one hop and your tests can verify it.",
@@ -17,7 +18,7 @@ export function EffortBadge({ band }: { band: EffortBand }) {
 }
 
 /** Free scan report (brief item 4): versions behind, EOL date, applicable recipes, effort band, risk flags, EOL calendar. */
-export function InspectionReport({ report }: { report: ScanReport }) {
+export function InspectionReport({ report, repoId, returnTo }: { report: ScanReport; repoId?: string; returnTo?: string }) {
   return (
     <div className="flex flex-col gap-6" data-testid="inspection-report">
       <p className="caption-5 text-text-subtle">Branch <span className="mono-data">{report.branch}</span> · scanned {report.scannedAt.slice(0, 10)} · latest Laravel major {report.latestMajor}</p>
@@ -60,6 +61,7 @@ export function InspectionReport({ report }: { report: ScanReport }) {
                   {a.hops.map((h) => (
                     <li key={h.from} className="border border-border bg-surface-raised p-4">
                       <p className="title-4 text-text">Laravel {h.from} to {h.to}</p>
+                      {repoId && returnTo && !h.missing && h.from === a.app.laravelMajor && a.app.supported ? <div className="mt-3"><StartRunButton repoId={repoId} appPath={a.path} hopFrom={h.from} hopTo={h.to} returnTo={returnTo} /></div> : null}
                       {h.missing ? <p className="body-6 mt-1 text-text-subtle">No recipe for this hop yet.</p> : (
                         <ul className="mt-2 flex flex-col gap-1">
                           {h.recipes.map((r) => (

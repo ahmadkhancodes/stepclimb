@@ -219,3 +219,16 @@ describe("per repo quantity and the 6 month interval", () => {
     expect(call.subscription_data.metadata).toMatchObject({ plan: "legacy_solo", interval: "half" });
   });
 });
+
+describe("pay per run: credit grant from a one time Checkout", () => {
+  it("a paid payment Checkout grants one credit, once, for this app only", async () => {
+    await db.upsertBillingAccount({ id: "org_1", stripeCustomerId: "cus_1", email: null });
+    const paid = (id: string, app = "stepclimb") => event("checkout.session.completed", { id, customer: "cus_1", mode: "payment", payment_status: "paid", metadata: { app, credit_kind: "to_latest" } }, `evt_${id}`);
+    expect((await (await hook(paid("cs_a"))).json()).credit).toBe(true);
+    await hook(paid("cs_a")); // replayed event
+    await handleStripeWebhook(paid("cs_a"), "good", { stripe: f.stripe, db, secret: "whsec_x", now: () => NOW }); // same session, new event id
+    expect((await db.docs.find("credits", { accountId: "org_1" })).length).toBe(1);
+    await hook(paid("cs_b", "other-app"));
+    expect((await db.docs.find("credits", { accountId: "org_1" })).length).toBe(1);
+  });
+});

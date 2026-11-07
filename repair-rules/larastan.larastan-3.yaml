@@ -1,0 +1,20 @@
+key: larastan.larastan-3
+category: larastan
+version: "11"
+title: Laravel 11 needs larastan/larastan ^3.0
+# Failure text follows Composer's solver format. Constraint taken from the package's own release notes, not the Laravel guide: confirm against a real run.
+signature: '(?:Root composer\.json requires|Root composer\.json and) larastan/larastan (?<constraint>[^\s,]+)'
+contextGuard:
+  kind: composer_constraint
+  package: larastan/larastan
+  notSatisfies: "^3.0"
+  section: require-dev
+fix:
+  kind: composer_constraint
+  params:
+    package: larastan/larastan
+    constraint: "^3.0"
+    section: require-dev
+sources:
+  - https://laravel.com/docs/11.x/upgrade
+unverified: true

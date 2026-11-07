@@ -1,0 +1,19 @@
+key: composer.laravel-13-php-8-3
+category: composer
+version: "13"
+title: Root php constraint allows PHP older than Laravel 13 minimum (8.3.0)
+signature: 'laravel/framework[^\n]*? requires? php \^8\.3 -> your php version \((?<php>[^)]+)\) does not satisfy that requirement'
+contextGuard:
+  kind: composer_constraint
+  package: php
+  notSatisfies: "^8.3"
+  section: require
+fix:
+  kind: composer_constraint
+  params:
+    package: php
+    constraint: "^8.3"
+    section: require
+sources:
+  - https://laravel.com/docs/13.x/upgrade
+unverified: true
