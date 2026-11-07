@@ -1,3 +1,4 @@
+import { requireFounderPage } from "@/lib/auth/session";
 import Link from "next/link";
 import { DataTable, Td } from "@/components/app/data-table";
 import { PageHeader } from "@/components/app/page-header";
@@ -13,6 +14,7 @@ export const dynamic = "force-dynamic";
 const tone = (s: string) => (s === "succeeded" ? "success" : s === "failed" || s === "timed_out" ? "danger" : s === "canceled" ? "warning" : "info");
 
 export default async function AdminRunsPage({ searchParams }: { searchParams: Promise<{ status?: string }> }) {
+  await requireFounderPage("/admin/runs");
   const { status } = await searchParams;
   const filter = RUN_STATUSES.find((s) => s === status);
   const runs = await adminRuns(await getDb(), { ...(filter ? { status: filter } : {}), limit: 100 });

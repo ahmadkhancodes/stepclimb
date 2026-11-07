@@ -1,3 +1,4 @@
+import { e2eMode } from "@/lib/env";
 import { getOrgContext } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 import { createFixtureApi, FIXTURE_INSTALLATION_ID, fixtureInstallationPayload, FIXTURE_LOGIN } from "@/lib/github/fixtures";
@@ -10,7 +11,7 @@ export const dynamic = "force-dynamic";
 
 /** E2E only: installs the fixture GitHub account for the signed in org and scans every repo. 404 unless E2E_OUTBOX=1. */
 export async function POST(req: Request) {
-  if (process.env.E2E_OUTBOX !== "1") return json({ error: "not_found" }, 404);
+  if (!e2eMode()) return json({ error: "not_found" }, 404);
   const ctx = await getOrgContext(req.headers);
   if (!ctx) return json({ error: "unauthorized" }, 401);
   const db = await getDb();
@@ -19,7 +20,8 @@ export async function POST(req: Request) {
   await db.docs.remove("repos", { installationId: FIXTURE_INSTALLATION_ID });
   await db.docs.remove("installations", { externalId: FIXTURE_INSTALLATION_ID });
   await applyGithubEvent(db, "installation", fixtureInstallationPayload());
-  await claimInstallations(db, ctx.org.id, { installationId: FIXTURE_INSTALLATION_ID, githubLogin: FIXTURE_LOGIN });
+  // fixture stand in for GitHub listing the installation for the user's own token
+  await claimInstallations(db, ctx.org.id, { installationId: FIXTURE_INSTALLATION_ID, githubLogin: FIXTURE_LOGIN, visibleIds: [FIXTURE_INSTALLATION_ID] });
   await syncInstallation(db, api, FIXTURE_INSTALLATION_ID);
   const repos = await db.docs.find<RepoDoc>("repos", { installationId: FIXTURE_INSTALLATION_ID });
   const scans: Record<string, string> = {};

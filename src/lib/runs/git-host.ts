@@ -32,7 +32,9 @@ export async function mintScopedToken(t: TokenSpec, fetchImpl: typeof fetch = fe
   return ((await res.json()) as { token: string }).token;
 }
 
-export const RUN_TOKEN_PERMISSIONS = { contents: "write", metadata: "read" } as const;
+/** The sandbox token is READ ONLY: customer code runs next to it (composer scripts, tests), and a write token there could push
+ * to the default branch. Pushes go through the orchestrator, which only ever writes `refs/heads/stepclimb/*` (D-35). */
+export const RUN_TOKEN_PERMISSIONS = { contents: "read", metadata: "read" } as const;
 export const FINALIZE_TOKEN_PERMISSIONS = { contents: "write", pull_requests: "write", checks: "write", metadata: "read" } as const;
 
 export function createGithubHost(getToken: () => Promise<string>, fetchImpl: typeof fetch = fetch): GitHost {

@@ -1,3 +1,4 @@
+import { requireFounderPage } from "@/lib/auth/session";
 import { AdminActionButton } from "@/components/admin/actions";
 import { DataTable, Td } from "@/components/app/data-table";
 import { PageHeader } from "@/components/app/page-header";
@@ -28,6 +29,7 @@ function PinTable({ kind, rows }: { kind: "recipes" | "rules"; rows: PinRow[] })
 }
 
 export default async function AdminRulesPage() {
+  await requireFounderPage("/admin/rules");
   const db = await getDb();
   const [{ recipes, rules }, flags] = await Promise.all([pinRows(db), getFlags()]);
   return (

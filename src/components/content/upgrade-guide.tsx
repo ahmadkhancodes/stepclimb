@@ -113,7 +113,7 @@ export function UpgradeGuide(p: UpgradeGuideProps) {
           <OL items={p.recipes} />
           {oneOff ? (
             <Bulletin label="Price">
-              {oneOff.name} is {price} for one verified pull request. A free inspection comes first, and it reads composer.json and composer.lock only.
+              {oneOff.name} is {price} for one verified pull request. A free inspection comes first, and it reads composer.json, composer.lock and package.json only.
             </Bulletin>
           ) : null}
         </ArticleSection>
@@ -128,7 +128,7 @@ export function UpgradeGuide(p: UpgradeGuideProps) {
       <Faq title="Common questions" items={p.faq} />
       <FinalCta
         title={`Find out what a move to Laravel ${p.to} needs in your repo`}
-        body="The free inspection reads composer.json and composer.lock only. No code is cloned."
+        body="The free inspection reads composer.json, composer.lock and package.json only. No code is cloned."
         cta={{ href: "/sign-in", label: "Inspect a repo free" }}
         note="Free inspection first. Cancel at period end. Pause up to 3 months."
       />

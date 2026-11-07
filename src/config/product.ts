@@ -85,7 +85,7 @@ export const product = {
       tagline: "See how far behind each repo is",
       prices: [],
       limits: { repos: 0, seats: 1, extended_verify: 0, public_prs: 1 },
-      highlights: ["Unlimited inspection reports", "1 upgrade PR a month on public open source repos", "Reads composer.json and composer.lock only"],
+      highlights: ["Unlimited inspection reports", "1 upgrade PR a month on public open source repos", "Reads composer.json, composer.lock and package.json only"],
       cta: "Inspect a repo free",
       trialDays: 0,
     },

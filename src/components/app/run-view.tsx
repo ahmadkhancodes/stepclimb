@@ -112,7 +112,7 @@ export function RunView({ runId }: { runId: string }) {
           <p className="body-5 text-text-subtle" role="status">{STATUS_TEXT[run.status] ?? run.status}</p>
         </div>
         <div className="flex items-center gap-2">
-          {run.prUrl ? <a href={run.prUrl} className="button-sm inline-flex min-h-8 items-center gap-1 text-action focus-visible:focus-ring" target="_blank" rel="noreferrer">Open PR #{run.prNumber}<ArrowSquareOut size={16} weight="regular" aria-hidden /></a> : null}
+          {run.prUrl ? <a href={run.prUrl} className="button-sm inline-flex min-h-11 items-center gap-1 text-action focus-visible:focus-ring" target="_blank" rel="noreferrer">Open PR #{run.prNumber}<ArrowSquareOut size={16} weight="regular" aria-hidden /></a> : null}
           {live ? <Button size="sm" variant="secondary" loading={canceling} onClick={cancel}><X size={16} weight="regular" aria-hidden />Cancel run</Button> : null}
         </div>
       </div>

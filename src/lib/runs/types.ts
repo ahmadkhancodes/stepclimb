@@ -88,6 +88,8 @@ export const LIMITS = {
   /** no output for this long while running counts as stalled */
   silenceMs: 5 * 60_000,
   creditTtlDays: 365,
+  /** run log chunks are deleted this long after the run ends (public security claim) */
+  logRetentionDays: 30,
 } as const;
 
 /** Egress allow list (architecture section 5, step 2). Everything else is blocked and logged as `blocked_host`. */

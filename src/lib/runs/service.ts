@@ -9,14 +9,15 @@ import { finalizeAutopilot } from "./autopilot-finalize";
 import { checkFreeTier, freeTierMessage } from "./free-tier";
 import { loadPins } from "./pins";
 import type { RunResult, RunnerEvent, SignedEvent } from "./events";
-import { verifyEvent } from "./events";
+import { RunnerEventSchema, verifyEvent } from "./events";
+import { branchName } from "./agent";
 import { AUTOPILOT_BRANCH } from "./autopilot-finalize";
 import { creditKindFor } from "./credit-kind";
 import type { GitHost } from "./git-host";
 import type { RunnerBackend } from "./runner";
 import { addStep, appendLog, consumeCredit, createRun, getRun, patchRun, refundCredit, saveSquawks, transition } from "./store";
 import { LIMITS, isTerminal, type RunDoc } from "./types";
-import { buildWorkOrderBody, checkOutput, conclusionFor, prTitle, reviewComments, stampFor, workOrderNo } from "./work-order";
+import { buildWorkOrderBody, checkOutput, conclusionFor, prTitle, reviewComments, sanitizeResult, stampFor, workOrderNo } from "./work-order";
 
 type RunWithId = RunDoc & { id: string };
 
@@ -144,14 +145,18 @@ async function failRun(d: RunDeps, runId: string, error: string, to: "failed" | 
 const friendlyReason = (e: string) => e.replace(/^app_is_on_(\w+)_not_(\d+)$/, "the app is on Laravel $1, not $2").replace(/_/g, " ");
 
 /** Verifies and applies one runner event. Returns false for replays and bad signatures (never throws on those). */
-export async function ingestEvent(d: RunDeps, runId: string, e: SignedEvent, signature: string | null): Promise<"ok" | "bad_signature" | "replay" | "not_found" | "closed"> {
+export async function ingestEvent(d: RunDeps, runId: string, e: SignedEvent, signature: string | null): Promise<"ok" | "bad_signature" | "replay" | "not_found" | "closed" | "invalid"> {
   const run = await getRun(d.db, runId);
   if (!run) return "not_found";
+  // the signature covers the event exactly as sent; validation happens after (parsing may reorder keys)
   if (!(await verifyEvent(run.eventSecret, runId, e, signature))) return "bad_signature";
   if (isTerminal(run.status)) return "closed";
   if (!Number.isInteger(e.seq) || e.seq <= run.lastSeq) return "replay";
+  // the event secret lives in the sandbox next to customer code: a valid signature proves nothing about intent, so validate the shape
+  const parsed = RunnerEventSchema.safeParse(e.event);
+  if (!parsed.success) return "invalid";
   await patchRun(d.db, runId, { lastSeq: e.seq });
-  await applyEvent(d, run, e.event);
+  await applyEvent(d, run, parsed.data as RunnerEvent);
   return "ok";
 }
 
@@ -167,18 +172,35 @@ async function applyEvent(d: RunDeps, run: RunWithId, ev: RunnerEvent) {
     case "log_chunk":
       await appendLog(d.db, run.id, ev.stream, redactSecrets(ev.text));
       return;
-    case "pushed":
-      await patchRun(d.db, run.id, { branch: ev.branch, headSha: ev.headSha });
+    case "pushed": {
+      // only the branch this run owns is ever accepted: never the base or default branch, never a name chosen in the sandbox
+      const want = expectedBranch(run);
+      if (ev.branch !== want || want === run.baseBranch) {
+        await appendLog(d.db, run.id, "system", "Push report for an unexpected branch was refused.");
+        await failRun(d, run.id, "unexpected_branch", "failed");
+        return;
+      }
+      await patchRun(d.db, run.id, { branch: want, headSha: /^[0-9a-zA-Z_-]{1,64}$/.test(ev.headSha) ? ev.headSha : null });
       return;
+    }
     case "result":
       await finalizeRun(d, run.id, ev.result);
   }
 }
 
+/** The one branch a run may push and open a PR from. Computed on our side, never taken from the sandbox. */
+export function expectedBranch(run: Pick<RunDoc, "kind" | "hopTo"> & { id: string }): string {
+  if (run.kind === "autopilot") return AUTOPILOT_BRANCH;
+  if (run.kind === "noop") return `stepclimb/noop-${run.id.slice(-8)}`;
+  return branchName(run.hopTo, run.id);
+}
+
 /** Orchestrator side of a run: PR, squawk comments, check run, status. The sandbox is destroyed in `finally`. */
-export async function finalizeRun(d: RunDeps, runId: string, result: RunResult): Promise<RunWithId> {
+export async function finalizeRun(d: RunDeps, runId: string, rawResult: RunResult): Promise<RunWithId> {
   let run = (await getRun(d.db, runId))!;
   if (isTerminal(run.status)) return run;
+  // untrusted: neutralise markdown, mentions, HTML and secrets before anything reaches the customer's PR
+  const result = sanitizeResult(rawResult);
   try {
     if (run.status === "starting") run = (await transition(d.db, runId, "running")) as RunWithId;
     run = (await transition(d.db, runId, "finalizing", { repairPasses: result.repair.passes, repairRulesApplied: result.repair.rulesApplied, computeSeconds: result.computeSeconds, verified: result.verified })) as RunWithId;
@@ -192,14 +214,21 @@ export async function finalizeRun(d: RunDeps, runId: string, result: RunResult):
       await failRun(d, runId, result.aborted, "failed");
       return (await getRun(d.db, runId))!;
     }
-    if (run.kind === "autopilot") return (await finalizeAutopilot(d, run, result)) as RunWithId;
+    if (run.kind === "autopilot" && (result.updates ?? []).length === 0) return (await finalizeAutopilot(d, run, result)) as RunWithId;
+    if (!run.branch) throw new Error("nothing_pushed");
+    const branch = expectedBranch(run);
     const host = await d.host(run);
+    // the check run goes on the commit GitHub reports for OUR branch, never on a sha the sandbox names (a forged sha could
+    // put a green "Verified" check on any commit, including one on the default branch)
+    const head = await host.branchHead(run.fullName, branch);
+    if (!head) throw new Error("branch_missing");
+    await patchRun(d.db, runId, { headSha: head });
+    if (run.kind === "autopilot") return (await finalizeAutopilot(d, { ...run, branch, headSha: head }, result)) as RunWithId;
     const input = { runId, fullName: run.fullName, hopFrom: run.hopFrom, hopTo: run.hopTo, result, appUrl: d.appUrl };
     const draft = !!result.timedOut;
-    const pr = await host.openPr(run.fullName, { head: run.branch!, base: run.baseBranch, title: prTitle(run.fullName, run.hopTo, runId, result) + (draft ? " (timed out)" : ""), body: buildWorkOrderBody(input), draft });
+    const pr = await host.openPr(run.fullName, { head: branch, base: run.baseBranch, title: prTitle(run.fullName, run.hopTo, runId, result) + (draft ? " (timed out)" : ""), body: buildWorkOrderBody(input), draft });
     const conclusion = conclusionFor(result);
     const out = checkOutput(input);
-    const head = run.headSha ?? (await host.branchHead(run.fullName, run.branch!)) ?? "";
     await host.createCheckRun(run.fullName, { headSha: head, conclusion, ...out });
     const comments = reviewComments(result);
     if (comments.length > 0) await host.postReview(run.fullName, pr.number, { headSha: head, body: `Stepclimb squawks: ${comments.length} on exact lines.`, comments });
@@ -233,7 +262,7 @@ async function continueChain(d: RunDeps, run: RunWithId): Promise<void> {
 export async function openNoopPr(d: RunDeps, run: RunWithId): Promise<void> {
   const host = await d.host(run);
   const base = await host.getBase(run.fullName, run.baseBranch);
-  const branch = `stepclimb/noop-${run.id.slice(-8)}`;
+  const branch = expectedBranch(run);
   await host.createBranch(run.fullName, branch, base.commitSha);
   const sha = await host.createCommit(run.fullName, { message: "Stepclimb: no-op work order (no files changed)", treeSha: base.treeSha, parentSha: base.commitSha });
   await host.moveBranch(run.fullName, branch, sha);

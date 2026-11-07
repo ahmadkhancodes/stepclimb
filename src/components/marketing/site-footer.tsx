@@ -41,7 +41,7 @@ export function SiteFooter() {
       <div className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 md:py-16 lg:px-8">
         <div className="grid gap-12 md:grid-cols-12">
           <div className="flex flex-col gap-4 md:col-span-4">
-            <Link href="/" className="w-fit rounded-md focus-visible:focus-ring" aria-label={`${product.fullName} home`}><BrandLockup /></Link>
+            <Link href="/" className="w-fit rounded-md focus-visible:focus-ring" ><BrandLockup /><span className="sr-only"> home</span></Link>
             <p className="body-6 max-w-xs text-text-subtle">{product.tagline}.</p>
             <p className="caption-4 text-text-subtle">A BufferSol product</p>
           </div>

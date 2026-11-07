@@ -23,7 +23,7 @@ export default async function WorkOrdersPage() {
         <EmptyState
           title="No work orders yet"
           body={<>Open an inspection in the Hangar and start the first hop. A work order runs in a fresh sandbox and ends in a pull request you review.</>}
-          action={<Link href="/app" className="button-sm inline-flex min-h-8 items-center text-action focus-visible:focus-ring">Go to the Hangar</Link>}
+          action={<Link href="/app" className="button-sm inline-flex min-h-11 items-center text-action focus-visible:focus-ring">Go to the Hangar</Link>}
         />
       ) : (
         <div className="overflow-x-auto border border-border" data-testid="work-orders">

@@ -15,7 +15,7 @@ export const howVerificationWorks: DocPage = {
     {
       heading: "Verified",
       body: [
-        "Verified means composer install, the asset build and your tests ran in the sandbox and passed. The check shows the test counts, for example how many tests passed.",
+        "Verified means composer install, the asset build and your tests ran in the sandbox and passed. The check lists each stage (composer, build, tests) and whether it passed.",
       ],
     },
     {

@@ -1,6 +1,6 @@
 import { join } from "node:path";
 import type { Db } from "@/lib/db";
-import { appUrl } from "@/lib/env";
+import { appUrl, fixturesMode } from "@/lib/env";
 import { loadRecipes } from "@/lib/engine/recipes";
 import { loadRules } from "@/lib/engine/repair";
 import { loadAppCredentials } from "@/lib/github/app-store";
@@ -17,14 +17,16 @@ const g = globalThis as unknown as { __stepclimbFixtureRun?: { runner: FakeRunne
 function fixtureRun() {
   if (!g.__stepclimbFixtureRun) {
     const repo = FIXTURE_REPOS.find((r) => r.fullName.endsWith("/billing-portal"))!;
+    const host = createFixtureHost();
     const runner = new FakeRunner({
+      host,
       repo: repo.files,
       recipes: loadRecipes(join(process.cwd(), "recipes")),
       rules: loadRules(join(process.cwd(), "repair-rules")),
       verify: (stage, fs) => simulatedVerify(stage, fs),
       updateDeps: simulatedUpdateDeps,
     });
-    g.__stepclimbFixtureRun = { runner, host: createFixtureHost() };
+    g.__stepclimbFixtureRun = { runner, host };
   }
   return g.__stepclimbFixtureRun;
 }
@@ -34,7 +36,7 @@ function fixtureRun() {
  * BEFORE any credit is taken. The Vercel Sandbox adapter (`SandboxDriver`) is added with the first real run: docs/MANUAL_STEPS.md.
  */
 export async function getRunDeps(db: Db): Promise<RunDeps | null> {
-  if (process.env.GITHUB_FIXTURES === "1") {
+  if (fixturesMode()) {
     const f = fixtureRun();
     return { db, runner: f.runner, host: async () => f.host, gitToken: async () => "fixture-token", appUrl: appUrl() };
   }

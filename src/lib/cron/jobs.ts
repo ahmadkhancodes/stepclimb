@@ -5,6 +5,7 @@ import { memoryStore, mongoStore, runBackup, type BackupSink, type CollectionSto
 import { alertCronFailure, collectAlerts, recordHeartbeat, sendAlerts } from "@/lib/ops/alerts";
 import { getRunDeps } from "@/lib/runs/runtime";
 import { reapRuns } from "@/lib/runs/service";
+import { purgeOldLogs } from "@/lib/runs/store";
 import { retryDueDeliveries } from "@/lib/webhooks/outbound";
 
 /** The live collection store for the configured driver (Mongo: every product collection; memory: the `Db.docs` list). */
@@ -45,6 +46,8 @@ export const cronJobs: Record<string, () => Promise<unknown>> = {
     const db = await getDb();
     return sendAlerts(db, await collectAlerts(db));
   },
+  /** nightly: delete run logs 30 days after the run ended (security page promise) */
+  retention: async () => purgeOldLogs(await getDb()),
   /** nightly export of the product collections */
   backup: async () => {
     const r = await runBackup(await getDb(), await liveStore(), backupSink());

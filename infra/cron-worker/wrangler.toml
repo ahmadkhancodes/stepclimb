@@ -6,7 +6,7 @@ compatibility_date = "2026-10-01"
 APP_URL = "https://stepclimb.buffersoltech.com"
 JOBS = "reap,heartbeat,alerts,webhook-retries"
 HOURLY_JOBS = "autopilot"
-DAILY_JOBS = "backup"
+DAILY_JOBS = "backup,retention"
 
 [triggers]
 crons = ["* * * * *"]

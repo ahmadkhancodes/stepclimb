@@ -57,3 +57,11 @@ export function envFlags(e: Pick<Env, "APP_FLAGS"> = env()): Record<string, stri
 
 export const adminEmails = (e: Env = env()) =>
   (e.ADMIN_EMAILS ?? "").split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
+
+/**
+ * Test switches. They turn off rate limits, ALTCHA and founder TOTP and open the /api/dev routes, so they are refused on a
+ * Vercel production deployment even if someone sets the variable there by mistake.
+ */
+export const e2eMode = () => process.env.E2E_OUTBOX === "1" && process.env.VERCEL_ENV !== "production";
+/** Fixture GitHub and the in process fake runner (no real PRs, no payment): never on a production deployment. */
+export const fixturesMode = () => process.env.GITHUB_FIXTURES === "1" && process.env.VERCEL_ENV !== "production";

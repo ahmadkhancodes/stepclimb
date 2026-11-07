@@ -76,7 +76,7 @@ export default function GuidesPage() {
       </Container>
       <FinalCta
         title="Find out how far behind your repos are"
-        body="The free inspection reads composer.json and composer.lock only. No code is cloned."
+        body="The free inspection reads composer.json, composer.lock and package.json only. No code is cloned."
         cta={{ href: "/sign-in", label: "Inspect a repo free" }}
         note="Free inspection first. Cancel at period end. Pause up to 3 months."
       />

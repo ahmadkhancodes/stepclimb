@@ -1,3 +1,4 @@
+import { requireFounderPage } from "@/lib/auth/session";
 import Link from "next/link";
 import { DataTable, Td } from "@/components/app/data-table";
 import { PageHeader } from "@/components/app/page-header";
@@ -11,6 +12,7 @@ import { getFlags } from "@/lib/flags";
 export const dynamic = "force-dynamic";
 
 export default async function AdminPage() {
+  await requireFounderPage("/admin");
   const db = await getDb();
   const [totals, flags, usage] = await Promise.all([adminOverview(), getFlags(), usageOverview(db)]);
   const stats = [

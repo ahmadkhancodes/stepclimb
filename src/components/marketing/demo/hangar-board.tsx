@@ -68,7 +68,7 @@ export function HangarBoard() {
           </div>
         ))}
       </dl>
-      <div className="m-4 hidden overflow-x-auto border border-border bg-surface-raised md:block">
+      <div role="region" aria-label="Sample Hangar table" tabIndex={0} className="m-4 hidden overflow-x-auto border border-border bg-surface-raised focus-visible:focus-ring md:block">
         <table className="w-full border-collapse">
           <thead>
             <tr>

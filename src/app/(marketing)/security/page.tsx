@@ -19,14 +19,14 @@ export const metadata = pageMetadata({ title, description, path });
 const lines = [
   { n: "1", head: "One sandbox per run", body: "Each run gets its own sandbox with no host mounts. It is destroyed when the run ends." },
   { n: "2", head: "Network allow list", body: "The sandbox can reach package registries and GitHub, nothing else. Blocked hosts are logged." },
-  { n: "3", head: "Tokens stay outside", body: "Installation tokens are scoped to one repo and expire after the run. The sandbox never holds them." },
+  { n: "3", head: "Tokens stay outside", body: "Installation tokens are scoped to one repo and expire within an hour. The sandbox never holds them." },
   { n: "4", head: "No retained code", body: "We do not retain customer code. Logs are kept 30 days with secrets redacted." },
 ];
 
 const faq: FaqItem[] = [
   {
     q: "Do you clone my private code?",
-    a: "Only when you ask for an upgrade run. The code goes into an isolated sandbox that is destroyed when the run ends, and we do not retain it. A free inspection does not clone anything: it reads composer.json and composer.lock only.",
+    a: "Only when you ask for an upgrade run. The code goes into an isolated sandbox that is destroyed when the run ends, and we do not retain it. A free inspection does not clone anything: it reads composer.json, composer.lock and package.json only.",
   },
   {
     q: "Does any AI service see my code?",
@@ -84,7 +84,7 @@ export default function SecurityPage() {
 
         <ArticleSection id="inspection" title="What a free inspection reads">
           <P>
-            The free inspection reads <Mono>composer.json</Mono> and <Mono>composer.lock</Mono> only, through the GitHub App you install on the repositories you choose. No code is cloned. The report shows versions behind, the support end date, the recipes that apply and an effort band from S to XL.
+            The free inspection reads <Mono>composer.json</Mono>, <Mono>composer.lock</Mono> and <Mono>package.json</Mono> only (plus the list of file names, to find each app), through the GitHub App you install on the repositories you choose. No code is cloned. The report shows versions behind, the support end date, the recipes that apply and an effort band from S to XL.
           </P>
         </ArticleSection>
 
@@ -134,7 +134,7 @@ export default function SecurityPage() {
       <Faq title="Common questions" items={faq} />
       <FinalCta
         title="Start with a report that clones nothing"
-        body="The free inspection reads composer.json and composer.lock only. No code is cloned."
+        body="The free inspection reads composer.json, composer.lock and package.json only. No code is cloned."
         cta={{ href: "/sign-in", label: "Inspect a repo free" }}
         note="Free inspection first. Cancel at period end. Pause up to 3 months."
       />

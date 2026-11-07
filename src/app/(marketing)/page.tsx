@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 };
 
 const CTA = "/sign-in";
-const RISK = "The free inspection reads composer.json and composer.lock only. No code is cloned.";
+const RISK = "The free inspection reads composer.json, composer.lock and package.json only. No code is cloned.";
 
 const compareRows: CompareRow[] = [
   { label: "Price per upgrade to the latest release", values: ["$9.99", "$19", "Your own agent usage"] },
@@ -47,7 +47,7 @@ const compareRows: CompareRow[] = [
 
 const faqs: FaqItem[] = [
   { q: "Will a new tool break my client apps?", a: "We never auto merge. Every pull request carries a Verified check, or an amber Unverified stamp when your repo has no tests, and you decide what merges. Recipes are tested against fixture apps before they ship." },
-  { q: "What does Verified actually mean?", a: "composer install, your asset build and your test suite ran in our sandbox and passed. The check shows the test counts so you can see what ran." },
+  { q: "What does Verified actually mean?", a: "composer install, your asset build and your test suite ran in our sandbox and passed. The check lists each stage (composer, build, tests) and whether it passed." },
   { q: "What if my repo has no tests?", a: "We still open the pull request, and it carries an amber Unverified stamp. Composer install and your build still run, and the stamp says plainly that no tests were available." },
   { q: "Do you clone my private code?", a: "Yes, into an ephemeral sandbox that is destroyed when the run ends. We do not retain customer code. The sandbox can reach package registries and GitHub, nothing else, and blocked hosts are logged." },
   { q: "Does any AI touch my code?", a: "No. Recipes and repair rules make the changes, and nothing is sent to an AI service. The prompts we attach to squawks are templates for your own agent, if you use one." },
@@ -131,7 +131,7 @@ export default function Home() {
         <h2 id="benefits-title" className="heading-4 md:heading-2 max-w-3xl text-text">What you get in every pull request</h2>
         <div className="mt-12 grid gap-4 lg:grid-cols-6">
           <Tile className="lg:col-span-4" title="Verified, not just opened" fragment={<VerifiedFragment />}>
-            composer install, npm run build and your tests run in a fresh sandbox before the PR opens. The result is a check on the PR: Verified, with test counts.
+            composer install, npm run build and your tests run in a fresh sandbox before the PR opens. The result is a check on the PR: Verified, with each stage listed.
           </Tile>
           <Tile className="lg:col-span-2 lg:row-span-2" title="One change per commit" fragment={<CommitList />}>
             Each recipe is one atomic commit with a name and a version, so you can review, revert or cherry pick.
@@ -223,7 +223,7 @@ export default function Home() {
               {[
                 "Each run gets its own sandbox with no host mounts. It is destroyed when the run ends.",
                 "The sandbox can reach package registries and GitHub, nothing else. Blocked hosts are logged.",
-                "Installation tokens are scoped to one repo and expire after the run. The sandbox never holds them.",
+                "Installation tokens are scoped to one repo and expire within an hour. The sandbox never holds them.",
                 "We do not retain customer code. Logs are kept 30 days with secrets redacted.",
               ].map((line, i) => (
                 <li key={line} className="grid grid-cols-[2rem_1fr] gap-4 border-b border-border py-4">

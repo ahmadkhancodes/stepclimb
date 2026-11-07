@@ -48,8 +48,8 @@ const sub = { isPaid: true, status: "active" as const, plan: "solo" as const, in
 
 function setup(files: Record<string, string> = portal.files) {
   const db: Db = createMemoryDb("stepclimb");
-  const runner = new FakeRunner({ repo: files, recipes, rules, verify: (s, fs) => simulatedVerify(s, fs), updateDeps: simulatedUpdateDeps });
   const host = createFixtureHost();
+  const runner = new FakeRunner({ host, repo: files, recipes, rules, verify: (s, fs) => simulatedVerify(s, fs), updateDeps: simulatedUpdateDeps });
   const t = { now: Date.parse("2026-11-09T11:00:00Z") };
   const deps: RunDeps = { db, runner, host: async () => host, gitToken: async () => "tok", appUrl: "https://stepclimb.test", now: () => new Date(t.now) };
   return { db, runner, host, deps, t };

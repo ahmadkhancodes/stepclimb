@@ -10,7 +10,7 @@ import { FakeRunner, type FakeRunnerOptions } from "@/lib/runs/fake-runner";
 import { createFixtureHost } from "@/lib/runs/fixture-host";
 import type { RunSpec } from "@/lib/runs/runner";
 import { VercelSandboxRunner, type SandboxDriver } from "@/lib/runs/sandbox-runner";
-import { cancelRun, creditKindFor, dispatchRun, finalizeRun, ingestEvent, reapRuns, startRun, type RunDeps, RunError } from "@/lib/runs/service";
+import { cancelRun, creditKindFor, dispatchRun, expectedBranch, finalizeRun, ingestEvent, reapRuns, startRun, type RunDeps, RunError } from "@/lib/runs/service";
 import { simulatedVerify } from "@/lib/runs/simulated-verify";
 import { availableCredit, consumeCredit, getRun, grantCredit, listLogs, listSquawks, listSteps, patchRun, transition, RunStateError } from "@/lib/runs/store";
 import { EGRESS_ALLOW, EGRESS_DENY_AI, LIMITS, TRANSITIONS, RUN_STATUSES } from "@/lib/runs/types";
@@ -26,8 +26,8 @@ const repo = { id: "9001:kestrel-digital/billing-portal", installationId: "9001"
 
 function setup(opts: Partial<FakeRunnerOptions> = {}, files: Record<string, string> = portal.files) {
   const db: Db = createMemoryDb("stepclimb");
-  const runner = new FakeRunner({ repo: files, recipes, rules, verify: (s, fs) => simulatedVerify(s, fs), ...opts });
   const host = createFixtureHost();
+  const runner = new FakeRunner({ host, repo: files, recipes, rules, verify: (s, fs) => simulatedVerify(s, fs), ...opts });
   const t = { now: Date.now() };
   const deps: RunDeps = { db, runner, host: async () => host, gitToken: async () => "tok", appUrl: "https://stepclimb.test", now: () => new Date(t.now) };
   return { db, runner, host, deps, t };
@@ -261,12 +261,15 @@ describe("watchdog", () => {
     await grantCredit(s.db, ACCOUNT, "to_previous", null);
     const { run } = await startRun(s.deps, { accountId: ACCOUNT, repo, hopFrom: 11, hopTo: 12 });
     await dispatchRun(s.deps, run.id);
-    await patchRun(s.db, run.id, { branch: "stepclimb/laravel-12-abc", headSha: "sha1" });
+    const branch = expectedBranch({ ...run, kind: "upgrade" });
+    await patchRun(s.db, run.id, { branch, headSha: "sha1" });
+    await s.host.moveBranch(repo.fullName, branch, "abc123");
     s.t.now += LIMITS.wallClockMs + 1000;
     await reapRuns(s.deps);
     const r = (await getRun(s.db, run.id))!;
     expect(r.status).toBe("timed_out");
-    expect(s.host.calls.prs[0]).toMatchObject({ draft: true, head: "stepclimb/laravel-12-abc" });
+    expect(s.host.calls.prs[0]).toMatchObject({ draft: true, head: branch });
+    expect(s.host.calls.checks[0]!.headSha).toBe("abc123");
   });
   it("fails a running sandbox that went silent", async () => {
     const s = setup({ hang: true });

@@ -14,7 +14,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-const Body = z.object({ catchUpTo: z.number().int().min(11).max(13).optional(), repoId: z.string().min(1), hopFrom: z.number().int().min(10).max(12), appPath: z.string().max(200).optional(), extendedVerify: z.boolean().optional(), kind: z.enum(["upgrade", "noop"]).optional() });
+const Body = z.object({ catchUpTo: z.number().int().min(11).max(13).optional(), repoId: z.string().min(1), hopFrom: z.number().int().min(10).max(12), appPath: z.string().max(200).regex(/^(?!\/)(?!.*(?:^|\/)\.\.(?:\/|$))[A-Za-z0-9._\/-]*$/, "bad_app_path").optional(), extendedVerify: z.boolean().optional(), kind: z.enum(["upgrade", "noop"]).optional() });
 
 const view = (r: Awaited<ReturnType<typeof listRuns>>[number]) => ({ id: r.id, status: r.status, fullName: r.fullName, hopFrom: r.hopFrom, hopTo: r.hopTo, prUrl: r.prUrl, checkConclusion: r.checkConclusion, createdAt: r.createdAt });
 

@@ -100,7 +100,7 @@ export default function CompareAgentsPage() {
 
         <ArticleSection id="together" title="Using both">
           <P>
-            Open the upgrade as a work order first. You get a pull request with the composer changes, the config diffs and a Verified check with test counts. Then hand the remaining squawks to your agent using the prompts in the PR. See{" "}
+            Open the upgrade as a work order first. You get a pull request with the composer changes, the config diffs and a Verified check that lists each stage it ran. Then hand the remaining squawks to your agent using the prompts in the PR. See{" "}
             <A href="/docs/squawks-and-severities">squawks and severities</A> and <A href="/docs/how-verification-works">how verification works</A>.
           </P>
         </ArticleSection>
@@ -123,7 +123,7 @@ export default function CompareAgentsPage() {
       <Faq title="Common questions" items={faq} />
       <FinalCta
         title="See what a verified upgrade pull request looks like"
-        body="The free inspection reads composer.json and composer.lock only. No code is cloned."
+        body="The free inspection reads composer.json, composer.lock and package.json only. No code is cloned."
         cta={{ href: "/sign-in", label: "Inspect a repo free" }}
         note="Free inspection first. Cancel at period end. Pause up to 3 months."
       />

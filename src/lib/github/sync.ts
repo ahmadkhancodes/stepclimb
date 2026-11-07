@@ -122,23 +122,27 @@ export async function syncInstallation(db: Db, api: GithubApi, installationId: s
   return { added: listed.filter((r) => !known.has(r.fullName)).length, removed: gone.length, total: listed.length };
 }
 
-const FRESH_MS = 15 * 60_000;
-
 /**
- * Links unclaimed installations to an org. By GitHub login match (user's login equals the installation account),
- * or by explicit id from the setup redirect when the installation is unclaimed and just created (GitHub gives the
- * redirect no signature, so a stale or already claimed id is refused).
+ * Links unclaimed installations to an org. Only with proof that the signed in person can see the installation on GitHub:
+ *  - a personal installation whose account login equals the user's GitHub login (from GitHub sign in, never user input), or
+ *  - an installation id listed by GitHub for the user's own OAuth token (`GET /user/installations`), passed in as `visibleIds`.
+ * The setup redirect's `installation_id` is NOT proof on its own: GitHub does not sign it and ids are sequential, so anyone
+ * could claim a stranger's fresh install (and with it their private repos) by guessing the next id.
  */
-export async function claimInstallations(db: Db, orgId: string, opts: { installationId?: string; githubLogin?: string | null; now?: Date }): Promise<string[]> {
-  const now = (opts.now ?? new Date()).getTime();
+export async function claimInstallations(db: Db, orgId: string, opts: { installationId?: string; githubLogin?: string | null; visibleIds?: string[] | null }): Promise<string[]> {
   const byId = new Map<string, InstallationDoc & { id: string }>();
+  const login = opts.githubLogin?.toLowerCase() ?? null;
+  const visible = new Set(opts.visibleIds ?? []);
   if (opts.installationId) {
     const one = await db.docs.get<InstallationDoc>("installations", opts.installationId);
-    const login = opts.githubLogin?.toLowerCase();
-    if (one && (one.accountLogin.toLowerCase() === login || now - new Date(one.updatedAt).getTime() < FRESH_MS)) byId.set(one.id, one);
+    if (one && (visible.has(one.id) || (login && one.accountType === "User" && one.accountLogin.toLowerCase() === login))) byId.set(one.id, one);
+  }
+  for (const id of visible) {
+    const one = await db.docs.get<InstallationDoc>("installations", id);
+    if (one) byId.set(one.id, one);
   }
   if (opts.githubLogin) {
-    for (const i of await db.docs.find<InstallationDoc>("installations", { accountLogin: opts.githubLogin, accountId: null })) byId.set(i.id, i);
+    for (const i of await db.docs.find<InstallationDoc>("installations", { accountLogin: opts.githubLogin, accountId: null })) if (i.accountType === "User") byId.set(i.id, i);
   }
   const claimed: string[] = [];
   for (const inst of byId.values()) {
@@ -148,4 +152,17 @@ export async function claimInstallations(db: Db, orgId: string, opts: { installa
     claimed.push(inst.id);
   }
   return claimed;
+}
+
+/** Installation ids of THIS app that the user's GitHub OAuth token can access (user-to-server token from GitHub sign in). */
+export async function userInstallationIds(userToken: string, fetchImpl: typeof fetch = fetch): Promise<string[]> {
+  const ids: string[] = [];
+  for (let page = 1; page <= 5; page++) {
+    const res = await fetchImpl(`https://api.github.com/user/installations?per_page=100&page=${page}`, { headers: { authorization: `Bearer ${userToken}`, accept: "application/vnd.github+json", "x-github-api-version": "2022-11-28", "user-agent": "stepclimb" } });
+    if (!res.ok) throw new Error(`user_installations_${res.status}`);
+    const j = (await res.json()) as { installations?: { id: number }[] };
+    for (const i of j.installations ?? []) ids.push(String(i.id));
+    if ((j.installations ?? []).length < 100) break;
+  }
+  return ids;
 }

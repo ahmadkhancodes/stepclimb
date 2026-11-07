@@ -42,7 +42,7 @@ export const comparisons: CompareEntry[] = [
       {
         label: "Checked before the PR opens",
         values: [
-          "Not verified. A Laravel Daily review found CI failed because composer update is not run",
+          "Not verified: composer update and your tests do not run before the PR opens",
           "composer install, your asset build and your tests run in our sandbox",
         ],
       },
