@@ -1,4 +1,4 @@
-/** One-off index creation (never per cold start): MONGODB_URI=... npx tsx scripts/ensure-indexes.ts */
+/** One-off index creation (manual use; the app also does this once per instance): MONGODB_URI=... npx tsx scripts/ensure-indexes.ts */
 import { ensureIndexes, mongoClient } from "../src/lib/db/mongo";
 import { product } from "../src/config/product";
 
