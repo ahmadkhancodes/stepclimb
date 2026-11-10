@@ -54,17 +54,17 @@ export const product = {
   companyUrl: "https://buffersoltech.com",
   host: "stepclimb.buffersoltech.com",
   url: process.env.NEXT_PUBLIC_APP_URL ?? "https://stepclimb.buffersoltech.com",
-  supportEmail: "support@buffersoltech.com",
-  legalEmail: "legal@buffersoltech.com",
+  supportEmail: "contact@buffersoltech.com",
+  legalEmail: "contact@buffersoltech.com",
   mailFrom: "Stepclimb by BufferSol <no-reply@stepclimb.buffersoltech.com>",
   description:
     "Verified Laravel upgrade pull requests. One commit per change, composer install and your tests run in our own sandbox before the PR opens. From $9.99 per upgrade.",
   tagline: "Laravel upgrade PRs that prove they work",
   /** Legal entity details used by the legal templates. */
   legal: {
-    entity: "BufferSol Technologies",
-    jurisdiction: "{{jurisdiction}}",
-    address: "{{registered address}}",
+    entity: "BufferSol Technologies LLC",
+    jurisdiction: "the State of New York, United States",
+    address: "447 W Broadway, 2nd Floor Suite #1964, New York, NY 10013, United States",
     effectiveDate: "2026-11-05",
   },
   /** Honest first release list (docs/DECISIONS.md D-07). */
