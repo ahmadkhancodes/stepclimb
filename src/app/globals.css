@@ -231,3 +231,8 @@
 @keyframes stamp-in { from { transform: rotate(-2deg) scale(1.06); opacity: 0; } to { transform: rotate(-2deg) scale(1); opacity: 1; } }
 .sc-stamp-in { animation: stamp-in 160ms cubic-bezier(0.3, 1.4, 0.6, 1) 400ms both; }
 @media (prefers-reduced-motion: reduce) { .sc-stamp-in { animation: none; } }
+
+/* Phones: inline body and footer links get a >=24px hit area (vertical padding does not change line layout). */
+@media (max-width: 767px) {
+  :where(p, li, dd, footer) a:not([class*="min-h-"]):not([class*="py-"]) { padding-block: 4px; }
+}

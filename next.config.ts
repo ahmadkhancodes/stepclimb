@@ -17,6 +17,9 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async redirects() {
+    return [{ source: "/favicon.ico", destination: "/icon", permanent: true }];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders() }];
   },

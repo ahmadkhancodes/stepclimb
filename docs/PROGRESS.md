@@ -39,3 +39,4 @@
 - 2026-11-10 Mongo indexes now auto-created once per instance (lazy, fire-and-forget, skipped at build/memory, conflicts logged); tests in tests/unit/autoindex.test.ts; not deployed.
 - 2026-11-10: fixed m4 tests depending on real clock: FakeRunner agent clock now starts from an injected `now` (was `Date.now()` vs fixed fake deadlines, so runs timed out); m4 tests inject their fake clock.
 - 2026-11-10 Launch hardening: closed P1-11 (credit refunds, early refund, async payment grant) and P1-12 (free PR per GitHub owner); mail sends in auth and alerts no longer throw on Resend rejection; tests in tests/unit/hardening.test.ts; P1-6/P1-7 stay open (SandboxDriver adapter); not deployed.
+- 2026-11-10 Browser-test fixes: /favicon.ico redirects to /icon; og:image + twitter:image on root and pageMetadata; docs grid min-width fix for 375px scroll; 24px hit area on phone inline links (globals.css); tests in tests/unit/seo-meta.test.ts; not deployed.

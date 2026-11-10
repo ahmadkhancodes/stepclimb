@@ -10,8 +10,8 @@ export const metadata: Metadata = {
   title: { default: `${product.fullName}: ${product.tagline}`, template: `%s · ${product.fullName}` },
   description: product.description,
   applicationName: product.fullName,
-  openGraph: { type: "website", siteName: product.fullName, url: product.url },
-  twitter: { card: "summary_large_image" },
+  openGraph: { type: "website", siteName: product.fullName, url: product.url, images: [new URL("/opengraph-image", product.url).toString()] },
+  twitter: { card: "summary_large_image", images: [new URL("/twitter-image", product.url).toString()] },
   alternates: { canonical: "/" },
 };
 
