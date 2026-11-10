@@ -1,7 +1,7 @@
 import type { Db } from "@/lib/db";
 import { adminEmails, env } from "@/lib/env";
 import { log } from "@/lib/logger";
-import { sendMail, type MailTransport } from "@/lib/mail";
+import { sendMailSafe, type MailTransport } from "@/lib/mail";
 import { noticeEmail } from "@/lib/mail/templates";
 import { isTerminal, LIMITS, type RunDoc } from "@/lib/runs/types";
 
@@ -63,7 +63,7 @@ export async function sendAlerts(db: Db, alerts: Alert[], opts: { now?: Date; tr
     log.error("alert", { code: a.key, message: a.title });
     if (to.length === 0) continue;
     const m = noticeEmail({ title: `Stepclimb alert: ${a.title}`, body: a.detail });
-    for (const addr of to) await sendMail({ to: addr, ...m, category: "transactional", tags: { kind: "alert" } }, opts.transport, db);
+    for (const addr of to) await sendMailSafe({ to: addr, ...m, category: "transactional", tags: { kind: "alert" } }, "alert", opts.transport, db);
     await db.docs.put("alert_state", a.key, { key: a.key, lastSentAt: now });
     res.sent.push(a.key);
   }

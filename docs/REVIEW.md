@@ -49,8 +49,14 @@ Context that shapes the ranking: real sandbox runs are switched off in code (`ge
 | P1-8 | Health route did not check the database | `src/app/api/health/route.ts` | Mongo outage still answered `ok: true` | **Fixed**: 2 s DB read, 503 when it fails |
 | P1-9 | e2e mail outbox per module instance | `src/lib/mail/transports.ts` | the magic link e2e failed whenever another spec loaded a page first (Next loads the module per bundle) | **Fixed**: process wide outbox |
 | P1-10 | Accessibility (axe, real tokens) | header and footer brand links, sample Hangar table, breadcrumbs and small buttons | `label-content-name-mismatch` (aria-label hid the visible lockup text), `scrollable-region-focusable`, 32 px targets (`min-h-8`) | **Fixed**; `tests/e2e/a11y.spec.ts` gates 7 pages in light and dark plus 375 px targets and the skip link |
-| P1-11 | A Stripe refund of a credit purchase does not take the credit back | `src/lib/billing/webhook.ts` `charge.refunded` | refunded outside the admin tool (dashboard, dispute), the unused credit stays spendable | Open: on `charge.refunded` for a `mode=payment` session, zero the matching `sess:<id>` credit if unspent |
-| P1-12 | Free tier is per Stepclimb account | `src/lib/runs/free-tier.ts` | uninstall and reinstall into a new account gives another free PR that month | Open: key the monthly free PR on the GitHub owner login as well |
+| P1-11 | A Stripe refund of a credit purchase does not take the credit back | `src/lib/billing/webhook.ts` `charge.refunded` | refunded outside the admin tool (dashboard, dispute), the unused credit stays spendable | **Fixed**: credits store `paymentIntentId`; a full refund revokes the unspent credit through the same unique claim as a spend and no longer cancels the customer's subscription; a refund that arrives before `checkout.session.completed` is remembered (`refunded_payments`) so the late grant is skipped; `checkout.session.async_payment_succeeded` also grants. Tests: `hardening.test.ts` |
+| P1-12 | Free tier is per Stepclimb account | `src/lib/runs/free-tier.ts` | uninstall and reinstall into a new account gives another free PR that month | **Fixed**: runs store `ownerLogin`; the month is counted per account and per GitHub owner. Test: `hardening.test.ts` |
+
+**P1 status:** P1-6 and P1-7 stay open on purpose: both are requirements for the `SandboxDriver` adapter, which does not exist (real runs answer 503), so no code in this repo can close them. They block the first real sandbox run (MANUAL_STEPS 5).
+
+### Launch hardening pass (2026-11-10)
+- Stripe webhook re-read for out-of-order and duplicate delivery: events are recorded only after success, every subscription and invoice event recomputes from Stripe, unknown event types answer 200 and are logged, checkout success never depends on the redirect (the credit is granted by the webhook). Fixed the two real gaps above (refund of a credit, early refund).
+- Mail: magic link, invitations and founder alerts used `sendMail` directly, so a Resend rejection (bad address, 429) threw out of the auth handler or the alert loop. They now go through `sendMailSafe` (logs the status only, never the provider text, never throws). Run, receipt and weekly mail already swallowed failures.
 
 ## P2
 

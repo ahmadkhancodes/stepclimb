@@ -89,7 +89,7 @@ export async function startRun(d: RunDeps, i: StartInput): Promise<{ run: RunWit
     if (creditId) billing = { via: "credit", creditId, creditKind };
     else {
       // free tier: the first PR a month on a public repo, GitHub account 30 days or older
-      const free = await checkFreeTier(db, { accountId: i.accountId, repoPrivate: i.repo.private ?? true, githubCreatedAt: i.githubCreatedAt ?? null, now: nowOf(d) });
+      const free = await checkFreeTier(db, { accountId: i.accountId, ownerLogin: i.repo.fullName.split("/")[0]!, repoPrivate: i.repo.private ?? true, githubCreatedAt: i.githubCreatedAt ?? null, now: nowOf(d) });
       if (!free.ok) throw new RunError("payment_required", 402, { creditKind, freeTier: { reason: free.reason, message: freeTierMessage(free.reason) } });
       billing = { via: "free", creditId: null, creditKind: null };
     }

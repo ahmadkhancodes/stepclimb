@@ -11,11 +11,15 @@ export type FreeTierCheck = { ok: true } | { ok: false; reason: FreeTierReason }
 
 const monthKey = (d: Date) => `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 
-export async function checkFreeTier(db: Db, i: { accountId: string; repoPrivate: boolean; githubCreatedAt: Date | null; now: Date }): Promise<FreeTierCheck> {
+export async function checkFreeTier(db: Db, i: { accountId: string; ownerLogin?: string; repoPrivate: boolean; githubCreatedAt: Date | null; now: Date }): Promise<FreeTierCheck> {
   if (i.repoPrivate) return { ok: false, reason: "private_repo" };
   if (!i.githubCreatedAt) return { ok: false, reason: "account_age_unknown" };
   if (i.now.getTime() - i.githubCreatedAt.getTime() < FREE_TIER.minAccountAgeDays * 86_400_000) return { ok: false, reason: "account_too_new" };
-  const mine = (await db.docs.find<RunDoc>("runs", { accountId: i.accountId })).filter((r) => r.billing.via === "free" && monthKey(new Date(r.createdAt)) === monthKey(i.now) && (isTerminal(r.status) ? r.status === "succeeded" || r.status === "timed_out" : true));
+  // P1-12: the month is counted per Stepclimb account AND per GitHub owner, so a reinstall into a new account gets no second free PR
+  const byAccount = await db.docs.find<RunDoc>("runs", { accountId: i.accountId });
+  const byOwner = i.ownerLogin ? await db.docs.find<RunDoc>("runs", { ownerLogin: i.ownerLogin.toLowerCase() }) : [];
+  const seen = new Set<string>();
+  const mine = [...byAccount, ...byOwner].filter((r) => !seen.has(r.id) && seen.add(r.id)).filter((r) => r.billing.via === "free" && monthKey(new Date(r.createdAt)) === monthKey(i.now) && (isTerminal(r.status) ? r.status === "succeeded" || r.status === "timed_out" : true));
   return mine.length >= FREE_TIER.prsPerMonth ? { ok: false, reason: "monthly_limit" } : { ok: true };
 }
 

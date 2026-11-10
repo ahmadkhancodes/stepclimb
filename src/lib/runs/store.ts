@@ -18,7 +18,7 @@ export async function createRun(db: Db, n: NewRun): Promise<{ run: Id<RunDoc>; c
   const now = n.now ?? new Date();
   const id = uuidv7(now.getTime());
   const doc: RunDoc = {
-    accountId: n.accountId, repoId: n.repoId, installationId: n.installationId, fullName: n.fullName, baseBranch: n.baseBranch, appPath: n.appPath ?? "",
+    accountId: n.accountId, repoId: n.repoId, installationId: n.installationId, fullName: n.fullName, ownerLogin: n.fullName.split("/")[0]!.toLowerCase(), baseBranch: n.baseBranch, appPath: n.appPath ?? "",
     kind: n.kind ?? "upgrade", status: "queued", hopFrom: n.hopFrom, hopTo: n.hopTo, branch: null, headSha: null, prNumber: null, prUrl: null, prDraft: false,
     checkConclusion: null, verified: null, repairPasses: 0, repairRulesApplied: [], computeSeconds: 0, sandboxId: null, billing: n.billing,
     idempotencyKey: n.idempotencyKey ?? null, extendedVerify: n.extendedVerify ?? false, eventSecret: randomToken(24), lastSeq: 0, error: null, effortBand: null,
@@ -87,9 +87,9 @@ export async function saveSquawks(db: Db, runId: string, list: Omit<SquawkDoc, "
 export const listSquawks = async (db: Db, runId: string) => (await db.docs.find<SquawkDoc>("squawks", { runId })).sort((a, b) => a.id.localeCompare(b.id));
 
 // ---- credits (one time packs bought through Stripe Checkout) ----
-export async function grantCredit(db: Db, accountId: string, kind: CreditKind, stripeSessionId: string | null, now = new Date()): Promise<boolean> {
+export async function grantCredit(db: Db, accountId: string, kind: CreditKind, stripeSessionId: string | null, now = new Date(), paymentIntentId: string | null = null): Promise<boolean> {
   const id = stripeSessionId ? `sess:${stripeSessionId}` : uuidv7(now.getTime());
-  const doc: CreditDoc = { accountId, kind, remaining: 1, expiresAt: new Date(now.getTime() + LIMITS.creditTtlDays * 86_400_000), stripeSessionId, createdAt: now };
+  const doc: CreditDoc = { accountId, kind, remaining: 1, expiresAt: new Date(now.getTime() + LIMITS.creditTtlDays * 86_400_000), stripeSessionId, paymentIntentId, createdAt: now };
   return db.docs.insert("credits", id, doc as unknown as Record<string, unknown>); // idempotent per Checkout session
 }
 export async function availableCredit(db: Db, accountId: string, kind: CreditKind, now = new Date()): Promise<Id<CreditDoc> | null> {
@@ -110,6 +110,20 @@ export async function consumeCredit(db: Db, accountId: string, kind: CreditKind,
     return c.id;
   }
   return null;
+}
+/** A Stripe refund took the money back (P1-11): zero the matching credit if it is still unspent. Returns the credits found and the ones revoked. */
+export async function revokeCreditsForPayment(db: Db, paymentIntentId: string): Promise<{ found: number; revoked: number }> {
+  const list = await db.docs.find<CreditDoc>("credits", { paymentIntentId });
+  let revoked = 0;
+  for (const c of list) {
+    if (c.remaining <= 0) continue;
+    const spent = (c as CreditDoc & { spent?: number }).spent ?? 0;
+    // same unique claim as a spend, so a start racing this refund cannot also win the credit
+    if (!(await db.docs.insert("credit_claims", `${c.id}:${spent}`, { creditId: c.id, accountId: c.accountId, at: new Date(), revoked: true }))) continue;
+    await db.docs.put("credits", c.id, { remaining: 0, spent: spent + 1, revokedAt: new Date() });
+    revoked++;
+  }
+  return { found: list.length, revoked };
 }
 export async function refundCredit(db: Db, creditId: string): Promise<void> {
   const c = await db.docs.get<CreditDoc>("credits", creditId);
