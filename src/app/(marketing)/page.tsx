@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { product } from "@/config/product";
+import { cadenceCopy, product } from "@/config/product";
 import { ButtonLink } from "@/components/ui/button";
 import { Container, Section } from "@/components/ui/layout";
 import {
@@ -99,7 +99,7 @@ export default function Home() {
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
                 <ButtonLink href={CTA} size="lg">Inspect a repo free</ButtonLink>
-                <a href="#sample" className="button-md inline-flex min-h-11 items-center text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring">See a sample work order</a>
+                <a href="#sample" className="button-md inline-flex min-h-11 items-center text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring">See an example work order</a>
               </div>
               <p className="caption-2 mt-4 max-w-md text-text-subtle">{RISK}</p>
               <p className="caption-3 mt-8 max-w-md border-t border-border pt-4 text-text-subtle">
@@ -143,7 +143,7 @@ export default function Home() {
             Runs happen in an isolated sandbox that is destroyed after the run. We keep no customer code. Nothing is sent to an AI service.
           </Tile>
           <Tile className="lg:col-span-3" title="Stay current weekly" fragment={<AutopilotPr />}>
-            One grouped dependency pull request a week per repo, verified, that refreshes instead of piling up.
+            {cadenceCopy.autopilot}
           </Tile>
         </div>
       </Section>
@@ -190,7 +190,7 @@ export default function Home() {
             <p className="body-3 mt-6 text-text-subtle">
               The hangar board shows every repo, how far behind it is, when support ends and the last work order. Studio and Agency plans add seats and white label client reports.
             </p>
-            <p className="caption-3 mt-4 text-text-subtle">Board shown with sample data.</p>
+            <p className="caption-3 mt-4 text-text-subtle">Example board with fictional repos.</p>
           </div>
           <div className="lg:col-span-8"><HangarBoard /></div>
         </div>

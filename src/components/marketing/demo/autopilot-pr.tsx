@@ -5,7 +5,7 @@ import { Stamp } from "./stamp";
 /** The weekly grouped dependency PR: one PR that refreshes, not a pile. */
 export function AutopilotPr({ className }: { className?: string }) {
   return (
-    <figure aria-label="Sample weekly dependency pull request" className={cn("border border-border bg-surface-raised", className)}>
+    <figure aria-label="Example weekly dependency pull request" className={cn("border border-border bg-surface-raised", className)}>
       <div className="flex items-center justify-between gap-2 border-b border-border px-4 py-2">
         <p className="body-5 text-text">Weekly dependencies</p>
         <Stamp tone="ok">Verified</Stamp>

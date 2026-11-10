@@ -6,7 +6,7 @@ import { SeverityShape } from "./squawk-drawer";
 /** The pull request as you receive it: work order body, squawk index, the Verified check. Merging stays with you. */
 export function PrCheck({ className }: { className?: string }) {
   return (
-    <figure aria-label="Sample pull request" className={cn("border border-border bg-surface-raised", className)}>
+    <figure aria-label="Example pull request" className={cn("border border-border bg-surface-raised", className)}>
       <div className="border-b border-border px-4 py-3">
         <p className="caption-4 text-text-subtle">northgate/billing-portal · pull request</p>
         <p className="body-4 mt-0.5 text-text">Work order No. 4821: Upgrade to Laravel 13</p>

@@ -101,7 +101,7 @@ describe("P0-9 autopilot job", () => {
     await saveContact(s.db, ACCOUNT, "dana@studio.test");
     return s;
   }
-  const week = (s: ReturnType<typeof setup>, iso: string) => { s.t.now = Date.parse(iso); return runAutopilot(s.deps, new Date(s.t.now)); };
+  const week = (s: ReturnType<typeof setup>, iso: string) => { s.t.now = Date.parse(iso); return runAutopilot(s.deps, new Date(s.t.now), "hourly"); };
 
   it("two consecutive weeks produce one refreshed PR, not two", async () => {
     const s = await ready();

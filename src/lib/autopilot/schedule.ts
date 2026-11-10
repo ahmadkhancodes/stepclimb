@@ -17,8 +17,13 @@ export function localParts(now: Date, tz: string): LocalParts {
   return { year: Number(p.year), month: Number(p.month), day: Number(p.day), weekday: WD[p.weekday!] ?? 0, hour: Number(p.hour) % 24, minute: Number(p.minute) };
 }
 
-/** True during the hour Monday 06:00 local. The cron runs hourly, `weekKey` makes the run once a week. */
-export function isAutopilotWindow(now: Date, tz: string): boolean {
+/**
+ * "hourly": true during the hour Monday 06:00 local (the cron runs hourly).
+ * "daily": the scheduler fires once a day at any hour, so every day qualifies.
+ * Either way `weekKey` makes the run happen once a week per repo.
+ */
+export function isAutopilotWindow(now: Date, tz: string, cadence: "daily" | "hourly" = "hourly"): boolean {
+  if (cadence === "daily") return true;
   const l = localParts(now, tz);
   return l.weekday === WINDOW.weekday && l.hour === WINDOW.hour;
 }

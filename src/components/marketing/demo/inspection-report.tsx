@@ -12,7 +12,7 @@ const rows: [string, string][] = [
 /** A free inspection report: versions behind, support end, recipes that apply, effort band. */
 export function InspectionReport({ className }: { className?: string }) {
   return (
-    <figure aria-label="Sample inspection report" className={cn("border border-border bg-surface-raised", className)}>
+    <figure aria-label="Example inspection report" className={cn("border border-border bg-surface-raised", className)}>
       <dl>
         {rows.map(([k, v]) => (
           <div key={k} className="flex items-baseline justify-between gap-4 border-b border-border px-4 py-2">

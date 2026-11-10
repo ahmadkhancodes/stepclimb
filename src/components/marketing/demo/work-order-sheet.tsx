@@ -30,13 +30,13 @@ export function WorkOrderSheet({ className, id }: { className?: string; id?: str
   return (
     <article
       id={id}
-      aria-label="Sample work order"
+      aria-label="Example work order"
       className={cn(
         "relative border border-border bg-surface-raised shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)] dark:shadow-none",
         className,
       )}
     >
-      <span className="stamp-text absolute -top-3 left-6 bg-surface-inverse px-2 text-text-inverse">Sample, fictional repo</span>
+      <span className="stamp-text absolute -top-3 left-6 bg-surface-inverse px-2 text-text-inverse">Example, fictional repo</span>
       <dl className="grid grid-cols-2 border-b border-border sm:grid-cols-[1fr_1.7fr_1.2fr_1.2fr]">
         <div className={headCell}><dt className={dt}>Work order</dt><dd className={cn(dd, "mono-data")}>No. 4821</dd></div>
         <div className={cn(headCell, "border-l border-border")}><dt className={dt}>Airframe</dt><dd className={dd}>northgate/billing-portal</dd></div>
