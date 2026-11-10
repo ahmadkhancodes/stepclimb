@@ -6,7 +6,7 @@ import { passkey } from "@better-auth/passkey";
 import { apiKey } from "@better-auth/api-key";
 import { product } from "@/config/product";
 import { appName, appUrl, dbDriver, env, isProd, e2eMode } from "@/lib/env";
-import { sendMail } from "@/lib/mail";
+import { sendMailSafe } from "@/lib/mail";
 import { inviteEmail, magicLinkEmail } from "@/lib/mail/templates";
 import { isDisposableEmail } from "@/lib/security/disposable";
 import { githubOAuthCreds, type GithubOAuthCreds } from "@/lib/github/credentials";
@@ -109,7 +109,7 @@ export function createAuth(db: BetterAuthOptions["database"], github: GithubOAut
         disableSignUp: false,
         sendMagicLink: async ({ email, url }) => {
           const m = magicLinkEmail(url);
-          await sendMail({ to: email, ...m, category: "transactional" });
+          await sendMailSafe({ to: email, ...m, category: "transactional" }, "magic_link");
         },
       }),
       twoFactor({ issuer: product.name, skipVerificationOnEnable: false }),
@@ -123,7 +123,7 @@ export function createAuth(db: BetterAuthOptions["database"], github: GithubOAut
         sendInvitationEmail: async (data) => {
           const url = `${base}/accept-invite/${data.id}`;
           const m = inviteEmail({ orgName: data.organization.name, inviter: data.inviter.user.name || data.inviter.user.email, url, role: data.role });
-          await sendMail({ to: data.email, ...m, category: "transactional" });
+          await sendMailSafe({ to: data.email, ...m, category: "transactional" }, "invite");
         },
       }),
       apiKey({

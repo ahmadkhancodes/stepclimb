@@ -3,7 +3,7 @@ import { planForLookupKey } from "@/config/product";
 import type { Db } from "@/lib/db/types";
 import { json } from "@/lib/http";
 import { log } from "@/lib/logger";
-import { grantCredit } from "@/lib/runs/store";
+import { grantCredit, revokeCreditsForPayment } from "@/lib/runs/store";
 import type { CreditKind } from "@/lib/runs/types";
 import { NONE, cancelAppSubscriptions, computeEntitlement, invoiceSubscriptionId, lifetimeEntitlement } from "./entitlement";
 
@@ -84,12 +84,29 @@ export async function handleStripeWebhook(rawBody: string, signature: string | n
       await deps.onChange?.(orgId, event.type);
       return json({ received: true });
     }
+    // a refunded one time credit purchase: take back the unspent credit, never touch the subscription
+    if (obj.payment_intent) {
+      const r = await revokeCreditsForPayment(db, obj.payment_intent);
+      if (r.found > 0) {
+        await db.markStripeEvent(event.id, event.type);
+        await deps.onChange?.(orgId, event.type);
+        return json({ received: true, creditRevoked: r.revoked });
+      }
+      // refund arrived before the checkout event: remember it so a late grant is skipped
+      await db.docs.put("refunded_payments", obj.payment_intent, { at: new Date(now) });
+    }
     await cancelAppSubscriptions(stripe, app, customerId);
   }
 
   // pay per run: a paid one time Checkout grants one credit (idempotent per session id)
-  if (event.type === "checkout.session.completed" && obj.mode === "payment" && obj.payment_status === "paid" && obj.metadata?.app === app && obj.metadata.credit_kind && obj.id) {
-    const granted = await grantCredit(db, orgId, obj.metadata.credit_kind as CreditKind, obj.id, new Date(now));
+  if ((event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") && obj.mode === "payment" && obj.payment_status === "paid" && obj.metadata?.app === app && obj.metadata.credit_kind && obj.id) {
+    const pi = typeof obj.payment_intent === "string" ? obj.payment_intent : null;
+    if (pi && (await db.docs.get("refunded_payments", pi))) {
+      log.warn("credit_grant_skipped_refunded", { code: "refunded_before_grant" });
+      await db.markStripeEvent(event.id, event.type);
+      return json({ received: true, credit: false });
+    }
+    const granted = await grantCredit(db, orgId, obj.metadata.credit_kind as CreditKind, obj.id, new Date(now), pi);
     if (granted) await deps.receipt?.({ orgId, description: "One time credit", amountUsd: obj.amount_total ?? 0, reference: obj.id, creditKind: obj.metadata.credit_kind }).catch((e) => log.error("receipt_failed", { message: (e as Error).message }));
     await db.markStripeEvent(event.id, event.type);
     await deps.onChange?.(orgId, event.type);
@@ -101,6 +118,7 @@ export async function handleStripeWebhook(rawBody: string, signature: string | n
     event.type.startsWith("invoice.") ||
     event.type === "checkout.session.completed" ||
     event.type === "charge.refunded";
+  if (!relevant) log.info("stripe_event_ignored", { code: event.type });
   if (relevant) {
     await db.setEntitlement(orgId, await computeEntitlement(stripe, app, customerId, prev?.status === "lifetime" ? prev : null, now));
     await deps.onChange?.(orgId, event.type);

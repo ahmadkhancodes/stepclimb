@@ -28,6 +28,8 @@ export interface RunDoc {
   repoId: string;
   installationId: string;
   fullName: string;
+  /** lower case owner of `fullName`; keys the monthly free PR across accounts (P1-12) */
+  ownerLogin?: string;
   baseBranch: string;
   appPath: string;
   kind: RunKind;
@@ -72,7 +74,7 @@ export interface RunDoc {
 export interface RunStepDoc { runId: string; seq: number; name: string; status: StepStatus; detail: string | null; durationMs: number | null; createdAt: Date }
 export interface RunLogDoc { runId: string; seq: number; stream: "stdout" | "stderr" | "system"; text: string; at: Date }
 export interface SquawkDoc extends Squawk { runId: string; resolvedBy: string | null; createdAt: Date }
-export interface CreditDoc { accountId: string; kind: CreditKind; remaining: number; expiresAt: Date; stripeSessionId: string | null; createdAt: Date }
+export interface CreditDoc { accountId: string; kind: CreditKind; remaining: number; expiresAt: Date; stripeSessionId: string | null; paymentIntentId?: string | null; createdAt: Date }
 
 /** Hard limits (docs/ARCHITECTURE.md section 5). */
 export const LIMITS = {

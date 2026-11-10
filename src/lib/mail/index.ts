@@ -1,6 +1,7 @@
 import { product } from "@/config/product";
 import { appUrl, env } from "@/lib/env";
 import { getDb, type Db } from "@/lib/db";
+import { log } from "@/lib/logger";
 import { hmacSha256Hex } from "@/lib/ids";
 import { consoleTransport, resendTransport, smtpTransport } from "./transports";
 import type { MailMessage, MailTransport, SendResult } from "./types";
@@ -46,4 +47,17 @@ export async function sendMail(msg: MailMessage, transport: MailTransport = tran
     headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click";
   }
   return transport.send({ ...msg, headers, from: msg.from ?? env().MAIL_FROM ?? product.mailFrom });
+}
+
+/**
+ * sendMail for request handlers: a provider rejection (bad address, rate limit, outage) is logged without the provider
+ * text and never thrown, so the route answers normally and nothing leaks (also keeps sign in from revealing which addresses bounce).
+ */
+export async function sendMailSafe(msg: MailMessage, tag: string, transport?: MailTransport, db?: Db): Promise<SendResult | null> {
+  try {
+    return await sendMail(msg, transport, db);
+  } catch (e) {
+    log.error("mail_failed", { route: `mail/${tag}`, message: (e as Error).message });
+    return null;
+  }
 }

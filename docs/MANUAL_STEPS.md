@@ -53,3 +53,7 @@ Formal trademark clearance for "Stepclimb" (USPTO, UKIPO, CIPO classes 9 and 42)
 3. **Daily retention job**: redeploy the Cloudflare worker after item 6.1 so `DAILY_JOBS=backup,retention` is live: `cd infra/cron-worker && npx wrangler deploy`.
 4. **Lighthouse** on the deployed host (no network in the build session): https://pagespeed.web.dev/ with `https://stepclimb.buffersoltech.com/`, mobile; target 90+ in every category. Record the scores in `docs/LAUNCH.md`.
 5. Work through `docs/LAUNCH.md` top to bottom.
+
+## Launch hardening note (2026-11-10)
+- Stripe webhook endpoint: also subscribe to `checkout.session.async_payment_succeeded` and `charge.refunded` (dashboard: https://dashboard.stripe.com/test/webhooks).
+- P1-6 and P1-7 remain open until the SandboxDriver adapter exists (item 5).
