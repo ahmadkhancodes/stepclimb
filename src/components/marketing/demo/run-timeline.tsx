@@ -17,7 +17,7 @@ const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "
 export function RunTimeline({ className }: { className?: string }) {
   const total = stages.reduce((a, b) => a + b.s, 0);
   return (
-    <figure aria-label="Sample run timeline" className={cn("border border-border bg-surface-raised p-4", className)}>
+    <figure aria-label="Example run timeline" className={cn("border border-border bg-surface-raised p-4", className)}>
       <div className="flex gap-0.5" role="img" aria-label={`Stages: ${stages.map((x) => `${x.name} ${fmt(x.s)}`).join(", ")}`}>
         {stages.map((x, i) => (
           <span key={x.name} className={cn("block h-6 basis-0", i === 5 ? "bg-amber" : "bg-action")} style={{ flexGrow: x.s }} />

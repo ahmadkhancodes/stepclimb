@@ -47,10 +47,10 @@ export function SquawkDrawer() {
     }
   };
   return (
-    <figure aria-label="Sample squawk drawer" className="border border-border bg-surface-raised shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)] dark:shadow-none">
+    <figure aria-label="Example squawk drawer" className="border border-border bg-surface-raised shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)] dark:shadow-none">
       <div className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
         <p className="body-4 text-text">Squawks <span className="mono-data body-6 text-text-subtle">3 open</span></p>
-        <span className="caption-4 text-text-subtle">Sample, fictional repo</span>
+        <span className="caption-4 text-text-subtle">Example, fictional repo</span>
       </div>
       <ul>
         {items.map((s) => (

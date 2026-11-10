@@ -39,7 +39,7 @@ function Row({ r }: { r: HangarRow }) {
   );
 }
 
-/** Dense fleet table at md and up, stacked list below. Sample data, fixed today. */
+/** Dense fleet table at md and up, stacked list below. Example data, fixed today. */
 export function HangarBoard() {
   const left = hangarRows.filter((r) => r.major === 12).length;
   const e12 = sampleEol(12).days;
@@ -50,8 +50,8 @@ export function HangarBoard() {
     { k: "Open squawks", v: "7", s: "2 must fix" },
   ];
   return (
-    <figure aria-label="Sample hangar board" className="relative border border-border bg-surface shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)] dark:shadow-none">
-      <span className="stamp-text absolute -top-3 left-6 bg-surface-inverse px-2 text-text-inverse">Sample, fictional agency</span>
+    <figure aria-label="Example hangar board" className="relative border border-border bg-surface shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)] dark:shadow-none">
+      <span className="stamp-text absolute -top-3 left-6 bg-surface-inverse px-2 text-text-inverse">Example, fictional agency</span>
       <div className="flex items-center justify-between gap-4 border-b border-border bg-surface-raised px-4 py-3">
         <p className="body-4 text-text">Kestrel Digital <span className="body-6 text-text-subtle">· Agency plan</span></p>
         <span className="button-sm inline-flex min-h-8 items-center rounded-md bg-action px-3 text-action-text" aria-hidden="true">New work order</span>
@@ -68,7 +68,7 @@ export function HangarBoard() {
           </div>
         ))}
       </dl>
-      <div role="region" aria-label="Sample Hangar table" tabIndex={0} className="m-4 hidden overflow-x-auto border border-border bg-surface-raised focus-visible:focus-ring md:block">
+      <div role="region" aria-label="Example Hangar table" tabIndex={0} className="m-4 hidden overflow-x-auto border border-border bg-surface-raised focus-visible:focus-ring md:block">
         <table className="w-full border-collapse">
           <thead>
             <tr>

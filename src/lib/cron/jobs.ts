@@ -55,6 +55,26 @@ export const cronJobs: Record<string, () => Promise<unknown>> = {
   },
 };
 
+/**
+ * The one daily run (vercel.json). Vercel Hobby fires cron once a day, so everything periodic
+ * (watchdog, weekly autopilot, webhook retries, retention, backup, alerts) happens here, one job after
+ * another, inside a time budget below the function limit. A failing job never blocks the next.
+ */
+const DAILY_BUDGET_MS = 50_000;
+const DAILY_ORDER = ["reap", "autopilot", "webhook-retries", "retention", "backup", "alerts"] as const;
+cronJobs.daily = async () => {
+  const started = Date.now();
+  const out: Record<string, unknown> = {};
+  for (const name of DAILY_ORDER) {
+    if (Date.now() - started > DAILY_BUDGET_MS) { out[name] = { skipped: "time_budget" }; continue; }
+    try { out[name] = await cronJobs[name]!(); } catch (e) {
+      out[name] = { error: (e as Error).message };
+      if (name !== "alerts") await reportCronFailure(name, (e as Error).message);
+    }
+  }
+  return out;
+};
+
 /** Wraps a job failure into a founder alert (used by the cron route). */
 export const reportCronFailure = async (job: string, message: string) => {
   try { await alertCronFailure(await getDb(), job, message); } catch { /* alerting must never mask the original failure */ }

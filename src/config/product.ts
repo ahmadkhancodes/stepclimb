@@ -183,3 +183,23 @@ export const oneOffs: readonly OneOff[] = [
   { kind: "small_converter", name: "Small converter (Lumen, Livewire, PSR 4)", usd: 499, lookupKey: `${slug}_credit_small_converter`, note: "One run" },
   { kind: "extended_verify", name: "Extended verification add on", usd: 499, lookupKey: `${slug}_credit_extended_verify`, note: "PHP 8.3, 8.4 and 8.5 matrix, 60 minute limit, 5 repair loops" },
 ];
+
+/**
+ * How often production can run scheduled work. Vercel Hobby allows one run a day.
+ * Flip to "hourly" (or faster) once a faster scheduler exists (infra/cron-worker); every public
+ * page that mentions timing reads from `cadenceCopy`, and tests/unit/cadence.test.ts keeps them in sync.
+ */
+export type SchedulerCadence = "daily" | "hourly";
+export const SCHEDULER_CADENCE = "daily" as SchedulerCadence;
+
+const fast = (SCHEDULER_CADENCE as SchedulerCadence) !== "daily";
+export const cadenceCopy = {
+  /** Webhook retry sentence (docs/webhooks). */
+  webhookRetries: fast
+    ? "Failed deliveries are retried with backoff at 30 seconds, 2 minutes, 10 minutes, 30 minutes, 1 hour, 3 hours, 6 hours and 12 hours. That is up to 8 attempts. After the last attempt the delivery is marked failed, and you can replay it from the dashboard."
+    : "Failed deliveries are retried once a day, for up to 8 attempts in total. After the last attempt the delivery is marked failed, and you can replay it from the dashboard right away.",
+  /** Autopilot sentence for the landing tile. */
+  autopilot: fast
+    ? "One grouped dependency pull request a week per repo, opened on Monday morning, verified, that refreshes instead of piling up."
+    : "One grouped dependency pull request a week per repo, opened by our daily run, verified, that refreshes instead of piling up.",
+} as const;

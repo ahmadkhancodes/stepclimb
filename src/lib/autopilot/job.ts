@@ -2,6 +2,7 @@ import type { Db } from "@/lib/db";
 import type { RepoDoc } from "@/lib/github/sync";
 import { log } from "@/lib/logger";
 import { dispatchRun, isSubscriber, RunError, startRun, type RunDeps } from "@/lib/runs/service";
+import { SCHEDULER_CADENCE, type SchedulerCadence } from "@/config/product";
 import { isAutopilotWindow, validTimezone, weekKey } from "./schedule";
 import { getState, putState } from "./state";
 
@@ -13,7 +14,7 @@ interface AppRow { path: string; laravelMajor: number | null; supported: boolean
  * Hourly cron. For every repo with weekly autopilot on whose local time is inside Monday 06:00, start one dependency
  * update run (once per ISO week), only for paying accounts. An open autopilot PR is refreshed by the run, not duplicated.
  */
-export async function runAutopilot(d: RunDeps, now: Date = new Date()): Promise<AutopilotReport> {
+export async function runAutopilot(d: RunDeps, now: Date = new Date(), cadence: SchedulerCadence = SCHEDULER_CADENCE): Promise<AutopilotReport> {
   const { db } = d;
   const rep: AutopilotReport = { checked: 0, started: [], skipped: {} };
   const repos = await db.docs.find<RepoDoc>("repos", { autopilotWeekly: true });
@@ -24,7 +25,7 @@ export async function runAutopilot(d: RunDeps, now: Date = new Date()): Promise<
     if (repo.archived) { why("archived"); continue; }
     if (repo.quietMode) { why("quiet_mode"); continue; }
     const tz = validTimezone(repo.timezone);
-    if (!isAutopilotWindow(now, tz)) { why("outside_window"); continue; }
+    if (!isAutopilotWindow(now, tz, cadence)) { why("outside_window"); continue; }
     const week = weekKey(now, tz);
     const state = await getState(db, repo.id);
     if (state?.lastWeekKey === week) { why("already_ran_this_week"); continue; }

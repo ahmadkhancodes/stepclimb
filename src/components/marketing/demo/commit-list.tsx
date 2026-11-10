@@ -11,7 +11,7 @@ const commits = [
 /** One recipe, one commit: each row has a short SHA, a name and the recipe version. */
 export function CommitList({ className }: { className?: string }) {
   return (
-    <figure aria-label="Sample commit history" className={cn("border border-border bg-surface-raised", className)}>
+    <figure aria-label="Example commit history" className={cn("border border-border bg-surface-raised", className)}>
       <ol>
         {commits.map((c) => (
           <li key={c.sha} className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 border-b border-border px-4 py-2 last:border-b-0">
