@@ -36,3 +36,4 @@
 9. Add a unit test for per repo quantity in `limitFor` and for the `half` interval in `tests/unit/billing.test.ts`.
 10. Mark the PR ready, merge (squash) when checks are green, update this file, send the orchestrator the one line for M1. Then M2 per `docs/ROADMAP.md` (GitHub App manifest page `/setup/github-app`, installations sync, `detectApp` on real repos, Hangar board, free scan, runner snapshot spike for PHP 8.2 to 8.5).
 11. Tell the orchestrator for `PALETTE_REGISTRY.md`: Stepclimb primary is teal `#0B5D6B` (dark `#4FB3C3`), amber `#E8A200` for warnings only.
+- 2026-11-10: fixed m4 tests depending on real clock: FakeRunner agent clock now starts from an injected `now` (was `Date.now()` vs fixed fake deadlines, so runs timed out); m4 tests inject their fake clock.

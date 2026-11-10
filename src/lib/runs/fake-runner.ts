@@ -21,6 +21,8 @@ export interface FakeRunnerOptions {
   failStart?: boolean;
   /** advancing clock for deadline tests */
   tickMs?: number;
+  /** injected epoch ms clock the in-process agent starts from (default: real time) */
+  now?: () => number;
   /** the git host that sees the pushes (fixture host), so the orchestrator can resolve branch heads like on GitHub */
   host?: { moveBranch(fullName: string, branch: string, sha: string): Promise<void> };
 }
@@ -46,7 +48,7 @@ export class FakeRunner implements RunnerBackend {
     const fs = new MemoryFs(stacked ? stacked.fs : this.opts.repo);
     const counts: Record<string, number> = {};
     let seq = 0;
-    let clock = Date.now();
+    let clock = (this.opts.now ?? Date.now)();
     const send = async (event: RunnerEvent) => {
       this.events.push(event);
       const e = { seq: ++seq, event };
