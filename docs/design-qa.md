@@ -1,6 +1,6 @@
 # Design QA scorecard (DESIGN_PLAYBOOK section 9)
 
-Date: 5 Nov 2026. Build: `npm run build && npm start`. Screenshots: `docs/qa/<page>-<375|1440>-<light|dark>.png` for `home`, `pricing`, `security`, `compare-laravelshift`, `guides`, `laravel-12-to-13`, `sign-in`, `app`.
+Date: 5 Nov 2026. Build: `npm run build && npm start`. Screenshots: `docs/qa/<page>-<375|1440>-light.png` for `home`, `pricing`, `security`, `compare-laravelshift`, `guides`, `laravel-12-to-13`, `sign-in`, `app`.
 Note: `/app` redirects to `/sign-in?next=/app` without a session, so the `app-*` screenshots show the sign-in page. The signed in Hangar needs a live session and is checked in M2.
 Self graded by the build session against `docs/design/mock-*.png`; the orchestrator should spot check.
 

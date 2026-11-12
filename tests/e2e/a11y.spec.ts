@@ -1,7 +1,7 @@
 import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
 
-// Accessibility gate (M5): axe-core on the public pages in light and dark, plus 44 px touch targets and keyboard focus at 375.
+// Accessibility gate (M5): axe-core on the public pages in light, plus 44 px touch targets and keyboard focus at 375.
 // axe-core is already in the lockfile (eslint-plugin-jsx-a11y depends on it); it is injected as a script, no new dependency (D-36).
 const axePath = join(process.cwd(), "node_modules", "axe-core", "axe.min.js");
 const PAGES = ["/", "/pricing", "/security", "/compare/laravelshift", "/guides", "/laravel-12-to-13", "/sign-in"];
@@ -18,17 +18,14 @@ async function axe(page: Page): Promise<Violation[]> {
   });
 }
 
-for (const theme of ["light", "dark"] as const) {
-  for (const path of PAGES) {
-    test(`axe: ${path} (${theme}) has no serious or critical WCAG A/AA violations`, async ({ page }) => {
-      await page.addInitScript((t) => { try { localStorage.setItem("theme", t); } catch {} }, theme);
-      await page.emulateMedia({ reducedMotion: "reduce", colorScheme: theme });
-      await page.goto(path);
-      await page.waitForLoadState("networkidle");
-      const bad = (await axe(page)).filter((v) => v.impact === "serious" || v.impact === "critical");
-      expect(bad, JSON.stringify(bad, null, 2)).toEqual([]);
-    });
-  }
+for (const path of PAGES) {
+  test(`axe: ${path} has no serious or critical WCAG A/AA violations`, async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "light" });
+    await page.goto(path);
+    await page.waitForLoadState("networkidle");
+    const bad = (await axe(page)).filter((v) => v.impact === "serious" || v.impact === "critical");
+    expect(bad, JSON.stringify(bad, null, 2)).toEqual([]);
+  });
 }
 
 test.describe("375 px", () => {

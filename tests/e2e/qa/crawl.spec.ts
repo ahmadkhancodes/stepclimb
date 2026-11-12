@@ -3,44 +3,41 @@ import { signIn, watch } from "./helpers";
 
 const PUBLIC = ["/", "/pricing", "/security", "/docs", "/guides", "/compare/laravelshift", "/compare/ai-agents", "/laravel-12-to-13", "/laravel-11-to-12", "/guides/laravel-and-php-end-of-life-calendar", "/legal/privacy", "/legal/terms", "/sign-in"];
 
-for (const scheme of ["light", "dark"] as const) {
-  for (const width of [375, 1440]) {
-    test(`public pages clean at ${width}px ${scheme}: no console errors, overflow, dead links, unnamed controls`, async ({ page }) => {
-      await page.setViewportSize({ width, height: 900 });
-      await page.emulateMedia({ colorScheme: scheme });
-      const problems = watch(page);
-      const links = new Set<string>();
-      for (const path of PUBLIC) {
-        const res = await page.goto(path);
-        expect(res?.status(), path).toBe(200);
-        await page.waitForLoadState("networkidle");
-        expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), `overflow ${path}`).toBeLessThanOrEqual(0);
-        const unnamed = await page.evaluate(() =>
-          [...document.querySelectorAll("button, a[href], input:not([type=hidden]), select, textarea")]
-            .filter((el) => {
-              const e = el as HTMLElement;
-              if (!e.offsetParent && getComputedStyle(e).position !== "fixed") return false;
-              const name = (e.getAttribute("aria-label") || e.textContent || (e as HTMLInputElement).placeholder || e.getAttribute("title") || "").trim();
-              const labelled = (e as HTMLInputElement).labels?.length || e.getAttribute("aria-labelledby") || !!e.querySelector("img[alt]:not([alt=''])");
-              return !name && !labelled;
-            })
-            .map((e) => e.outerHTML.slice(0, 120)),
-        );
-        expect(unnamed, `unnamed controls ${path}`).toEqual([]);
-        for (const h of await page.$$eval("a[href]", (as) => as.map((a) => (a as HTMLAnchorElement).href))) {
-          const u = new URL(h);
-          if (u.origin === new URL(page.url()).origin) links.add(u.pathname);
-        }
+for (const width of [375, 1440]) {
+  test(`public pages clean at ${width}px: no console errors, overflow, dead links, unnamed controls`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    const problems = watch(page);
+    const links = new Set<string>();
+    for (const path of PUBLIC) {
+      const res = await page.goto(path);
+      expect(res?.status(), path).toBe(200);
+      await page.waitForLoadState("networkidle");
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth), `overflow ${path}`).toBeLessThanOrEqual(0);
+      const unnamed = await page.evaluate(() =>
+        [...document.querySelectorAll("button, a[href], input:not([type=hidden]), select, textarea")]
+          .filter((el) => {
+            const e = el as HTMLElement;
+            if (!e.offsetParent && getComputedStyle(e).position !== "fixed") return false;
+            const name = (e.getAttribute("aria-label") || e.textContent || (e as HTMLInputElement).placeholder || e.getAttribute("title") || "").trim();
+            const labelled = (e as HTMLInputElement).labels?.length || e.getAttribute("aria-labelledby") || !!e.querySelector("img[alt]:not([alt=''])");
+            return !name && !labelled;
+          })
+          .map((e) => e.outerHTML.slice(0, 120)),
+      );
+      expect(unnamed, `unnamed controls ${path}`).toEqual([]);
+      for (const h of await page.$$eval("a[href]", (as) => as.map((a) => (a as HTMLAnchorElement).href))) {
+        const u = new URL(h);
+        if (u.origin === new URL(page.url()).origin) links.add(u.pathname);
       }
-      const dead: string[] = [];
-      for (const l of links) {
-        const r = await page.request.get(l, { maxRedirects: 5 });
-        if (r.status() >= 400) dead.push(`${l} ${r.status()}`);
-      }
-      expect(dead).toEqual([]);
-      expect(problems).toEqual([]);
-    });
-  }
+    }
+    const dead: string[] = [];
+    for (const l of links) {
+      const r = await page.request.get(l, { maxRedirects: 5 });
+      if (r.status() >= 400) dead.push(`${l} ${r.status()}`);
+    }
+    expect(dead).toEqual([]);
+    expect(problems).toEqual([]);
+  });
 }
 
 test("signed-in pages clean at 375 and 1440, tap targets and no overflow", async ({ page, baseURL }) => {

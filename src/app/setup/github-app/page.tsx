@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { ThemeToggle } from "@/components/theme";
 import { Button, buttonClass } from "@/components/ui/button";
 import { Notice } from "@/components/ui/states";
 import { product } from "@/config/product";
@@ -34,7 +33,6 @@ export default async function SetupGithubAppPage({ searchParams }: { searchParam
     <div className="flex min-h-dvh flex-col bg-surface">
       <header className="flex items-center justify-between px-4 py-4 sm:px-6 lg:px-10">
         <Link href="/app" className="heading-6 text-text focus-visible:focus-ring">{product.name}</Link>
-        <ThemeToggle />
       </header>
       <main id="main" className="flex flex-1 flex-col gap-6 px-4 py-8 sm:px-6 lg:px-10">
         <div className="flex max-w-2xl flex-col gap-6">
