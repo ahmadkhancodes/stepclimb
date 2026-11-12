@@ -22,7 +22,7 @@ function StateChip({ state }: { state: TaskState }) {
 }
 
 const headCell = "px-4 py-3";
-const dt = "caption-3 uppercase tracking-wider text-text-subtle";
+const dt = "label-log whitespace-nowrap text-text-subtle";
 const dd = "body-4 mt-1 break-words";
 
 /** The hero object: a work order sheet. Cropped to header + 4 tasks + stamp below 640px. */
@@ -32,19 +32,19 @@ export function WorkOrderSheet({ className, id }: { className?: string; id?: str
       id={id}
       aria-label="Example work order"
       className={cn(
-        "relative border border-border bg-surface-raised shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)]",
+        "relative border border-border bg-surface-raised shadow-[0_1px_0_rgba(28,26,22,0.06),0_12px_32px_-16px_rgba(28,26,22,0.22)]",
         className,
       )}
     >
       <span className="stamp-text absolute -top-3 left-6 bg-surface-inverse px-2 text-text-inverse">Example, fictional repo</span>
-      <dl className="grid grid-cols-2 border-b border-border sm:grid-cols-[1fr_1.7fr_1.2fr_1.2fr]">
+      <dl className="grid grid-cols-2 border-b border-border sm:grid-cols-[auto_1fr_auto_auto]">
         <div className={headCell}><dt className={dt}>Work order</dt><dd className={cn(dd, "mono-data")}>No. 4821</dd></div>
         <div className={cn(headCell, "border-l border-border")}><dt className={dt}>Airframe</dt><dd className={dd}>northgate/billing-portal</dd></div>
         <div className={cn(headCell, "border-t border-border sm:border-l sm:border-t-0")}><dt className={dt}>Hop</dt><dd className={cn(dd, "mono-data")}>11.45 → 13.x</dd></div>
         <div className={cn(headCell, "border-l border-t border-border sm:border-t-0")}><dt className={dt}>Opened</dt><dd className={cn(dd, "mono-data")}>05 Nov 2026</dd></div>
       </dl>
       <div className="flex items-baseline justify-between gap-4 px-4 pb-2 pt-4">
-        <h2 className="heading-6 text-text">Upgrade to Laravel 13</h2>
+        <h2 className="heading-5 text-text">Upgrade to Laravel 13</h2>
         <span className="caption-4 text-right text-text-subtle">9 recipes · 11 min 42 s</span>
       </div>
       <ol>

@@ -16,10 +16,13 @@ export function Faq({ title = "Questions, answered", items }: { title?: string; 
   return (
     <Section labelledBy="faq-title">
       <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
-        <h2 id="faq-title" className="heading-4 md:heading-2 text-text lg:col-span-4">{title}</h2>
+        <div className="lg:col-span-4">
+          <p className="label-log rule-double pt-3 text-text">Objections</p>
+          <h2 id="faq-title" className="heading-4 md:heading-2 mt-6 text-text">{title}</h2>
+        </div>
         <div className="lg:col-span-8">
           {items.map((item) => (
-            <details key={item.q} className="group border-t border-border last:border-b">
+            <details key={item.q} className="group border-t border-border first:border-text last:border-b">
               <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 py-4 title-2 text-text transition-colors duration-300 ease-out-kit hover:text-action focus-visible:focus-ring [&::-webkit-details-marker]:hidden">
                 {item.q}
                 <Plus size={20} weight="regular" aria-hidden className="shrink-0 transition-transform duration-300 ease-out-kit group-open:rotate-45" />

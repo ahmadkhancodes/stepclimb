@@ -9,6 +9,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/components/ui/cn";
 import { authClient } from "@/lib/auth/client";
 import { OrgSwitcher } from "./org-switcher";
+import { BrandLockup } from "@/components/marketing/demo/brand-lockup";
+import { Dateline } from "@/components/marketing/dateline";
 
 type IconType = typeof User;
 interface NavItem { href: string; label: string; icon: IconType }
@@ -34,8 +36,8 @@ function NavLink({ item, pathname, onNavigate }: { item: NavItem; pathname: stri
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex min-h-11 items-center gap-3 rounded-md px-3 py-2 body-5 transition-colors duration-300 focus-visible:focus-ring",
-        active ? "bg-surface-sunken text-text" : "text-text-subtle hover:bg-surface-raised hover:text-text",
+        "flex min-h-11 items-center gap-3 rounded-sm px-3 py-2 body-5 transition-colors duration-300 focus-visible:focus-ring",
+        active ? "bg-action-soft text-text [&>svg]:text-action" : "text-text-subtle hover:bg-surface-sunken hover:text-text",
       )}
     >
       <Icon size={20} weight="regular" aria-hidden />
@@ -54,12 +56,12 @@ function SidebarBody({ org, user, isAdmin, pathname, onNavigate }: { org: { id: 
           {MAIN.map((i) => <NavLink key={i.href} item={i} pathname={pathname} onNavigate={onNavigate} />)}
         </div>
         <div className="flex flex-col gap-1">
-          <p className="px-3 pb-1 caption-3 text-text-muted">Settings</p>
+          <p className="label-log px-3 pb-1 text-text-muted">Settings</p>
           {SETTINGS.map((i) => <NavLink key={i.href} item={i} pathname={pathname} onNavigate={onNavigate} />)}
         </div>
         {isAdmin ? (
           <div className="flex flex-col gap-1">
-            <p className="px-3 pb-1 caption-3 text-text-muted">Founder</p>
+            <p className="label-log px-3 pb-1 text-text-muted">Founder</p>
             <NavLink item={{ href: "/admin", label: "Admin", icon: Gauge }} pathname={pathname} onNavigate={onNavigate} />
           </div>
         ) : null}
@@ -79,7 +81,7 @@ function SidebarBody({ org, user, isAdmin, pathname, onNavigate }: { org: { id: 
             await authClient.signOut();
             hardNavigate("/");
           }}
-          className="flex min-h-11 items-center gap-3 rounded-md px-3 py-2 body-5 text-text-subtle transition-colors duration-300 hover:bg-surface-raised hover:text-text focus-visible:focus-ring disabled:opacity-50"
+          className="flex min-h-11 items-center gap-3 rounded-sm px-3 py-2 body-5 text-text-subtle transition-colors duration-300 hover:bg-surface-sunken hover:text-text focus-visible:focus-ring disabled:opacity-50"
         >
           <SignOut size={20} weight="regular" aria-hidden />
           {signingOut ? "Signing out" : "Sign out"}
@@ -114,17 +116,17 @@ export function AppShell({ org, user, isAdmin, productName, banners, children }:
 
   return (
     <div className="flex min-h-dvh flex-col bg-surface lg:flex-row">
-      <aside className="sticky top-0 hidden h-dvh w-full max-w-xs shrink-0 flex-col border-r border-border bg-surface-raised p-4 lg:flex lg:w-1/4 xl:w-1/5">
+      <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col border-r border-border-strong bg-surface-raised p-4 lg:flex">
         <div className="mb-6 px-3 pt-2">
-          <Link href="/app" className="heading-6 inline-flex min-h-11 min-w-11 items-center text-text focus-visible:focus-ring">{productName}</Link>
+          <Link href="/app" className="inline-flex min-h-11 min-w-11 items-center focus-visible:focus-ring"><BrandLockup /></Link>
         </div>
         <div className="min-h-0 flex-1">
           <SidebarBody org={org} user={user} isAdmin={isAdmin} pathname={pathname} />
         </div>
       </aside>
 
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-surface px-4 py-2 lg:hidden">
-        <Link href="/app" className="heading-6 inline-flex min-h-11 items-center text-text focus-visible:focus-ring">{productName}</Link>
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border-strong bg-surface px-4 py-2 lg:hidden">
+        <Link href="/app" className="inline-flex min-h-11 items-center focus-visible:focus-ring"><BrandLockup /></Link>
         <button
           type="button"
           aria-label="Open menu"
@@ -162,7 +164,8 @@ export function AppShell({ org, user, isAdmin, productName, banners, children }:
       </div>
 
       <main id="main" className="min-w-0 flex-1">
-        <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
+        <Dateline />
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
           {banners}
           {children}
         </div>

@@ -15,7 +15,7 @@ export function SupportRunway() {
         <thead>
           <tr>
             {["Release", "Behind 13", "Security fixes", "Status"].map((h, i) => (
-              <th key={h} scope="col" className={`caption-3 border-b border-border px-3 py-2 text-left uppercase tracking-wider text-text-subtle ${i === 1 ? "hidden sm:table-cell" : ""}`}>{h}</th>
+              <th key={h} scope="col" className={`label-log border-b border-border px-3 py-2 text-left text-text-subtle ${i === 1 ? "hidden sm:table-cell" : ""}`}>{h}</th>
             ))}
           </tr>
         </thead>

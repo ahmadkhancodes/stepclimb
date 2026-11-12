@@ -5,3 +5,4 @@ export { PricingTable } from "./pricing-table";
 export { Faq, type FaqItem } from "./faq";
 export { TaglineReveal } from "./tagline-reveal";
 export { FinalCta } from "./final-cta";
+export { Dateline, eolEntries } from "./dateline";

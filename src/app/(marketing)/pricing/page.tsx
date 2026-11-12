@@ -1,4 +1,4 @@
-import { ButtonLink } from "@/components/ui/button";
+import Link from "next/link";
 import { Container } from "@/components/ui/layout";
 import { PricingTable } from "@/components/marketing/pricing-table";
 import { Faq, type FaqItem } from "@/components/marketing/faq";
@@ -79,12 +79,12 @@ export default function PricingPage() {
       <JsonLd data={jsonLd} />
       <PageHeader
         crumbs={[{ label: "Home", href: "/" }, { label: "Pricing" }]}
-        title="Pricing"
+        title="Pricing: a free inspection, then upgrades from $9.99"
         lede="Same core jobs, about half the price of laravelshift.com on every comparable plan, with verification included and no third party AI touching your code."
         meta={`Prices compared on ${COMPARED.label}`}
-        actions={<ButtonLink href="/compare/laravelshift" size="lg" variant="tertiary">See the price by price comparison</ButtonLink>}
+        actions={<Link href="/compare/laravelshift" className="button-md inline-flex min-h-11 items-center text-text underline decoration-border-strong underline-offset-4 hover:decoration-action focus-visible:focus-ring">See the price by price comparison</Link>}
       />
-      <Container className="flex flex-col gap-16 py-12 md:py-20">
+      <Container className="flex flex-col gap-16 pb-16 pt-8 md:pb-24 md:pt-12">
         <PricingTable id="rate-card" />
 
         <ArticleSection id="limits" title="Plan limits">

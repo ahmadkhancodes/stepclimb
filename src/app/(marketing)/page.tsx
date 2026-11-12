@@ -58,53 +58,66 @@ const faqs: FaqItem[] = [
   { q: "How does billing and cancelling work?", a: "Payments run through Stripe, and invoices carry your VAT or GST ID. You can cancel at period end or pause for up to 3 months." },
 ];
 
-function Tile({ title, children, fragment, className }: { title: string; children: ReactNode; fragment: ReactNode; className?: string }) {
+/** One logbook entry: numbered margin, text, then the real product fragment. Hairline between entries, no card. */
+function Entry({ n, title, fragment, children }: { n: number; title: string; fragment: ReactNode; children: ReactNode }) {
   return (
-    <div className={`flex flex-col gap-6 border border-border bg-surface-raised p-6 ${className ?? ""}`}>
-      <div>
-        <h3 className="heading-6 text-text">{title}</h3>
-        <p className="body-4 mt-2 max-w-xl text-text-subtle">{children}</p>
+    <li className="grid gap-6 border-t border-border py-10 first:border-t-0 lg:grid-cols-12 lg:gap-8">
+      <p className="mono-data caption-1 text-action lg:col-span-1">{String(n).padStart(2, "0")}</p>
+      <div className="lg:col-span-4">
+        <h3 className="heading-5 text-text">{title}</h3>
+        <p className="body-6 mt-3 max-w-md text-text-subtle">{children}</p>
       </div>
-      <div className="mt-auto">{fragment}</div>
-    </div>
+      <div className="lg:col-span-7">{fragment}</div>
+    </li>
   );
 }
 
+/** Procedure step in a newspaper column: vertical rule between columns on desktop, hairline on phones. */
 function Step({ n, title, fragment, children }: { n: number; title: string; fragment: ReactNode; children: ReactNode }) {
   return (
-    <li className="flex flex-col gap-6 border-t border-border-strong pt-6">
+    <li className="flex flex-col gap-6 border-t border-border pt-6 lg:border-l lg:border-t-0 lg:px-8 lg:pt-0 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0">
       <div>
-        <p className="mono-data caption-3 text-text-subtle">Step {n}</p>
-        <h3 className="heading-5 mt-2 text-text">{title}</h3>
-        <p className="body-4 mt-2 text-text-subtle">{children}</p>
+        <p className="label-log text-text-subtle">Step <span className="mono-data">{n}</span></p>
+        <h3 className="heading-4 mt-2 text-text">{title}</h3>
+        <p className="body-6 mt-3 text-text-subtle">{children}</p>
       </div>
       <div className="mt-auto">{fragment}</div>
     </li>
   );
 }
 
+/** Section head: double rule, then the heading. The logbook's way of opening a new page. */
+function Head({ id, label, children, className }: { id: string; label: string; children: ReactNode; className?: string }) {
+  return (
+    <div className={className}>
+      <p className="label-log rule-double pt-3 text-text">{label}</p>
+      <h2 id={id} className="heading-4 md:heading-2 mt-6 max-w-3xl text-text">{children}</h2>
+    </div>
+  );
+}
+
+const link = "text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring";
+
 export default function Home() {
   return (
-    <main id="main">
-      {/* 2. Hero */}
-      <section aria-labelledby="hero-title" className="bg-surface pb-12 pt-32 md:pb-24 md:pt-40">
+    <>
+      {/* Hero */}
+      <section aria-labelledby="hero-title" className="bg-surface pb-16 pt-12 md:pb-24 md:pt-16">
         <Container>
-          <div className="grid items-center gap-12 lg:grid-cols-12 lg:gap-16">
-            <div className="lg:col-span-5">
-              <h1 id="hero-title" className="heading-3 md:heading-1 text-text">
-                Laravel upgrade PRs <span className="block">that prove they work</span>
+          <div className="grid items-start gap-12 lg:grid-cols-12 lg:gap-12">
+            <div className="lg:col-span-5 lg:pt-8">
+              <p className="label-log text-text-subtle">Verified upgrades for Laravel 10, 11 and 12</p>
+              <h1 id="hero-title" className="heading-2 xl:heading-1 mt-6 text-text">
+                Laravel upgrade PRs that prove they work
               </h1>
-              <p className="body-2 mt-6 max-w-xl text-text-subtle">
-                Stepclimb by BufferSol upgrades your Laravel app as a pull request: one commit per change, composer install and your tests run in our own sandbox, and a repair pass driven by rules for common breakage. Your code never leaves our servers. From $9.99 per upgrade.
+              <p className="body-3 mt-8 max-w-lg text-text-subtle">
+                One commit per change. composer install, your build and your tests run in our sandbox before the pull request opens. No AI service touches your code. From <span className="mono-data text-text">$9.99</span> per upgrade.
               </p>
               <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
                 <ButtonLink href={CTA} size="lg">Inspect a repo free</ButtonLink>
-                <a href="#sample" className="button-md inline-flex min-h-11 items-center text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring">See an example work order</a>
+                <a href="#sample" className="button-md inline-flex min-h-11 items-center text-text underline decoration-border-strong underline-offset-4 hover:decoration-action focus-visible:focus-ring">See an example work order</a>
               </div>
-              <p className="caption-2 mt-4 max-w-md text-text-subtle">{RISK}</p>
-              <p className="caption-3 mt-8 max-w-md border-t border-border pt-4 text-text-subtle">
-                Laravel 11 security fixes ended 12 Mar 2026. Laravel 12 security fixes end 24 Feb 2027. Dates from the Laravel release notes, checked 3 Nov 2026.
-              </p>
+              <p className="caption-2 mt-4 max-w-md text-text-muted">{RISK}</p>
             </div>
             <div className="lg:col-span-7">
               <WorkOrderSheet id="sample" className="scroll-mt-24" />
@@ -113,48 +126,48 @@ export default function Home() {
         </Container>
       </section>
 
-      {/* 3. Problem */}
+      {/* Problem: the support runway ledger, full width */}
       <Section tone="raised" labelledBy="problem-title">
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-5">
-            <h2 id="problem-title" className="heading-4 md:heading-2 text-text">Every Laravel major ends the clock on the one before it</h2>
-            <p className="body-3 mt-6 text-text-subtle">
-              Laravel ships a breaking major each year, around Q1. Each gets 18 months of bug fixes and 2 years of security fixes. So an app left alone for two releases is out of support, and the longer the gap, the bigger the diff. Teams put it off until the client asks about a security questionnaire, a host drops old PHP, or composer audit finds a CVE.
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+          <Head id="problem-title" label="Why now" className="lg:col-span-5">Every Laravel major ends the clock on the one before it</Head>
+          <div className="lg:col-span-7 lg:pt-16">
+            <p className="body-3 max-w-2xl text-text-subtle">
+              Laravel ships a breaking major each year, around Q1. Each gets 18 months of bug fixes and 2 years of security fixes. An app left alone for two releases is out of support, and the longer the gap, the bigger the diff. Teams put it off until a client sends a security questionnaire, a host drops old PHP, or composer audit finds a CVE.
             </p>
+            <div className="mt-10"><SupportRunway /></div>
           </div>
-          <div className="lg:col-span-7"><SupportRunway /></div>
         </div>
       </Section>
 
-      {/* 4. Benefits bento */}
-      <Section labelledBy="benefits-title">
-        <h2 id="benefits-title" className="heading-4 md:heading-2 max-w-3xl text-text">What you get in every pull request</h2>
-        <div className="mt-12 grid gap-4 lg:grid-cols-6">
-          <Tile className="lg:col-span-4" title="Verified, not just opened" fragment={<VerifiedFragment />}>
+      {/* What is in every PR: a numbered ledger, not cards */}
+      <Section labelledBy="benefits-title" rhythm="open">
+        <Head id="benefits-title" label="In every pull request">Five things you can check before you merge</Head>
+        <ol className="mt-12">
+          <Entry n={1} title="Verified, not just opened" fragment={<VerifiedFragment />}>
             composer install, npm run build and your tests run in a fresh sandbox before the PR opens. The result is a check on the PR: Verified, with each stage listed.
-          </Tile>
-          <Tile className="lg:col-span-2 lg:row-span-2" title="One change per commit" fragment={<CommitList />}>
+          </Entry>
+          <Entry n={2} title="One change per commit" fragment={<CommitList />}>
             Each recipe is one atomic commit with a name and a version, so you can review, revert or cherry pick.
-          </Tile>
-          <Tile className="lg:col-span-4" title="Inspect before you pay" fragment={<InspectionReport />}>
+          </Entry>
+          <Entry n={3} title="Inspect before you pay" fragment={<InspectionReport />}>
             A free report from composer.json and composer.lock: versions behind, support end date, recipes that apply, effort band S to XL.
-          </Tile>
-          <Tile className="lg:col-span-3" title="Your code stays on our servers" fragment={<CustodyLines />}>
+          </Entry>
+          <Entry n={4} title="Your code stays on our servers" fragment={<CustodyLines />}>
             Runs happen in an isolated sandbox that is destroyed after the run. We keep no customer code. Nothing is sent to an AI service.
-          </Tile>
-          <Tile className="lg:col-span-3" title="Stay current weekly" fragment={<AutopilotPr />}>
+          </Entry>
+          <Entry n={5} title="Stay current weekly" fragment={<AutopilotPr />}>
             {cadenceCopy.autopilot}
-          </Tile>
-        </div>
+          </Entry>
+        </ol>
       </Section>
 
-      {/* 5. Tagline */}
+      {/* Tagline */}
       <TaglineReveal text="Every upgrade is a work order. Every change is a logbook entry. Nothing returns to service until it is signed off." />
 
-      {/* 6. How it works */}
+      {/* How it works: three newspaper columns with vertical rules */}
       <Section tone="raised" labelledBy="how-title">
-        <h2 id="how-title" className="heading-4 md:heading-2 max-w-3xl text-text">How it works</h2>
-        <ol className="mt-12 grid gap-10 lg:grid-cols-3 lg:gap-8">
+        <Head id="how-title" label="Procedure">How it works</Head>
+        <ol className="mt-12 grid gap-10 lg:grid-cols-3 lg:gap-0">
           <Step n={1} title="Inspect" fragment={<InspectionReport />}>
             Install the GitHub App on the repos you choose. Each repo gets an inspection: Laravel version, PHP constraint, stack, what applies and what it would take.
           </Step>
@@ -167,59 +180,58 @@ export default function Home() {
         </ol>
       </Section>
 
-      {/* 7. Rules, not guesses */}
+      {/* Rules, not guesses */}
       <Section labelledBy="rules-title">
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
           <div className="lg:col-span-5">
-            <p className="caption-3 uppercase tracking-wider text-text-subtle">Rules, not guesses</p>
-            <h2 id="rules-title" className="heading-4 md:heading-2 mt-4 text-text">Recipes make the known changes the same way every time</h2>
+            <Head id="rules-title" label="Rules, not guesses">Recipes make the known changes the same way every time</Head>
             <p className="body-3 mt-6 text-text-subtle">
-              Recipes and repair rules make the known changes the same way every time. Nothing is sent to an AI service. What is left is listed for you, with a ready prompt for your own agent if you use one.
+              Nothing is sent to an AI service. What is left is listed for you, with a ready prompt for your own agent if you use one.
             </p>
-            <p className="body-4 mt-4 text-text">Expect a few more squawks than a human plus AI pass would leave. We list them instead of guessing.</p>
+            <p className="body-5 mt-4 text-text">Expect a few more squawks than a human plus AI pass would leave. We list them instead of guessing.</p>
           </div>
-          <div className="lg:col-span-7"><SquawkDrawer /></div>
+          <div className="lg:col-span-7 lg:pt-16"><SquawkDrawer /></div>
         </div>
       </Section>
 
-      {/* 8. For agencies */}
-      <Section tone="raised" labelledBy="agencies-title">
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
-          <div className="lg:col-span-4">
-            <h2 id="agencies-title" className="heading-4 md:heading-2 text-text">Fifty client apps, one board</h2>
-            <p className="body-3 mt-6 text-text-subtle">
-              The hangar board shows every repo, how far behind it is, when support ends and the last work order. Studio and Agency plans add seats and white label client reports.
-            </p>
-            <p className="caption-3 mt-4 text-text-subtle">Example board with fictional repos.</p>
-          </div>
-          <div className="lg:col-span-8"><HangarBoard /></div>
+      {/* For agencies: the board gets the full width */}
+      <Section tone="raised" labelledBy="agencies-title" rhythm="open">
+        <div className="grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-12">
+          <Head id="agencies-title" label="For agencies" className="lg:col-span-6">Fifty client apps, one board</Head>
+          <p className="body-3 text-text-subtle lg:col-span-6">
+            The hangar board shows every repo, how far behind it is, when support ends and the last work order. Studio and Agency plans add seats and white label client reports.
+          </p>
         </div>
+        <div className="mt-12"><HangarBoard /></div>
+        <p className="caption-2 mt-4 text-text-muted">Example board with fictional repos.</p>
       </Section>
 
-      {/* 9. Compare */}
+      {/* Compare */}
       <Section labelledBy="compare-title">
-        <h2 id="compare-title" className="heading-4 md:heading-2 max-w-3xl text-text">Against laravelshift.com and doing it with an AI agent</h2>
+        <Head id="compare-title" label="Compared on 3 Nov 2026">Against laravelshift.com and doing it with an AI agent</Head>
         <p className="caption-2 mb-8 mt-4 text-text-subtle">
-          Prices and features compared on 3 Nov 2026. Sources are listed on the <Link href="/compare/laravelshift" className="text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring">full comparison</Link>.
+          Sources are listed on the <Link href="/compare/laravelshift" className={link}>full comparison</Link>.
         </p>
         <CompareTable caption="Stepclimb compared with laravelshift.com and an AI agent" rowHeader="Compared on" columns={["Stepclimb", "laravelshift.com", "AI agent"]} rows={compareRows} highlightColumn={0} />
-        <p className="body-4 mt-6 max-w-2xl text-text-subtle">
+        <p className="body-6 mt-6 max-w-2xl text-text-subtle">
           Upgrading from Laravel 7 or older? Today laravelshift.com covers more legacy versions; our 8.x and 9.x paths ship in v1 and older ones in v2.
         </p>
       </Section>
 
-      {/* 10. Pricing */}
-      <PricingTable
-        title="Pricing"
-        intro="Same core jobs, about half the price of laravelshift.com on every comparable plan, with verification included and no third party AI touching your code. Prices compared on 3 Nov 2026; sources linked."
-      />
+      {/* Pricing */}
+      <Section labelledBy="pricing-title">
+        <PricingTable
+          title="Pricing"
+          intro="Same core jobs, about half the price of laravelshift.com on every comparable plan, with verification included and no third party AI touching your code. Prices compared on 3 Nov 2026; sources linked."
+        />
+      </Section>
 
-      {/* 11. Security */}
+      {/* Security */}
       <Section tone="raised" labelledBy="security-title">
-        <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
-          <h2 id="security-title" className="heading-4 md:heading-2 text-text lg:col-span-5">Where your code goes, in four lines</h2>
-          <div className="lg:col-span-7">
-            <ol className="border-t border-border-strong">
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+          <Head id="security-title" label="Custody" className="lg:col-span-5">Where your code goes, in four lines</Head>
+          <div className="lg:col-span-7 lg:pt-16">
+            <ol className="border-t border-text">
               {[
                 "Each run gets its own sandbox with no host mounts. It is destroyed when the run ends.",
                 "The sandbox can reach package registries and GitHub, nothing else. Blocked hosts are logged.",
@@ -227,29 +239,27 @@ export default function Home() {
                 "We do not retain customer code. Logs are kept 30 days with secrets redacted.",
               ].map((line, i) => (
                 <li key={line} className="grid grid-cols-[2rem_1fr] gap-4 border-b border-border py-4">
-                  <span className="mono-data caption-3 pt-1 text-text-subtle">{i + 1}</span>
+                  <span className="mono-data caption-1 text-action">{String(i + 1).padStart(2, "0")}</span>
                   <span className="body-3 text-text">{line}</span>
                 </li>
               ))}
             </ol>
-            <p className="body-4 mt-6 text-text-subtle">
-              Payment, hosting and database providers are listed in full on the{" "}
-              <Link href="/legal/subprocessors" className="text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring">sub processor list</Link>. Read more on the{" "}
-              <Link href="/security" className="text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring">security page</Link>.
+            <p className="body-6 mt-6 text-text-subtle">
+              Payment, hosting and database providers are listed in full on the <Link href="/legal/subprocessors" className={link}>sub processor list</Link>. Read more on the <Link href="/security" className={link}>security page</Link>.
             </p>
           </div>
         </div>
       </Section>
 
-      {/* 13. FAQ */}
+      {/* FAQ */}
       <Faq items={faqs} />
 
-      {/* 14. Final CTA */}
+      {/* Final CTA */}
       <FinalCta
         title="Find out how far behind your repos are"
         cta={{ href: CTA, label: "Inspect a repo free" }}
         note={RISK}
       />
-    </main>
+    </>
   );
 }

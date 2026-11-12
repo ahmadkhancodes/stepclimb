@@ -64,7 +64,7 @@ export function SquawkDrawer() {
       </ul>
       <div className="p-4">
         <div className="mb-2 flex items-center justify-between gap-4">
-          <p className="caption-3 uppercase tracking-wider text-text-subtle">Prompt for your own agent</p>
+          <p className="label-log text-text-subtle">Prompt for your own agent</p>
           <button
             type="button"
             onClick={copy}

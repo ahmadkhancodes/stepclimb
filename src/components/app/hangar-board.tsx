@@ -6,8 +6,8 @@ import { Stamp } from "@/components/marketing/demo/stamp";
 import { eolText, formatDate, serviceBulletin, TEST_LABEL, type Hangar, type HangarRow } from "@/lib/github/hangar";
 import { ScanButton } from "./scan-button";
 
-const th = "caption-3 whitespace-nowrap border-b border-border bg-surface px-3 py-2 text-left uppercase tracking-wider text-text-subtle";
-const td = "h-10 whitespace-nowrap border-b border-border px-3 group-last:border-b-0";
+const th = "label-log whitespace-nowrap border-b border-border-strong bg-surface-sunken px-3 py-2 text-left text-text-subtle";
+const td = "h-12 whitespace-nowrap border-b border-border px-3 py-1 group-last:border-b-0";
 const behindText = (n: number) => (n === 0 ? "current" : `${n} ${n === 1 ? "major" : "majors"} behind`);
 
 function Support({ r }: { r: HangarRow }) {
@@ -16,24 +16,28 @@ function Support({ r }: { r: HangarRow }) {
   return <DateChip tone={tone}>{text}</DateChip>;
 }
 
-function Action({ r }: { r: HangarRow }) {
+function Action({ r, table }: { r: HangarRow; table?: boolean }) {
   if (r.kind === "unscanned") return <ScanButton repoId={r.repoId} />;
   if (r.kind === "not_laravel") return <ScanButton repoId={r.repoId} label="Rescan" variant="tertiary" />;
   return (
-    <span className="inline-flex flex-wrap items-center gap-x-4">
+    <span className="inline-flex flex-nowrap items-center gap-x-4">
       <Link href={`/app/inspections/${encodeURIComponent(r.scanId!)}`} className="button-sm inline-flex min-h-11 items-center gap-1 text-action focus-visible:focus-ring">
         Open inspection<ArrowRight size={16} weight="regular" aria-hidden />
       </Link>
-      <Link href={`/app/repos/${encodeURIComponent(r.repoId)}`} className="button-sm inline-flex min-h-11 items-center text-text-subtle hover:text-text focus-visible:focus-ring">Autopilot</Link>
+      {table ? null : <Link href={`/app/repos/${encodeURIComponent(r.repoId)}`} className="button-sm inline-flex min-h-11 items-center text-text-subtle hover:text-text focus-visible:focus-ring">Autopilot</Link>}
     </span>
   );
 }
 
-function Name({ r }: { r: HangarRow }) {
+function Name({ r, link }: { r: HangarRow; link?: boolean }) {
   const sub = r.kind === "laravel" ? [r.path ? r.path : null, r.stack, r.tests ? TEST_LABEL[r.tests] : null].filter(Boolean).join(" · ") : r.kind === "unscanned" ? "Not scanned yet" : "Not a Laravel app";
   return (
     <>
-      <span className="body-4 block text-text">{r.repo}</span>
+      {link && r.kind === "laravel" ? (
+        <Link href={`/app/repos/${encodeURIComponent(r.repoId)}`} title="Repo settings and autopilot" className="mono-data caption-1 block whitespace-nowrap text-text underline decoration-border underline-offset-4 hover:decoration-action focus-visible:focus-ring">{r.repo}</Link>
+      ) : (
+        <span className="mono-data caption-1 block whitespace-nowrap text-text">{r.repo}</span>
+      )}
       <span className="caption-5 block text-text-subtle">{sub}</span>
     </>
   );
@@ -44,7 +48,7 @@ export function ServiceBulletin({ rows }: { rows: HangarRow[] }) {
   if (!b) return null;
   const when = b.tone === "soon" ? `ends ${formatDate(b.securityEnd)}, in ${b.days} days` : `ended ${formatDate(b.securityEnd)}`;
   return (
-    <div role="note" aria-label="Service bulletin" className="body-6 flex items-start gap-3 rounded-md border border-amber bg-warning-surface p-3 text-text">
+    <div role="note" aria-label="Service bulletin" className="body-6 flex items-start gap-3 border border-amber bg-warning-surface p-3 text-text">
       <Warning size={16} weight="regular" aria-hidden className="mt-0.5 shrink-0" />
       <p><b className="font-bold">Service bulletin.</b> Laravel {b.major} security support {when}. {b.affected} {b.affected === 1 ? "airframe" : "airframes"} in this hangar {b.affected === 1 ? "is" : "are"} affected.</p>
     </div>
@@ -63,7 +67,7 @@ export function HangarStats({ rows, repoCount }: { rows: HangarRow[]; repoCount:
     <dl className="grid grid-cols-2 border border-border bg-surface-raised md:grid-cols-4">
       {stats.map((s, i) => (
         <div key={s.k} className={`px-4 py-3 ${i % 2 === 1 ? "border-l border-border" : ""} ${i > 1 ? "border-t border-border md:border-t-0" : ""} ${i > 0 ? "md:border-l" : ""}`}>
-          <dt className="caption-3 uppercase tracking-wider text-text-subtle">{s.k}</dt>
+          <dt className="label-log text-text-subtle">{s.k}</dt>
           <dd className="mono-data heading-4 mt-1">{s.v}{s.s ? <small className="caption-5 ml-1 font-sans text-text-subtle">{s.s}</small> : null}</dd>
         </div>
       ))}
@@ -90,13 +94,13 @@ export function HangarBoard({ hangar }: { hangar: Hangar }) {
           <tbody>
             {rows.map((r) => (
               <tr key={r.key} className="group transition-colors duration-300 ease-out-kit hover:bg-action-soft">
-                <td className={td}><Name r={r} /></td>
+                <td className={td}><Name r={r} link /></td>
                 <td className={`${td} mono-data body-6`}>{r.version ?? "n/a"}</td>
                 <td className={td}>{r.kind === "laravel" ? <span className="inline-flex items-center gap-2"><RunwayBar behind={r.behind} /><span className="caption-5 text-text-subtle">{behindText(r.behind)}</span></span> : null}</td>
                 <td className={td}><Support r={r} /></td>
                 <td className={`${td} mono-data body-6 ${r.tests === "none" ? "text-text-subtle" : ""}`}>{r.tests ? TEST_LABEL[r.tests] : "n/a"}</td>
                 <td className={td}>{r.kind === "laravel" ? <Stamp tone="idle">No run</Stamp> : null}</td>
-                <td className={`${td} text-right`}><Action r={r} /></td>
+                <td className={`${td} text-right`}><Action r={r} table /></td>
               </tr>
             ))}
           </tbody>

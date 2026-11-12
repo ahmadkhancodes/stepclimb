@@ -33,7 +33,7 @@ function annualSaving(): { plan: Plan; monthly: number; yearly: number; saved: n
 }
 
 const rowGrid = "grid gap-x-6 gap-y-4 px-4 py-6 md:grid-cols-12 md:items-start md:px-6";
-const colHead = "caption-3 uppercase tracking-wider text-text-subtle";
+const colHead = "label-log text-text-subtle";
 
 function PlanRow({ plan, interval }: { plan: Plan; interval: Interval }) {
   const price = priceFor(plan, interval);
@@ -43,7 +43,7 @@ function PlanRow({ plan, interval }: { plan: Plan; interval: Interval }) {
   const includes = plan.highlights.filter((h) => !h.startsWith("$"));
   const featured = !!plan.featured;
   return (
-    <li className={cn("relative bg-surface-raised", featured ? "border-2 border-action" : "border-t border-border first:border-t-0")}>
+    <li className={cn("relative", featured ? "border-2 border-action bg-action-soft" : "border-t border-border bg-surface-raised first:border-t-0")}>
       {featured ? <span className="stamp-text absolute -top-3 left-6 bg-action px-2 text-action-text">Best for agencies</span> : null}
       <div className={rowGrid}>
         <div className="md:col-span-3">
@@ -66,7 +66,7 @@ function PlanRow({ plan, interval }: { plan: Plan; interval: Interval }) {
           ))}
         </ul>
         <div className="md:col-span-2 md:justify-self-end">
-          <Link href={href} className={cn(buttonClass(featured || free ? "primary" : "secondary", "md"), "w-full md:w-auto")}>
+          <Link href={href} className={cn(buttonClass(free ? "primary" : "secondary", "md"), "w-full md:w-auto")}>
             {plan.cta}
           </Link>
         </div>
@@ -87,13 +87,14 @@ export function PricingTable({ id = "pricing", title, intro }: { id?: string; ti
 
   return (
     <div id={id}>
-      <div className="grid gap-6 md:grid-cols-12 md:items-end md:gap-x-6">
+      <div className={cn("grid gap-6 md:grid-cols-12 md:items-end md:gap-x-6", title && "rule-double pt-3")}>
         <div className="md:col-span-7">
-          {title ? <h2 id={`${id}-title`} className="heading-4 md:heading-2 text-text">{title}</h2> : null}
+          {title ? <p className="label-log text-text">Rate card</p> : null}
+          {title ? <h2 id={`${id}-title`} className="heading-4 md:heading-2 mt-6 text-text">{title}</h2> : <h2 className="sr-only">Rate card</h2>}
           {intro ? <p className="body-3 mt-4 max-w-xl text-text-subtle">{intro}</p> : null}
         </div>
         {saving ? (
-          <div className="flex flex-col gap-2 md:col-span-5 md:items-end">
+          <div className={cn("flex flex-col gap-2 md:col-span-5", title ? "md:items-end" : "md:col-span-12 md:flex-row md:items-center md:gap-6")}>
             <div role="group" aria-label="Billing interval" className="inline-flex w-fit border border-border bg-surface-raised p-1">
               {options.map((o) => (
                 <button
@@ -102,7 +103,7 @@ export function PricingTable({ id = "pricing", title, intro }: { id?: string; ti
                   aria-pressed={interval === o.id}
                   onClick={() => setBilling(o.id)}
                   className={cn(
-                    "button-sm min-h-11 rounded-sm px-4 transition-colors duration-300 ease-out-kit focus-visible:focus-ring",
+                    "button-sm min-h-11 px-4 transition-colors duration-300 ease-out-kit focus-visible:focus-ring",
                     interval === o.id ? "bg-action text-action-text" : "text-text-subtle hover:text-text",
                   )}
                 >
@@ -110,14 +111,14 @@ export function PricingTable({ id = "pricing", title, intro }: { id?: string; ti
                 </button>
               ))}
             </div>
-            <p className="mono-data caption-4 text-text-subtle md:text-right">
+            <p className="caption-4 tabular-nums text-text-subtle md:text-right">
               {saving.plan.name} annual: {money(saving.yearly)} instead of {money(saving.monthly)}. You save {money(saving.saved)} a year.
             </p>
           </div>
         ) : null}
       </div>
 
-      <div className="mt-10 border border-border bg-surface md:mt-12">
+      <div className="mt-8 border border-border-strong bg-surface md:mt-10">
         <div aria-hidden="true" className={cn(colHead, "hidden border-b border-border bg-surface px-6 py-2 md:grid md:grid-cols-12 md:gap-x-6")}>
           <span className="col-span-3">Plan</span>
           <span className="col-span-3">Price in USD</span>

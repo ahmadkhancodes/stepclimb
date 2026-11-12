@@ -9,7 +9,7 @@ import { cn } from "@/components/ui/cn";
 
 const STAGGER_MS = 60;
 
-/** Floating bar, off the top edge. Mobile: full-height panel, staggered links (60ms, 24px rise, <= 400ms total). */
+/** Masthead: full width ruled bar, sticky. Mobile: full-height panel, staggered links (60ms, 24px rise, <= 400ms total). */
 export function SiteHeader() {
   const pathname = usePathname();
   // The menu counts as open only on the page it was opened on, so navigating closes it without an effect.
@@ -65,7 +65,7 @@ export function SiteHeader() {
   const linkClass = (href: string) =>
     cn(
       "inline-flex min-h-11 items-center px-1 button-sm transition-colors duration-300 ease-out-kit hover:text-text focus-visible:focus-ring",
-      isCurrent(href) ? "text-text shadow-[0_2px_0_0_var(--action)]" : "text-text-subtle",
+      isCurrent(href) ? "text-text underline decoration-action decoration-2 underline-offset-8" : "text-text-subtle",
     );
 
   const panelItems = [
@@ -75,19 +75,20 @@ export function SiteHeader() {
   ];
 
   return (
-    <header className="fixed inset-x-0 top-4 z-50 flex justify-center px-4">
-      <div className="relative z-50 flex w-full max-w-7xl items-center justify-between gap-4 rounded-xl border border-border bg-surface-raised/80 py-2 pl-4 pr-2 backdrop-blur-md md:w-fit md:justify-start md:gap-8">
+    <header className="sticky top-0 z-50 border-b border-border-strong bg-surface">
+      <div className="relative z-50 mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6 lg:px-8">
         <Link href="/" className="inline-flex min-h-11 items-center rounded-md focus-visible:focus-ring">
           <BrandLockup />
         </Link>
-        <nav aria-label="Primary" className="hidden items-center gap-6 md:flex">
+        <nav aria-label="Primary" className="hidden items-center gap-8 md:flex lg:ml-12 lg:mr-auto">
           {navLinks.map((n) => (
             <Link key={n.href} href={n.href} aria-current={isCurrent(n.href) ? "page" : undefined} className={linkClass(n.href)}>
               {n.label}
             </Link>
           ))}
         </nav>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-4">
+          <Link href="/sign-in" className="button-sm hidden min-h-11 items-center text-text-subtle hover:text-text focus-visible:focus-ring md:inline-flex">Sign in</Link>
           <Link href="/sign-in" className={cn(buttonClass("primary", "md"), "button-sm max-sm:hidden")}>Inspect a repo free</Link>
           <button
             ref={toggleRef}
@@ -114,7 +115,7 @@ export function SiteHeader() {
         aria-label="Menu"
         inert={!open}
         className={cn(
-          "fixed inset-0 z-40 flex h-dvh flex-col bg-surface/95 px-4 pt-24 backdrop-blur-xl transition-opacity duration-300 ease-out-kit md:hidden",
+          "fixed inset-0 z-40 flex h-dvh flex-col bg-surface px-4 pt-24 transition-opacity duration-300 ease-out-kit md:hidden",
           open ? "visible opacity-100" : "invisible opacity-0",
         )}
       >
@@ -131,7 +132,7 @@ export function SiteHeader() {
                 open ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
                 item.kind === "cta"
                   ? cn(buttonClass("primary", "lg"), "mt-8")
-                  : "heading-5 flex min-h-12 items-center border-b border-border text-text aria-[current=page]:text-action",
+                  : "heading-4 flex min-h-12 items-center border-b border-border py-2 text-text aria-[current=page]:text-action",
               )}
             >
               {item.label}

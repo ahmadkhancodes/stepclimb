@@ -133,8 +133,8 @@ export function BillingClient(p: Props) {
 
       <section aria-labelledby="plans-h" className="flex flex-col gap-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <h2 id="plans-h" className="title-2 text-text">Plans</h2>
-          <div role="group" aria-label="Billing interval" className="inline-flex rounded-md border border-border-strong p-1">
+          <h2 id="plans-h" className="heading-5 text-text">Plans</h2>
+          <div role="group" aria-label="Billing interval" className="inline-flex border border-border-strong bg-surface-raised p-1">
             {(["month", "year"] as const).map((i) => (
               <button
                 key={i}
@@ -151,41 +151,47 @@ export function BillingClient(p: Props) {
             ))}
           </div>
         </div>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <ul className="border border-border-strong bg-surface-raised">
           {product.plans.map((pl) => {
             const price = pl.prices.find((x) => x.interval === interval) ?? pl.prices[0];
             const current = pl.id === live.planId;
             const chosen = p.preselect?.plan === pl.id;
+            // one primary per screen: the plan picked on the pricing page, else the featured plan
+            const primary = p.preselect ? chosen : !!pl.featured;
             return (
-              <article
-                key={pl.id}
-                aria-label={pl.name}
-                className={cn("flex flex-col gap-4 rounded-lg border bg-surface p-4", current || chosen ? "border-action" : "border-border")}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <h3 className="title-3 text-text">{pl.name}</h3>
-                  {current ? <Badge tone="success">Current</Badge> : null}
-                </div>
-                <p className="body-6 text-text-subtle">{pl.tagline}</p>
-                <p className="text-text">
-                  <span className="heading-5 tabular-nums">{price ? money(price.usd) : "$0"}</span>
-                  <span className="caption-2 text-text-subtle"> {price ? `per ${price.interval}` : "forever"}</span>
-                </p>
-                {price && price.interval !== interval ? <p className="caption-2 text-text-muted">Billed {price.interval === "year" ? "yearly" : "monthly"} only.</p> : null}
-                <ul className="flex flex-1 flex-col gap-1">
-                  {pl.highlights.map((h) => <li key={h} className="body-6 text-text-subtle">{h}</li>)}
-                </ul>
-                {pl.prices.length === 0 ? null : current ? (
-                  <Button variant="secondary" disabled>Current plan</Button>
-                ) : p.isPaid ? (
-                  <Button variant="secondary" onClick={portal} loading={busy === "portal"} disabled={!p.canManage}>Change in billing portal</Button>
-                ) : (
-                  <Button onClick={() => checkout(pl)} loading={busy === pl.id} disabled={!p.canManage || !!busy}>{pl.cta}</Button>
-                )}
-              </article>
+              <li key={pl.id} className={cn("border-t border-border first:border-t-0", chosen ? "bg-action-soft" : current ? "bg-surface-sunken" : "")}>
+                <article aria-label={pl.name} className="grid gap-x-6 gap-y-3 px-4 py-4 md:grid-cols-12 md:items-start md:px-6">
+                  <div className="md:col-span-3">
+                    <div className="flex items-center gap-2">
+                      <h3 className="heading-6 text-text">{pl.name}</h3>
+                      {current ? <Badge tone="success">Current</Badge> : null}
+                    </div>
+                    <p className="body-6 mt-1 text-text-subtle">{pl.tagline}</p>
+                  </div>
+                  <div className="md:col-span-2">
+                    <p className="text-text">
+                      <span className="mono-data title-1">{price ? money(price.usd) : "$0"}</span>
+                      <span className="caption-2 text-text-subtle"> {price ? `per ${price.interval}` : "forever"}</span>
+                    </p>
+                    {price && price.interval !== interval ? <p className="caption-2 text-text-muted">Billed {price.interval === "year" ? "yearly" : "monthly"} only.</p> : null}
+                  </div>
+                  <ul className="flex flex-col gap-1 md:col-span-4">
+                    {pl.highlights.map((h) => <li key={h} className="body-6 text-text-subtle">{h}</li>)}
+                  </ul>
+                  <div className="md:col-span-3 md:justify-self-end">
+                    {pl.prices.length === 0 ? null : current ? (
+                      <Button variant="secondary" disabled>Current plan</Button>
+                    ) : p.isPaid ? (
+                      <Button variant="secondary" onClick={portal} loading={busy === "portal"} disabled={!p.canManage}>Change in billing portal</Button>
+                    ) : (
+                      <Button variant={primary ? "primary" : "secondary"} onClick={() => checkout(pl)} loading={busy === pl.id} disabled={!p.canManage || !!busy}>{pl.cta}</Button>
+                    )}
+                  </div>
+                </article>
+              </li>
             );
           })}
-        </div>
+        </ul>
       </section>
     </div>
   );

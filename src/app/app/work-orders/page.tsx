@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/app/page-header";
 import { Stamp } from "@/components/marketing/demo/stamp";
 import { EmptyState } from "@/components/ui/states";
+import { buttonClass } from "@/components/ui/button";
 import { requireOrg } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 import { listRuns } from "@/lib/runs/store";
@@ -10,7 +11,7 @@ import { workOrderNo } from "@/lib/runs/work-order";
 export const metadata = { title: "Work orders" };
 export const dynamic = "force-dynamic";
 
-const th = "caption-3 whitespace-nowrap border-b border-border bg-surface px-3 py-2 text-left uppercase tracking-wider text-text-subtle";
+const th = "label-log whitespace-nowrap border-b border-border-strong bg-surface-sunken px-3 py-2 text-left text-text-subtle";
 const td = "h-10 whitespace-nowrap border-b border-border px-3";
 
 export default async function WorkOrdersPage() {
@@ -23,10 +24,18 @@ export default async function WorkOrdersPage() {
         <EmptyState
           title="No work orders yet"
           body={<>Open an inspection in the Hangar and start the first hop. A work order runs in a fresh sandbox and ends in a pull request you review.</>}
-          action={<Link href="/app" className="button-sm inline-flex min-h-11 items-center text-action focus-visible:focus-ring">Go to the Hangar</Link>}
+          visual={
+            <figure aria-label="Example work order row, fictional" className="w-full max-w-2xl border border-dashed border-border-strong bg-surface p-3">
+              <figcaption className="label-log text-text-muted">Example, fictional repo</figcaption>
+              <div className="mono-data caption-1 mt-2 flex flex-wrap gap-x-4 gap-y-1 text-text">
+                <span>No. 4821</span><span>northgate/billing-portal</span><span>11 to 13</span><span className="text-success">Verified</span>
+              </div>
+            </figure>
+          }
+          action={<Link href="/app" className={buttonClass("primary")}>Go to the Hangar</Link>}
         />
       ) : (
-        <div className="overflow-x-auto border border-border" data-testid="work-orders">
+        <div className="overflow-x-auto border border-border bg-surface-raised" data-testid="work-orders">
           <table className="w-full border-collapse">
             <thead><tr><th scope="col" className={th}>Order</th><th scope="col" className={th}>Repository</th><th scope="col" className={th}>Hop</th><th scope="col" className={th}>Status</th><th scope="col" className={th}>Started</th></tr></thead>
             <tbody>
