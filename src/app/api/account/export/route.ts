@@ -1,6 +1,7 @@
 import { headers } from "next/headers";
 import { getAuth } from "@/lib/auth";
 import { requireUser } from "@/lib/auth/session";
+import { can } from "@/lib/auth/roles";
 import { getDb } from "@/lib/db";
 import { withApi } from "@/lib/http";
 import { enforceRateLimit, RULES } from "@/lib/security/ratelimit";
@@ -21,7 +22,12 @@ export const GET = withApi(async () => {
     exportedAt: new Date().toISOString(),
     user,
     sessions: (sessions as { id: string; createdAt: Date; userAgent?: string | null; ipAddress?: string | null }[]).map((s) => ({ id: s.id, createdAt: s.createdAt, userAgent: s.userAgent, ipAddress: s.ipAddress })),
-    organizations: await Promise.all(orgs.map(async (o) => ({ ...o, data: await db.exportOrgData(o.id) }))),
+    organizations: await Promise.all(orgs.map(async (o) => {
+      // Org records (audit log, billing, webhooks) belong to the org, not the person: only roles that may read the audit log get them
+      const full = (await auth.api.getFullOrganization({ headers: h, query: { organizationId: o.id } }).catch(() => null)) as { members?: { userId: string; role: string }[] } | null;
+      const role = full?.members?.find((m) => m.userId === user.id)?.role?.split(",")[0] ?? null;
+      return { ...o, role, ...(can(role, "audit", "read") ? { data: await db.exportOrgData(o.id) } : {}) };
+    })),
   };
   return new Response(JSON.stringify(data, null, 2), {
     headers: {

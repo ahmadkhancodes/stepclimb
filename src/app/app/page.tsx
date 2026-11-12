@@ -38,7 +38,7 @@ export default async function OverviewPage({ searchParams }: { searchParams: Pro
   const plan = effectivePlan(ent);
   const usage = await currentUsage(db, ctx.org.id, METERS_SHOWN, new Date(), await seatsInUse(ctx.org.id));
   const app = await hasAppCredentials(db);
-  const founder = isFounderAdmin(ctx.user.email);
+  const founder = isFounderAdmin(ctx.user);
   let hangar: Hangar | null = null;
   try {
     // installs made before this org existed are linked by GitHub login

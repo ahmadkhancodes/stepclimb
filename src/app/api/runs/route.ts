@@ -28,7 +28,7 @@ export const POST = withApi(async (req) => {
   const ctx = await requireOrg();
   requirePermission(ctx, "data", "write");
   const body = await readJson(req, Body);
-  if (body.kind === "noop" && !isFounderAdmin(ctx.user.email)) throw new HttpError(403, "forbidden"); // P2-1: the no-op probe opens a PR for free
+  if (body.kind === "noop" && !isFounderAdmin(ctx.user)) throw new HttpError(403, "forbidden"); // P2-1: the no-op probe opens a PR for free
   const db = await getDb();
   if ((await db.hitRateLimit(`runs:${ctx.org.id}`, 60_000)) > 10) throw new HttpError(429, "rate_limited");
   const repo = await db.docs.get<RepoDoc>("repos", body.repoId);

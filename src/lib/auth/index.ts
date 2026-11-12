@@ -92,7 +92,9 @@ export function createAuth(db: BetterAuthOptions["database"], github: GithubOAut
         githubCreatedAt: { type: "string", required: false, input: false },
       },
     },
-    account: { accountLinking: { enabled: true, trustedProviders: ["github"] } },
+    // No trusted providers: GitHub links to an existing account only when GitHub says the address is verified. Trusting
+    // GitHub blindly let anyone who added a victim's address (unverified) to their GitHub profile sign in as the victim.
+    account: { accountLinking: { enabled: true, trustedProviders: [] } },
     databaseHooks: {
       user: {
         create: {
