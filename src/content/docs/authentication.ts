@@ -1,4 +1,5 @@
 import { product as p } from "@/config/product";
+import { meCurl } from "./snippets";
 import type { DocPage } from "./types";
 
 export const authentication: DocPage = {
@@ -7,9 +8,9 @@ export const authentication: DocPage = {
   description: `Sign in to ${p.name} with GitHub, add two factor, and call the API with keys.`,
   sections: [
     {
-      heading: "GitHub sign in",
+      heading: "Signing in",
       body: [
-        "Sign in uses your GitHub account, so there is no password to set. The free tier needs a GitHub account that is at least 30 days old.",
+        "Sign in with your GitHub account, or ask for a one time link by email. Either way there is no password to set. The free upgrade PR needs a GitHub account that is at least 30 days old.",
       ],
     },
     {
@@ -21,11 +22,11 @@ export const authentication: DocPage = {
     {
       heading: "API keys",
       body: [
-        "Server to server requests use API keys. Create and revoke them in Settings, then API keys. Send the key in the x-api-key header on every request. Never put a key in browser code or a public repository. If a key leaks, revoke it and create a new one.",
+        "Server to server requests use API keys. Create and revoke them in Settings, then API keys. Send the key in the x-api-key header on every request. Right after you create a key, the app shows this command with your real key filled in. Never put a key in browser code or a public repository. If a key leaks, revoke it and create a new one.",
       ],
       code: {
         lang: "bash",
-        code: `curl ${p.url}/api/v1/me \\\n  -H "x-api-key: YOUR_API_KEY"`,
+        code: meCurl(p.url),
       },
     },
   ],

@@ -39,7 +39,7 @@ export const api: DocPage = {
     {
       heading: "Account export and deletion",
       body: [
-        "GET /api/account/export returns a JSON copy of your account data. DELETE /api/account permanently deletes your account and organization. Both require a signed in session and are also available in Settings, then Account.",
+        "GET /api/account/export returns a JSON copy of your account data. DELETE /api/account permanently deletes your account and organization. Both require a signed in session and are also available in Settings, then Profile.",
       ],
     },
   ],

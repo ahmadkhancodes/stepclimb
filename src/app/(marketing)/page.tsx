@@ -201,7 +201,7 @@ export default function Home() {
             Install the GitHub App on the repos you choose. Each repo gets an inspection: Laravel version, PHP constraint, stack, what applies and what it would take.
           </Step>
           <Step n={2} title="Open a work order" fragment={<RunTimeline />}>
-            Pick the hop, for example 11 to 13. We run the recipes in a sandbox, apply the repair rules if something breaks, and re-verify up to three times.
+            Pick the next hop, for example 11 to 12. We run the recipes in a sandbox, apply the repair rules if something breaks, and re-verify up to three times.
           </Step>
           <Step n={3} title="Return to service" fragment={<PrCheck />}>
             You get a pull request with a work order in the body, squawks on the exact lines that need a person, and the Verified check. Merging stays with you. We never auto merge.

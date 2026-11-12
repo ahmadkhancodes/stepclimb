@@ -7,7 +7,7 @@ import { formatDate } from "@/components/app/api";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/components/ui/cn";
 import { Badge, Notice } from "@/components/ui/states";
-import { planById, product, type Interval, type Plan, type PlanId } from "@/config/product";
+import { INTERVAL_COPY, planById, product, type Interval, type Plan, type PlanId } from "@/config/product";
 import type { UsageState } from "@/lib/billing/usage";
 
 interface Props {
@@ -21,6 +21,8 @@ interface Props {
   usage: UsageState[];
   preselect: { plan: PlanId; interval: Interval } | null;
   returnedSession: string | null;
+  /** back from Stripe Checkout through its cancel link */
+  checkoutCanceled?: boolean;
 }
 
 const money = (cents: number) =>
@@ -89,6 +91,7 @@ export function BillingClient(p: Props) {
 
   return (
     <div className="flex flex-col gap-6">
+      {p.checkoutCanceled && !p.isPaid ? <Notice title="Checkout canceled">Nothing was charged and your plan did not change. Pick a plan below when you are ready.</Notice> : null}
       {verifying ? <Notice title="Confirming your payment">This takes a few seconds.</Notice> : null}
       {activated ? <Notice tone="success" title="Your plan is active">You are now on {activated}. A receipt is on its way to your email.</Notice> : null}
       {error ? (
@@ -102,7 +105,7 @@ export function BillingClient(p: Props) {
           title={`Continue with ${pre.name}`}
           action={<Button onClick={() => checkout(pre)} loading={busy === pre.id}>Continue to checkout</Button>}
         >
-          You picked {pre.name} billed {p.preselect?.interval === "month" ? "monthly" : "yearly"} on the pricing page.
+          You picked {pre.name} {INTERVAL_COPY[(pre.prices.find((x) => x.interval === p.preselect?.interval) ?? pre.prices[0])?.interval ?? "year"].billed} on the pricing page.
         </Notice>
       ) : null}
 
@@ -171,9 +174,9 @@ export function BillingClient(p: Props) {
                   <div className="md:col-span-2">
                     <p className="text-text">
                       <span className="mono-data title-1">{price ? money(price.usd) : "$0"}</span>
-                      <span className="caption-2 text-text-subtle"> {price ? `per ${price.interval}` : "forever"}</span>
+                      <span className="caption-2 text-text-subtle"> {price ? INTERVAL_COPY[price.interval].per : "forever"}</span>
                     </p>
-                    {price && price.interval !== interval ? <p className="caption-2 text-text-muted">Billed {price.interval === "year" ? "yearly" : "monthly"} only.</p> : null}
+                    {price && price.interval !== interval ? <p className="caption-2 text-text-muted">{INTERVAL_COPY[price.interval].billed.replace(/^b/, "B")} only.</p> : null}
                   </div>
                   <ul className="flex flex-col gap-1 md:col-span-4">
                     {pl.highlights.map((h) => <li key={h} className="body-6 text-text-subtle">{h}</li>)}

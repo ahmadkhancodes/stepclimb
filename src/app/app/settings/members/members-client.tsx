@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import { authError, formatDate, useAsync } from "@/components/app/api";
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
@@ -6,7 +7,8 @@ import { DataTable, Td } from "@/components/app/data-table";
 import { Panel } from "@/components/app/page-header";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
-import { Badge, EmptyState, ErrorState, Skeleton } from "@/components/ui/states";
+import { buttonClass } from "@/components/ui/button";
+import { Badge, EmptyState, ErrorState, Notice, Skeleton } from "@/components/ui/states";
 import { authClient } from "@/lib/auth/client";
 
 interface Member { id: string; userId: string; role: string; createdAt: string | Date; user: { name?: string | null; email: string } }
@@ -16,8 +18,15 @@ interface Full { members: Member[]; invitations: Invite[] }
 const ROLES = ["admin", "member", "viewer"] as const;
 const roleLabel = (r: string) => r.charAt(0).toUpperCase() + r.slice(1);
 
-export function MembersClient({ orgId, meId, canInvite, canCancelInvite, canUpdate, canRemove }: {
+/** Seats taken by members plus pending invitations: each pending invite needs a free seat to be accepted. */
+export function seatsState(members: number, pendingInvites: number, limit: number) {
+  const taken = members + pendingInvites;
+  return { taken, full: taken >= limit, left: Math.max(0, limit - taken) };
+}
+
+export function MembersClient({ orgId, meId, canInvite, canCancelInvite, canUpdate, canRemove, seats }: {
   orgId: string; meId: string; canInvite: boolean; canCancelInvite: boolean; canUpdate: boolean; canRemove: boolean;
+  seats: { limit: number; planName: string };
 }) {
   const org = useAsync<Full>(async () => {
     const { data, error } = await authClient.organization.getFullOrganization({ query: { organizationId: orgId } });
@@ -85,6 +94,16 @@ export function MembersClient({ orgId, meId, canInvite, canCancelInvite, canUpda
   return (
     <div className="flex flex-col gap-6">
       {notice ? <p role={notice.ok ? "status" : "alert"} className={notice.ok ? "caption-2 text-success" : "caption-2 text-danger"}>{notice.text}</p> : null}
+
+      {canInvite && org.data && seatsState(org.data.members.length, org.data.invitations.filter((i) => i.status === "pending").length, seats.limit).full ? (
+        <Notice
+          tone="warning"
+          title={`All ${seats.limit} ${seats.limit === 1 ? "seat" : "seats"} on ${seats.planName} are taken`}
+          action={<Link href="/app/billing" className={buttonClass("secondary", "md")}>See plans with more seats</Link>}
+        >
+          Members and pending invitations count as seats. You can still send an invitation, but your teammate can only join once a seat is free or you move to a plan with more seats.
+        </Notice>
+      ) : null}
 
       {canInvite ? (
         <Panel title="Invite a teammate" description="They get an email with a link that works for 7 days.">

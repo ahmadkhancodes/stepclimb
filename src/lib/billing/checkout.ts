@@ -7,6 +7,12 @@ import { findPrice } from "./catalog";
 // Web replacement for trayo createSubscription (PaymentIntent + ephemeral key): hosted Stripe Checkout.
 // Kept: app isolation, one trial per customer (C-19), no second live sub (409 already_subscribed).
 
+/** Where Stripe Checkout returns: the billing page, which confirms the plan (success) or says nothing was charged (canceled). */
+export function checkoutReturnUrls(base: string) {
+  const b = base.replace(/\/$/, "");
+  return { success: `${b}/app/billing?checkout=success`, cancel: `${b}/app/billing?checkout=canceled`, portalReturn: `${b}/app/billing` };
+}
+
 export interface BillingSubject {
   orgId: string;
   email: string | null;

@@ -64,3 +64,40 @@ Specs in `tests/e2e/qa2/` (`brand`, `interactions`, `layout`, `limits`) plus `te
 - **Low:** some class names still carry the retired "logbook" vocabulary (`label-log`, `rule-double`); behaviour and looks are right, rename is cosmetic.
 - **Info:** on plain `http://localhost` the production CSP `upgrade-insecure-requests` makes router prefetches after sign-out fail with `ERR_SSL_PROTOCOL_ERROR`; harmless on https (production), filtered in the spec.
 - The earlier open items (prod-only hydration #418 on `/onboarding`, passkey "Auth cancelled" copy) were not reproduced or changed here.
+
+## Usefulness pass 2: first ten minutes, working docs, billing path (12 Nov 2026)
+Run against the production build (memory DB, outbox mail, fixture GitHub as the stand-in for the GitHub App install, no Stripe key so billing is in stub mode; Stripe itself is covered by a faithful stand-in in unit tests). New specs: `tests/e2e/personas.spec.ts` (5 tests), `tests/unit/usefulness.test.ts` (17 tests). Whole suite: 83 Playwright tests, 379 unit tests, lint (only the off-limits `.github/claude/run.mjs` warning), typecheck, build green. Not deployed.
+
+### Personas (from docs/brief.md)
+- **Solo Sam**, indie dev with 2 live Laravel apps, one on 11.x. Wants to know how far behind he is and pay per PR, not per month.
+- **Agency Alex**, tech lead at a 25 person agency with 40 client apps. Wants the fleet view, a teammate in the account and a webhook into their own tooling; decides between Studio and Agency.
+- **Product-team Priya**, senior dev on a 6 dev SaaS team with 3 repos. Wants an API key for an internal dashboard, reads the docs before anything else, picks a plan from the pricing page.
+
+### Week in the life (walked in Playwright, then turned into specs)
+- **Day 1, first value.** Landing "Inspect a repo free" -> email -> magic link -> name the organization -> Hangar -> (GitHub install) -> Open inspection: 6 clicks including the e-mail link and the install, now a budget asserted in `personas.spec.ts`. Friction: the free Hangar showed **"Repos 0 of 0"**, which reads like something is broken.
+- **Day 2, second thing.** Sam/Priya create an API key: the key was shown alone, so the first request meant reading the docs and typing the URL. Alex invites a teammate on Free (1 seat): the invitation was sent, then **the teammate's accept was refused**, with nothing on the owner's side saying why (dead end). Alex subscribes a webhook to `member.invited`: **the event was never sent** by the product.
+- **Day 7, the limit and the decision to pay.** On Billing the 6 month plans read **"$74 per half"** and **"Billed monthly only."** (both wrong: they bill every 6 months), and arriving from the pricing page with `?plan=legacy_solo` said "billed yearly". Coming back from a canceled Stripe Checkout showed the plain page with no word that nothing was charged.
+- **Docs.** Getting started told users to "pick the hop, for example 11 to 13", but a work order moves one major; the API page pointed at "Settings, then Account" (it is Profile); authentication said sign in is GitHub only (the email link is the default); the webhooks page did not list its events or the body envelope.
+
+### Fixed (top five by impact, plus the docs)
+1. **6 month pricing copy**: `INTERVAL_COPY` in `src/config/product.ts`; Billing shows "every 6 months", "Billed every 6 months only." and the right preselect sentence.
+2. **Meters a plan does not include** read "Not on this plan" instead of "0 of 0" (Hangar, Billing).
+3. **Seats**: the Members page warns when members plus pending invitations fill the plan's seats and links to Billing (D-UP2).
+4. **API key snippet**: after creating a key, a ready to run `curl .../api/v1/me` with the real origin and key and a Copy command button; the same function (`src/content/docs/snippets.ts`) renders the docs sample.
+5. **Webhooks**: `member.invited` is now emitted; every event offered on the settings page is emitted and documented (unit guard).
+6. **Billing return**: `?checkout=canceled` shows "Checkout canceled. Nothing was charged"; Checkout and portal return URLs come from one helper (`checkoutReturnUrls`).
+7. **Docs** corrected as listed above; the same two mistakes were fixed in the privacy policy ("Settings, then Profile") and on the landing page ("Pick the next hop, for example 11 to 12").
+
+### Docs executed by tests
+- The authentication curl (docs page and the API keys page) runs with `curl` against the app and returns the org id; the API error sample equals the real response to a bad key; the `GET /api/v1/me` sample has the real shape; account export returns JSON; the docs page renders the command.
+- The Node signature verifier in the webhooks docs is written to a file, imported and checked against our real `signPayload`: accepts, and rejects a changed body, a wrong secret and a replay.
+- The rate limit sentence equals `RULES.api`; every "Settings, then X" names a real sidebar page; `docs/STRIPE.md` lookup keys and amounts equal `product.ts`. The only other code blocks in `docs/` are diagrams and a spike log in ARCHITECTURE.md, not runnable steps.
+
+### Billing path (as far as Stripe test mode allows without a card)
+For **every** paid plan and interval: Checkout uses the price with the right lookup key, `metadata.app=stepclimb` on the session and subscription, success and cancel URLs on `/app/billing`, adjustable quantity on per repo plans; the `checkout.session.completed` webhook activates that plan with its seat and repo limits (per repo quantity respected). The portal opens for the paying customer and returns to Billing; cancel at period end keeps the plan and flags it; `customer.subscription.deleted` drops to Free limits.
+
+### Left open
+- Real Stripe Checkout, portal configuration and webhook endpoint still need the live keys (MANUAL_STEPS).
+- No run events (`run.finished`, `pr.opened`) on outbound webhooks yet; they would be the most useful ones for agencies.
+- Repo meter enforcement (earlier open item) is unchanged; Free now reads "Not on this plan" rather than a count.
+- `emitEvent` tries delivery inline, so a slow customer endpoint can add up to its timeout to the invite request.

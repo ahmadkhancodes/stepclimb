@@ -3,6 +3,13 @@ import { METER_LABELS, fmt } from "./labels";
 
 const bar = { ok: "bg-action", near: "bg-warning", over: "bg-danger" } as const;
 
+/** "3 of 5 this month"; a meter the plan does not include reads "Not on this plan" instead of a puzzling "0 of 0". */
+export function meterText(state: Pick<UsageState, "meter" | "used" | "limit">): string {
+  const label = METER_LABELS[state.meter];
+  if (state.limit === 0 && state.used === 0) return "Not on this plan";
+  return `${fmt(state.used)} of ${fmt(state.limit)}${label.period ? ` ${label.period}` : ""}`;
+}
+
 /** Usage bar. Width is a transform (scaleX), never an animated width. */
 export function Meter({ state }: { state: UsageState }) {
   const label = METER_LABELS[state.meter];
@@ -13,7 +20,7 @@ export function Meter({ state }: { state: UsageState }) {
       <div className="flex items-baseline justify-between gap-4">
         <p className="title-4 text-text">{name}</p>
         <p className="caption-2 text-text-subtle tabular-nums">
-          {fmt(state.used)} of {fmt(state.limit)}{label.period ? ` ${label.period}` : ""}
+          {meterText(state)}
         </p>
       </div>
       <div

@@ -13,6 +13,17 @@ export const webhooks: DocPage = {
       ],
     },
     {
+      heading: "Events",
+      body: [
+        "billing.updated is sent when your plan or its status changes, for example after checkout, a failed payment or a cancellation. member.invited is sent when someone in your organization invites a teammate. test.ping is sent by Send test on the webhooks page. Subscribe to * to get every event.",
+        "Every body has the same envelope: id (the same value as x-webhook-id), type (the event name), created (Unix seconds) and data (the event details).",
+      ],
+      code: {
+        lang: "json",
+        code: `{\n  "id": "0193...",\n  "type": "member.invited",\n  "created": 1794470400,\n  "data": { "invitationId": "inv_123", "email": "sam@example.com", "role": "member" }\n}`,
+      },
+    },
+    {
       heading: "Headers",
       body: [
         "Every delivery carries three headers. x-webhook-id is a unique ID for the event, so you can deduplicate. x-webhook-event is the event name. x-webhook-signature proves the request came from us.",
