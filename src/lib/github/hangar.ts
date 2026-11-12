@@ -1,6 +1,6 @@
 import type { Db } from "@/lib/db";
 import type { EffortBand } from "@/lib/engine/types";
-import { latestScan, type AppReport } from "./scan";
+import { latestScans, type AppReport } from "./scan";
 import type { InstallationDoc, RepoDoc } from "./sync";
 
 export interface HangarRow {
@@ -36,8 +36,9 @@ export async function loadHangar(db: Db, orgId: string): Promise<Hangar> {
   const installations = await db.docs.find<InstallationDoc>("installations", { accountId: orgId });
   const repos = await db.docs.find<RepoDoc>("repos", { accountId: orgId }, { sort: { field: "fullName", dir: 1 } });
   const rows: HangarRow[] = [];
+  const scans = await latestScans(db, repos.map((r) => r.id));
   for (const r of repos) {
-    const scan = await latestScan(db, r.id);
+    const scan = scans.get(r.id);
     const base = { repoId: r.id, repo: r.fullName, scanId: scan?.id ?? null, lastRun: null };
     if (!scan) {
       rows.push({ ...base, key: r.id, path: "", kind: "unscanned", stack: "", version: null, major: null, behind: 0, eol: null, tests: null, effort: null, supported: false });

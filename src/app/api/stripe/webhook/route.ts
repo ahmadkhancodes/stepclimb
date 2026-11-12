@@ -4,6 +4,7 @@ import { getStripe } from "@/lib/billing/stripe";
 import { getDb } from "@/lib/db";
 import { env } from "@/lib/env";
 import { json } from "@/lib/http";
+import { webhookFlood } from "@/lib/security/ratelimit";
 import { log } from "@/lib/logger";
 import { mailReceipt, creditDescription } from "@/lib/mail/notify";
 import { recordWebhookFailure } from "@/lib/ops/alerts";
@@ -13,6 +14,7 @@ export const dynamic = "force-dynamic";
 
 /** Stripe webhook: signature on the RAW body (req.text(), never req.json()). Exempt from CSRF (signed). */
 export async function POST(req: Request) {
+  if (await webhookFlood(req)) return json({ error: "rate_limited" }, 429);
   const stripe = getStripe();
   const secret = env().STRIPE_WEBHOOK_SECRET;
   if (!stripe || !secret) return json({ error: "billing_unavailable" }, 503);

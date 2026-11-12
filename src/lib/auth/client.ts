@@ -9,7 +9,9 @@ import { ac, roles } from "./roles";
 export const authClient = createAuthClient({
   plugins: [
     magicLinkClient(),
-    twoFactorClient({ onTwoFactorRedirect: () => { window.location.href = "/sign-in/two-factor"; } }),
+    twoFactorClient({ onTwoFactorRedirect: () => { // full reload on purpose: the session cookie just changed
+      // eslint-disable-next-line @next/next/no-location-assign-relative-destination
+      window.location.href = "/sign-in/two-factor"; } }),
     passkeyClient(),
     organizationClient({ ac, roles }),
     apiKeyClient(),
