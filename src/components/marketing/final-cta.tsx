@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ButtonLink } from "@/components/ui/button";
+import { SessionButtonLink } from "./session-button-link";
 import { Section } from "@/components/ui/layout";
 
 /** Closing sign off: a double rule, a large display line and one action. No dark slab. */
@@ -13,7 +13,7 @@ export function FinalCta({ title, body, cta, note }: { title: ReactNode; body?: 
           {body ? <p className="body-3 mt-6 max-w-2xl text-text-subtle">{body}</p> : null}
         </div>
         <div className="flex flex-col items-start gap-4 lg:col-span-5">
-          <ButtonLink href={cta.href} size="lg">{cta.label}</ButtonLink>
+          <SessionButtonLink href={cta.href} label={cta.label} size="lg" />
           {note ? <p className="caption-2 max-w-sm text-text-muted">{note}</p> : null}
         </div>
       </div>

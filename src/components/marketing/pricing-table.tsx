@@ -6,6 +6,8 @@ import { CheckBox } from "@/components/ui/check-box";
 import { product, plans, oneOffs, type Interval, type Plan, type PlanPrice } from "@/config/product";
 import { buttonClass } from "@/components/ui/button";
 import { cn } from "@/components/ui/cn";
+import { planCta, sessionCta } from "./session-labels";
+import { useSignedIn } from "./use-signed-in";
 
 const money = (cents: number) =>
   new Intl.NumberFormat("en-US", {
@@ -36,10 +38,22 @@ function annualSaving(): { plan: Plan; monthly: number; yearly: number; saved: n
 const rowGrid = "grid gap-x-6 gap-y-4 px-4 py-6 md:grid-cols-12 md:items-start md:px-6";
 const colHead = "label-log text-text-subtle";
 
+function UpgradeLink({ kind }: { kind: string }) {
+  const cta = sessionCta(useSignedIn(), { href: `/sign-in?credit=${kind}`, label: "Open upgrade PR" });
+  return (
+    <Link
+      href={cta.href}
+      className="button-sm inline-flex min-h-11 items-center gap-1 rounded-sm text-link transition-colors duration-300 ease-out-kit hover:text-link-hover focus-visible:focus-ring"
+    >
+      {cta.label}<ArrowRight size={16} weight="regular" aria-hidden />
+    </Link>
+  );
+}
+
 function PlanRow({ plan, interval }: { plan: Plan; interval: Interval }) {
   const price = priceFor(plan, interval);
   const free = !price;
-  const href = free ? "/sign-in?plan=free" : `/sign-in?plan=${plan.id}&interval=${price.interval}`;
+  const cta = planCta(useSignedIn(), plan, price);
   const monthlyEq = price && price.interval === "year" && plan.prices.some((p) => p.interval === "month") ? price.usd / 12 : null;
   const includes = plan.highlights.filter((h) => !h.startsWith("$"));
   const featured = !!plan.featured;
@@ -67,8 +81,8 @@ function PlanRow({ plan, interval }: { plan: Plan; interval: Interval }) {
           ))}
         </ul>
         <div className="md:col-span-2 md:justify-self-end">
-          <Link href={href} className={cn(buttonClass(free ? "primary" : "secondary", "md"), "w-full md:w-auto")}>
-            {plan.cta}
+          <Link href={cta.href} className={cn(buttonClass(free ? "primary" : "secondary", "md"), "w-full md:w-auto")}>
+            {cta.label}
           </Link>
         </div>
       </div>
@@ -141,12 +155,7 @@ export function PricingTable({ id = "pricing", title, intro }: { id?: string; ti
               <span className="mono-data body-4 text-text md:col-span-3">{money(o.usd)} <span className="body-6 font-normal text-text-subtle">per run</span></span>
               <span className="body-6 text-text-subtle md:col-span-4">{o.note}</span>
               <span className="md:col-span-2 md:justify-self-end">
-                <Link
-                  href={`/sign-in?credit=${o.kind}`}
-                  className="button-sm inline-flex min-h-11 items-center gap-1 rounded-sm text-link transition-colors duration-300 ease-out-kit hover:text-link-hover focus-visible:focus-ring"
-                >
-                  Open upgrade PR<ArrowRight size={16} weight="regular" aria-hidden />
-                </Link>
+                <UpgradeLink kind={o.kind} />
               </span>
             </li>
           ))}

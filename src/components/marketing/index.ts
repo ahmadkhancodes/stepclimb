@@ -6,3 +6,4 @@ export { Faq, type FaqItem } from "./faq";
 export { TaglineReveal } from "./tagline-reveal";
 export { FinalCta } from "./final-cta";
 export { Dateline, eolEntries } from "./dateline";
+export { SessionButtonLink } from "./session-button-link";

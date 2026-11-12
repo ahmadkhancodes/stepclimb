@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { cadenceCopy, product } from "@/config/product";
-import { ButtonLink } from "@/components/ui/button";
 import { CheckBox } from "@/components/ui/check-box";
 import { cn } from "@/components/ui/cn";
 import { Container, Section } from "@/components/ui/layout";
@@ -10,6 +9,7 @@ import {
   CompareTable,
   Faq,
   FinalCta,
+  SessionButtonLink,
   PricingTable,
   TaglineReveal,
   type CompareRow,
@@ -129,7 +129,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
-                  <ButtonLink href={CTA} size="lg">Inspect a repo free</ButtonLink>
+                  <SessionButtonLink href={CTA} label="Inspect a repo free" size="lg" />
                   <a href="#sample" className="button-md inline-flex min-h-11 items-center text-link underline underline-offset-4 hover:text-link-hover focus-visible:focus-ring">See an example work order</a>
                 </div>
                 <p className="caption-2 mt-4 max-w-md text-text-muted">{RISK}</p>
