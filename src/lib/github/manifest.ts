@@ -4,7 +4,8 @@ import { safeEqual } from "@/lib/ids";
 
 /** Permissions and events from docs/ARCHITECTURE.md section 3 (least privilege). */
 export const APP_PERMISSIONS = { contents: "write", pull_requests: "write", checks: "write", metadata: "read" } as const;
-export const APP_EVENTS = ["pull_request", "push", "issue_comment", "check_run"] as const;
+// No issue_comment: GitHub rejects it unless the app also asks for the Issues permission, and nothing here handles comment commands yet.
+export const APP_EVENTS = ["pull_request", "push", "check_run"] as const;
 
 export interface GithubManifest {
   name: string;
