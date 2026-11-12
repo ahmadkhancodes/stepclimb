@@ -2,7 +2,7 @@ import { METERS_SHOWN } from "@/components/app/labels";
 import { PageHeader } from "@/components/app/page-header";
 import { planById } from "@/config/product";
 import { can } from "@/lib/auth/roles";
-import { requireOrg } from "@/lib/auth/session";
+import { requireOrg, seatsInUse } from "@/lib/auth/session";
 import { effectivePlan } from "@/lib/billing/entitlement";
 import { currentUsage } from "@/lib/billing/usage";
 import { getDb } from "@/lib/db";
@@ -19,7 +19,7 @@ export default async function BillingPage({ searchParams }: { searchParams: SP }
   const db = await getDb();
   const ent = await db.getEntitlement(ctx.org.id);
   const plan = effectivePlan(ent);
-  const usage = await currentUsage(db, ctx.org.id, METERS_SHOWN);
+  const usage = await currentUsage(db, ctx.org.id, METERS_SHOWN, new Date(), await seatsInUse(ctx.org.id));
   const want = one(sp.plan);
   const wanted = want ? planById(want) : undefined;
   return (

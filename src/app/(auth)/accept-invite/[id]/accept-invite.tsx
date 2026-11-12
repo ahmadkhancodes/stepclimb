@@ -42,7 +42,8 @@ export function AcceptInvite({ id, email }: { id: string; email: string }) {
     const { error: err } = await authClient.organization.acceptInvitation({ invitationId: id });
     if (err) {
       setBusy(null);
-      setError(authError(err, "We could not accept the invitation. Try again."));
+      const full = err.code === "ORGANIZATION_MEMBERSHIP_LIMIT_REACHED" || /membership limit/i.test(err.message ?? "");
+      setError(full ? "This workspace has used every seat on its plan. Ask the owner to upgrade on the Billing page, then accept again." : authError(err, "We could not accept the invitation. Try again."));
       return;
     }
     await authClient.organization.setActive({ organizationId: i.organizationId });

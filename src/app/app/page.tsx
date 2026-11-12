@@ -9,7 +9,7 @@ import { isFounderAdmin } from "@/lib/auth/session";
 import { hasAppCredentials } from "@/lib/github/app-store";
 import { loadHangar, type Hangar } from "@/lib/github/hangar";
 import { claimInstallations } from "@/lib/github/sync";
-import { requireOrg } from "@/lib/auth/session";
+import { requireOrg, seatsInUse } from "@/lib/auth/session";
 import { effectivePlan } from "@/lib/billing/entitlement";
 import { currentUsage } from "@/lib/billing/usage";
 import { getDb } from "@/lib/db";
@@ -36,7 +36,7 @@ export default async function OverviewPage({ searchParams }: { searchParams: Pro
   const db = await getDb();
   const ent = await db.getEntitlement(ctx.org.id);
   const plan = effectivePlan(ent);
-  const usage = await currentUsage(db, ctx.org.id, METERS_SHOWN);
+  const usage = await currentUsage(db, ctx.org.id, METERS_SHOWN, new Date(), await seatsInUse(ctx.org.id));
   const app = await hasAppCredentials(db);
   const founder = isFounderAdmin(ctx.user.email);
   let hangar: Hangar | null = null;

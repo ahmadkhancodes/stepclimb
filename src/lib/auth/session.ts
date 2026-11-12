@@ -108,3 +108,10 @@ export async function authApiKey(req: Request): Promise<{ orgId: string; keyId: 
   if (!r.valid || !r.key) throw new HttpError(401, "invalid_api_key");
   return { orgId: r.key.referenceId ?? r.key.userId ?? "", keyId: r.key.id };
 }
+
+/** Number of members in the org (the "seats" in use). Pending invitations do not take a seat until accepted. */
+export async function seatsInUse(orgId: string): Promise<number> {
+  const auth = await getAuth();
+  const full = (await auth.api.getFullOrganization({ headers: await headers(), query: { organizationId: orgId } }).catch(() => null)) as { members?: unknown[] } | null;
+  return full?.members?.length ?? 1;
+}

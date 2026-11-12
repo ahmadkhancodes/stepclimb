@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { ButtonLink } from "@/components/ui/button";
 import { Section } from "@/components/ui/layout";
 
-/** Closing sign off: a double rule, a large serif line and one action. No dark slab. */
+/** Closing sign off: a double rule, a large display line and one action. No dark slab. */
 export function FinalCta({ title, body, cta, note }: { title: ReactNode; body?: ReactNode; cta: { href: string; label: string }; note?: ReactNode }) {
   return (
     <Section labelledBy="final-cta-title" rhythm="open">
