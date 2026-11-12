@@ -14,7 +14,7 @@ const tones: Record<StampTone, string> = {
 /** Small state tag for tables: uppercase, 1px border, 2px radius. Icon plus text plus colour. */
 export function Stamp({ tone, children }: { tone: StampTone; children: string }) {
   return (
-    <span className={cn("stamp-text inline-flex items-center gap-1 rounded-sm border border-current px-2 leading-5", tones[tone])}>
+    <span className={cn("stamp-text inline-flex items-center gap-1 rounded-xs border border-current px-2 leading-5", tones[tone])}>
       {tone === "ok" ? <Check size={12} weight="regular" aria-hidden /> : null}
       {tone === "failed" ? <X size={12} weight="regular" aria-hidden /> : null}
       {children}
@@ -24,7 +24,7 @@ export function Stamp({ tone, children }: { tone: StampTone; children: string })
 
 /**
  * The Return to Service tag: a hangar serviceability tag with an eyelet, a ticked box and the sign-off line.
- * Square and upright (no rotation, no ink stamp). `animate` ticks the box once (160ms); reduced motion shows it ticked.
+ * Square and upright (no rotation, no ink stamp). `animate` ticks the box once (300ms); reduced motion shows it ticked.
  */
 export function ReturnStamp({
   verified = true,
@@ -47,7 +47,7 @@ export function ReturnStamp({
       role="img"
       aria-label={label}
       className={cn(
-        "relative inline-grid grid-cols-[auto_1fr] items-start gap-x-3 rounded-md border-2 py-2 pl-6 pr-3 text-left",
+        "relative inline-grid grid-cols-[auto_1fr] items-start gap-x-3 rounded-sm border-2 py-2 pl-6 pr-3 text-left",
         verified ? "border-success bg-success-surface text-success" : "border-text bg-amber text-text",
         className,
       )}

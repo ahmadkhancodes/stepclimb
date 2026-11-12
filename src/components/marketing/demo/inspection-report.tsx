@@ -32,7 +32,7 @@ export function InspectionReport({ className }: { className?: string }) {
           <dt className="body-6 text-text-subtle">Effort band</dt>
           <dd className="flex items-center gap-1" aria-label="Effort band M of S, M, L, XL">
             {["S", "M", "L", "XL"].map((b) => (
-              <span key={b} className={cn("mono-data caption-3 inline-flex min-w-6 justify-center rounded-sm border px-1", b === "M" ? "border-action bg-action text-action-text" : "border-border text-text-subtle")}>{b}</span>
+              <span key={b} className={cn("mono-data caption-3 inline-flex min-w-6 justify-center rounded-xs border px-1", b === "M" ? "border-action bg-action text-action-text" : "border-border text-text-subtle")}>{b}</span>
             ))}
           </dd>
         </div>

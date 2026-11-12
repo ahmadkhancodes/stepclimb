@@ -122,14 +122,10 @@
   --spacing-160: 640px;
   --spacing-176: 704px;
 
-  /* Radius: 0 on sheets and tables, 2px on inputs, 4px on buttons and tags (design-brief section 4). */
-  --radius-xs: 2px;
-  --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
-  --radius-2xl: 0px;
-  --radius-3xl: 0px;
+  /* Radius: Tailwind defaults only. Sheets and tables rounded-none, inputs rounded-xs (2px), buttons and tags rounded-sm (4px). */
+
+  /* Hero and tagline measure (B5): heading and subheading never wider than 680px. */
+  --container-hero: 680px;
 
   --ease-out-kit: cubic-bezier(0.22, 1, 0.36, 1);
   --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -137,14 +133,12 @@
 }
 
 /* ---- Named type styles (playbook §5). Use these, never loose size+weight pairs. ---- */
-/* Display (text-7xl step): hero only. */
-@utility display-1 { font-family: var(--font-display-family); font-size: 4.5rem; line-height: 0.95; font-weight: 600; letter-spacing: -0.005em; text-transform: uppercase; text-wrap: balance; }
 @utility heading-1 { font-family: var(--font-display-family); font-size: 3.75rem; line-height: 1; font-weight: 600; letter-spacing: 0; text-wrap: balance; }
 @utility heading-2 { font-family: var(--font-display-family); font-size: 3rem; line-height: 1; font-weight: 600; letter-spacing: 0; text-wrap: balance; }
 @utility heading-3 { font-family: var(--font-display-family); font-size: 2.25rem; line-height: 2.5rem; font-weight: 600; letter-spacing: 0; text-wrap: balance; }
 @utility heading-4 { font-family: var(--font-display-family); font-size: 1.875rem; line-height: 2.25rem; font-weight: 600; letter-spacing: 0; text-wrap: balance; }
-@utility heading-5 { font-family: var(--font-display-family); font-size: 1.5rem; line-height: 1.75rem; font-weight: 600; letter-spacing: 0; text-wrap: balance; }
-@utility heading-6 { font-family: var(--font-display-family); font-size: 1.25rem; line-height: 1.5rem; font-weight: 600; letter-spacing: 0; text-wrap: balance; }
+@utility heading-5 { font-family: var(--font-display-family); font-size: 1.5rem; line-height: 2rem; font-weight: 600; letter-spacing: 0; text-wrap: balance; }
+@utility heading-6 { font-family: var(--font-display-family); font-size: 1.25rem; line-height: 1.75rem; font-weight: 600; letter-spacing: 0; text-wrap: balance; }
 @utility title-1 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; }
 @utility title-2 { font-size: 1.125rem; line-height: 1.75rem; font-weight: 500; }
 @utility title-3 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
@@ -167,7 +161,7 @@
 @utility caption-5 { font-size: 0.75rem; line-height: 1rem; font-weight: 400; }
 
 /* Field label: the printed caption in the corner of a work order box (condensed caps, tracked). */
-@utility label-log { font-family: var(--font-display-family); font-size: 0.875rem; line-height: 1rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+@utility label-log { font-family: var(--font-display-family); font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
 /* Section rule: a 2px navy drawing line opens a section (name kept for call sites); hairlines separate entries. */
 @utility rule-double { border-top: 2px solid var(--text); }
 @utility rule-hair { border-top: 1px solid var(--border); }
@@ -198,22 +192,22 @@
 /* Scroll reveal (rise 32px + fade, once). Reduced motion: opacity only. */
 .kit-reveal { opacity: 0; transform: translateY(32px); transition: opacity 700ms var(--ease-out-kit), transform 700ms var(--ease-out-kit); }
 .kit-reveal[data-visible="true"] { opacity: 1; transform: none; }
-/* Unlit words use the strong rule colour (3.4:1 on paper, AA for large text) instead of low opacity. */
-.kit-word { color: var(--border-strong); transition: color 500ms var(--ease-out-kit); }
-.kit-word[data-on="true"] { color: var(--text); }
+/* Tagline reveal (B11): unlit words sit at 30% of the ink colour; each word fades to full ink as it crosses the trigger line. */
+.kit-word { opacity: 0.3; transition: opacity 500ms var(--ease-out-kit); }
+.kit-word[data-on="true"] { opacity: 1; }
 @media (prefers-reduced-motion: reduce) {
   .kit-reveal { transform: none; transition: opacity 300ms var(--ease-out-kit); }
-  .kit-word { color: var(--text); transition: none; }
+  .kit-word { opacity: 1; transition: none; }
   *, *::before, *::after { animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
 
 /* Tag text and figures (inspection tag, state tags, versions, dates, money). */
 @utility stamp-text { font-family: var(--font-mono-family); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; line-height: 1rem; }
 @utility mono-data { font-family: var(--font-mono-family); font-variant-numeric: tabular-nums; }
-/* Checklist tick: the box is ticked once when the work order scrolls in (160ms). Reduced motion: shown ticked. */
-@keyframes tick-in { from { stroke-dashoffset: 24; } to { stroke-dashoffset: 0; } }
-.sc-tick-in path { stroke-dasharray: 24; animation: tick-in 160ms ease-out 400ms both; }
-@media (prefers-reduced-motion: reduce) { .sc-tick-in path { animation: none; stroke-dasharray: none; } }
+/* Checklist tick: the tick settles into the box once (300ms, opacity and scale on the base curve). Reduced motion: shown ticked. */
+@keyframes tick-in { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+.sc-tick-in path { transform-box: fill-box; transform-origin: center; animation: tick-in 300ms cubic-bezier(0.22, 1, 0.36, 1) 400ms both; }
+@media (prefers-reduced-motion: reduce) { .sc-tick-in path { animation: none; } }
 
 /* Phones: inline body and footer links get a >=24px hit area (vertical padding does not change line layout). */
 @media (max-width: 767px) {

@@ -13,7 +13,7 @@ const chip: Record<TaskState, { label: string; cls: string }> = {
 function StateChip({ state }: { state: TaskState }) {
   const c = chip[state];
   return (
-    <span className={cn("caption-3 inline-flex items-center gap-1 rounded-sm border border-current px-2 py-0.5", c.cls)}>
+    <span className={cn("caption-3 inline-flex items-center gap-1 rounded-xs border border-current px-2 py-0.5", c.cls)}>
       {state === "done" ? <Check size={12} weight="regular" aria-hidden /> : null}
       {state === "must" ? <Warning size={12} weight="regular" aria-hidden /> : null}
       {state === "review" ? <Eye size={12} weight="regular" aria-hidden /> : null}

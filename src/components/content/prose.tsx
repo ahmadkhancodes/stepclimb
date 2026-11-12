@@ -74,5 +74,5 @@ export function Sources({ checked, items }: { checked: string; items: { label: s
 
 /** Inline code and version text in the mono face. */
 export function Mono({ children }: { children: ReactNode }) {
-  return <code className="mono-data rounded-sm bg-surface-sunken px-1 text-text">{children}</code>;
+  return <code className="mono-data rounded-xs bg-surface-sunken px-1 text-text">{children}</code>;
 }

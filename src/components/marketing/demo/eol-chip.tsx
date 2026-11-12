@@ -11,7 +11,7 @@ const tones = {
 export function EolChip({ major }: { major: number }) {
   const { text, tone } = eolLabel(major);
   return (
-    <span className={cn("mono-data caption-3 inline-flex items-center whitespace-nowrap rounded-sm px-2 leading-5", tones[tone])}>
+    <span className={cn("mono-data caption-3 inline-flex items-center whitespace-nowrap rounded-xs px-2 leading-5", tones[tone])}>
       {text}
     </span>
   );
@@ -20,7 +20,7 @@ export function EolChip({ major }: { major: number }) {
 /** A chip with a fixed label, for dated facts such as "ended 12 Mar 2026". */
 export function DateChip({ tone, children }: { tone: keyof typeof tones; children: string }) {
   return (
-    <span className={cn("mono-data caption-3 inline-flex items-center whitespace-nowrap rounded-sm px-2 leading-5", tones[tone])}>
+    <span className={cn("mono-data caption-3 inline-flex items-center whitespace-nowrap rounded-xs px-2 leading-5", tones[tone])}>
       {children}
     </span>
   );

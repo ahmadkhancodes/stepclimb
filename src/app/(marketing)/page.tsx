@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { cadenceCopy, product } from "@/config/product";
 import { CheckBox } from "@/components/ui/check-box";
+import { proofFacts } from "@/content/proof";
 import { cn } from "@/components/ui/cn";
 import { Container, Section } from "@/components/ui/layout";
 import {
@@ -101,6 +102,7 @@ function Head({ id, label, children, className }: { id: string; label: string; c
 const link = "text-link underline underline-offset-4 hover:text-link-hover focus-visible:focus-ring";
 
 export default function Home() {
+  const proof = proofFacts();
   return (
     <>
       {/* Hero: a framed drawing sheet. Checklist left, the work order on drafting film right, title block below. */}
@@ -113,10 +115,10 @@ export default function Home() {
             </div>
             <div className="grid lg:grid-cols-12">
               <div className="px-4 py-8 md:px-10 md:py-12 lg:col-span-6">
-                <h1 id="hero-title" className="heading-2 sm:heading-1 xl:display-1 uppercase text-text">
-                  Laravel upgrade PRs that prove they work
+                <h1 id="hero-title" className="heading-2 sm:heading-1 max-w-hero uppercase text-text">
+                  Laravel upgrade PRs{" "}<br className="max-sm:hidden" />that prove they work
                 </h1>
-                <ul className="mt-8 grid max-w-xl gap-3">
+                <ul className="mt-8 grid max-w-hero gap-3">
                   {[
                     "One commit per change.",
                     "composer install, your build and your tests run in our sandbox before the pull request opens.",
@@ -128,9 +130,8 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+                <div className="mt-10">
                   <SessionButtonLink href={CTA} label="Inspect a repo free" size="lg" />
-                  <a href="#sample" className="button-md inline-flex min-h-11 items-center text-link underline underline-offset-4 hover:text-link-hover focus-visible:focus-ring">See an example work order</a>
                 </div>
                 <p className="caption-2 mt-4 max-w-md text-text-muted">{RISK}</p>
               </div>
@@ -201,7 +202,7 @@ export default function Home() {
             Install the GitHub App on the repos you choose. Each repo gets an inspection: Laravel version, PHP constraint, stack, what applies and what it would take.
           </Step>
           <Step n={2} title="Open a work order" fragment={<RunTimeline />}>
-            Pick the next hop, for example 11 to 12. We run the recipes in a sandbox, apply the repair rules if something breaks, and re-verify up to three times.
+            Pick the next hop, for example 11 to 12. We run the recipes in a sandbox, apply the repair rules if something breaks, and verify again, up to three times.
           </Step>
           <Step n={3} title="Return to service" fragment={<PrCheck />}>
             You get a pull request with a work order in the body, squawks on the exact lines that need a person, and the Verified check. Merging stays with you. We never auto merge.
@@ -233,6 +234,30 @@ export default function Home() {
         </div>
         <div className="mt-12"><HangarBoard /></div>
         <p className="caption-2 mt-4 text-text-muted">Example board with fictional repos.</p>
+      </Section>
+
+      {/* Proof: real counts from the shipped rule files, and an honest note instead of invented quotes */}
+      <Section labelledBy="proof-title" rhythm="tight">
+        <div className="grid gap-10 lg:grid-cols-12 lg:gap-12">
+          <Head id="proof-title" label="Proof on file" className="lg:col-span-5">What ships today, counted from the rule files</Head>
+          <div className="lg:col-span-7 lg:pt-16">
+            <dl className="grid grid-cols-3 border-y-2 border-text">
+              {[
+                [proof.recipes, "recipes"],
+                [proof.upgradePaths, "upgrade paths"],
+                [proof.repairRules, "repair rules"],
+              ].map(([n, k], i) => (
+                <div key={String(k)} className={cn("flex flex-col-reverse gap-2 px-3 py-4 md:px-6", i > 0 && "border-l border-border")}>
+                  <dt className="label-log text-text-subtle">{k}</dt>
+                  <dd className="heading-3 text-text">{n}</dd>
+                </div>
+              ))}
+            </dl>
+            <p className="body-6 mt-6 max-w-2xl text-text-subtle">
+              Recipes are tested against fixture apps before they ship. We have no customer quotes to show yet, and we will not make any up: merged pull requests and named customers go here once they are real.
+            </p>
+          </div>
+        </div>
       </Section>
 
       {/* Compare */}

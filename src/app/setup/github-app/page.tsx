@@ -69,7 +69,7 @@ export default async function SetupGithubAppPage({ searchParams }: { searchParam
           {!existing ? (
             <form method="get" className="body-6 flex flex-wrap items-end gap-2 text-text-subtle">
               <label className="flex flex-col gap-1">Owned by an organisation instead? Organisation login
-                <input name="org" defaultValue={sp.org ?? ""} pattern="[A-Za-z0-9-]{1,39}" className="min-h-11 rounded-md border border-border-strong bg-surface px-3 text-text focus-visible:focus-ring" />
+                <input name="org" defaultValue={sp.org ?? ""} pattern="[A-Za-z0-9-]{1,39}" className="min-h-11 rounded-sm border border-border-strong bg-surface px-3 text-text focus-visible:focus-ring" />
               </label>
               <Button type="submit" variant="secondary">Use organisation</Button>
             </form>
