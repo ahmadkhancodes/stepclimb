@@ -120,6 +120,12 @@ export function createAuth(db: BetterAuthOptions["database"], github: GithubOAut
         creatorRole: "owner",
         allowUserToCreateOrganization: true,
         invitationExpiresIn: 60 * 60 * 24 * 7,
+        // the seats the pricing page promises: accepting an invitation past the plan's seat count is refused
+        membershipLimit: async (_user, org) => {
+          const { getDb } = await import("@/lib/db");
+          const { limitFor } = await import("@/lib/billing/entitlement");
+          return limitFor(await (await getDb()).getEntitlement(org.id), "seats");
+        },
         sendInvitationEmail: async (data) => {
           const url = `${base}/accept-invite/${data.id}`;
           const m = inviteEmail({ orgName: data.organization.name, inviter: data.inviter.user.name || data.inviter.user.email, url, role: data.role });

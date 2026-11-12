@@ -27,8 +27,22 @@ export async function meter(db: Db, orgId: string, m: MeterId, by = 1, now = new
   return { ...usageState(m, used, limit), within: used <= limit };
 }
 
-export async function currentUsage(db: Db, orgId: string, meters: MeterId[], now = new Date()): Promise<UsageState[]> {
+/**
+ * Usage for display. `seats` is a live count (members of the org), not a monthly counter:
+ * nothing increments that counter, so reading it always showed 0 of N. `liveSeats` comes from the caller (members live in Better Auth).
+ */
+export async function currentUsage(db: Db, orgId: string, meters: MeterId[], now = new Date(), liveSeats?: number): Promise<UsageState[]> {
   const ent = await db.getEntitlement(orgId);
   const plan = effectivePlan(ent, now.getTime());
-  return Promise.all(meters.map(async (m) => usageState(m, await db.getUsage(orgId, m, periodOf(now)), plan.limits[m])));
+  return Promise.all(
+    meters.map(async (m) => {
+      const limit = limitFor(ent, m, now.getTime());
+      if (m === "seats" && liveSeats !== undefined) {
+        // using every seat is normal (a solo owner on a 1 seat plan): only more members than seats is a problem, so never "near"
+        const u = usageState(m, liveSeats, limit);
+        return { ...u, level: liveSeats > limit ? "over" : "ok" };
+      }
+      return usageState(m, await db.getUsage(orgId, m, periodOf(now)), plan.limits[m]);
+    }),
+  );
 }

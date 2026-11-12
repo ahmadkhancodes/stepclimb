@@ -1,5 +1,5 @@
 import { product, type MeterId } from "@/config/product";
-import { requireOrg } from "@/lib/auth/session";
+import { requireOrg, seatsInUse } from "@/lib/auth/session";
 import { computeEntitlement, effectivePlan } from "@/lib/billing/entitlement";
 import { getStripe } from "@/lib/billing/stripe";
 import { currentUsage } from "@/lib/billing/usage";
@@ -24,5 +24,5 @@ export const GET = withApi(async (req) => {
   }
   const plan = effectivePlan(ent);
   const meters = Object.keys(plan.limits) as MeterId[];
-  return json({ plan: { id: plan.id, name: plan.name }, entitlement: ent, usage: await currentUsage(db, ctx.org.id, meters), currency: product.currency });
+  return json({ plan: { id: plan.id, name: plan.name }, entitlement: ent, usage: await currentUsage(db, ctx.org.id, meters, new Date(), await seatsInUse(ctx.org.id)), currency: product.currency });
 });
