@@ -23,7 +23,6 @@
   "default_events": [
     "pull_request",
     "push",
-    "issue_comment",
     "check_run"
   ]
 }

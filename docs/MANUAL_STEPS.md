@@ -12,7 +12,7 @@ Exact URL to open after deploy (production host, see `NEXT_PUBLIC_APP_URL`):
 
 1. Sign in to Stepclimb with the founder email, open the link, then click **Create the Stepclimb GitHub App**. GitHub shows its confirmation page: click **Create GitHub App**.
 2. Nothing to paste. GitHub redirects to `/api/github/manifest/callback`, which exchanges the code and stores app id, private key, webhook secret and OAuth client id/secret encrypted in the database. The page then shows "GitHub App connected" with an **Install on a repository** button. Setup is one time and never overwrites stored credentials.
-3. Manifest values used (for review): name "Stepclimb by BufferSol", public app, webhook `{{HOST}}/api/github/webhook`, callback `{{HOST}}/api/auth/callback/github`, setup URL `{{HOST}}/api/github/setup`, permissions contents write, pull requests write, checks write, metadata read, events pull_request, push, issue_comment, check_run (`docs/manifests/github-app.json`).
+3. Manifest values used (for review): name "Stepclimb by BufferSol", public app, webhook `{{HOST}}/api/github/webhook`, callback `{{HOST}}/api/auth/callback/github`, setup URL `{{HOST}}/api/github/setup`, permissions contents write, pull requests write, checks write, metadata read, events pull_request, push, check_run (`docs/manifests/github-app.json`).
 4. Click **Install** on the target account; you land on the Hangar with the repos listed and can run a free scan on each.
 
 Organisation owned alternative: use `https://github.com/organizations/{{ORG}}/settings/apps/new` as the form target; the page has a toggle.

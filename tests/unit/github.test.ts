@@ -66,7 +66,7 @@ describe("manifest builder", () => {
     expect(m.default_permissions).toEqual(APP_PERMISSIONS);
     expect(m.default_permissions).toEqual({ contents: "write", pull_requests: "write", checks: "write", metadata: "read" });
     expect(m.default_events).toEqual([...APP_EVENTS]);
-    expect(m.default_events).toEqual(["pull_request", "push", "issue_comment", "check_run"]);
+    expect(m.default_events).toEqual(["pull_request", "push", "check_run"]);
   });
   it("derives webhook, callback and setup URLs from the origin without a double slash", () => {
     expect(m.hook_attributes.url).toBe("https://stepclimb.buffersoltech.com/api/github/webhook");
@@ -268,5 +268,17 @@ describe("scan report and Hangar", () => {
     expect(serviceBulletin([])).toBeNull();
     await scanRepo(db, createFixtureApi(), await repoByName("dispatch-api"), { today: TODAY, recipes });
     expect(serviceBulletin((await loadHangar(db, "org-a")).rows)).toMatchObject({ tone: "ended", major: 10, affected: 1 });
+  });
+});
+
+describe("manifest is accepted by GitHub", () => {
+  // GitHub validates the manifest: every default event must be covered by a requested permission.
+  const NEEDS: Record<string, string> = { pull_request: "pull_requests", push: "contents", check_run: "checks" };
+  it("requests a permission for every default event", () => {
+    const m = buildManifest("https://stepclimb.example.com");
+    for (const e of m.default_events) {
+      expect(NEEDS[e], `no permission mapping for event ${e}`).toBeTruthy();
+      expect(Object.keys(m.default_permissions)).toContain(NEEDS[e]);
+    }
   });
 });

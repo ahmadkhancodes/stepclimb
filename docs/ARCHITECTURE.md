@@ -62,7 +62,7 @@ Conclusions and risk handling:
 
 ## 3. The GitHub App
 - Created through a **manifest flow** (see `docs/MANUAL_STEPS.md`, one click for the owner). Manifest in `docs/manifests/github-app.json`, generated at runtime from the deployment origin by `/setup/github-app`.
-- Permissions (least privilege, as the brief): contents read and write, pull requests read and write, checks read and write, metadata read. Events: `pull_request`, `push`, `issue_comment` (for `/stepclimb rerun`, v1), `check_run`, plus the always sent `installation` and `installation_repositories`.
+- Permissions (least privilege, as the brief): contents read and write, pull requests read and write, checks read and write, metadata read. Events: `pull_request`, `push`, `check_run` (`issue_comment` for `/stepclimb rerun` is left out until that command exists: GitHub rejects the event without the Issues permission), plus the always sent `installation` and `installation_repositories`.
 - On manifest conversion the callback stores `app_id`, private key (PEM), webhook secret and client id/secret **encrypted in Mongo** (libsodium secretbox, key from `APP_ENCRYPTION_KEY`), so there is nothing to paste into env vars. A one time setup guard refuses to overwrite.
 - Webhook endpoint: verify `X-Hub-Signature-256` on the raw body, write `webhook_events` (unique delivery id) and acknowledge in under 10 s; work happens in jobs. Idempotent.
 - Installation tokens: minted per run, scoped to the one repo with the minimum permissions, 1 hour life, never written to disk and, with Vercel's network policy header injection, never present inside the sandbox (section 5).
