@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { audit } from "@/lib/audit";
 import { requireOrg, requirePermission } from "@/lib/auth/session";
-import { createCheckoutSession } from "@/lib/billing/checkout";
+import { checkoutReturnUrls, createCheckoutSession } from "@/lib/billing/checkout";
 import { requireStripe } from "@/lib/billing/stripe";
 import { getDb } from "@/lib/db";
 import { appUrl } from "@/lib/env";
@@ -21,11 +21,11 @@ export const POST = withApi(async (req) => {
   const body = await readJson(req, Body);
   const db = await getDb();
   await enforceRateLimit(`billing:${ctx.user.id}`, RULES.billing, db);
-  const base = appUrl();
+  const back = checkoutReturnUrls(appUrl());
   const r = await createCheckoutSession(requireStripe(), db, { orgId: ctx.org.id, email: ctx.user.email, userId: ctx.user.id }, body.plan, body.interval, {
     quantity: body.quantity,
-    success: `${base}/app/billing?checkout=success`,
-    cancel: `${base}/app/billing?checkout=canceled`,
+    success: back.success,
+    cancel: back.cancel,
   });
   await audit({ orgId: ctx.org.id, actorId: ctx.user.id, action: "billing.checkout_started", target: `${body.plan}:${body.interval}` });
   return json(r);

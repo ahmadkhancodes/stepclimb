@@ -20,13 +20,13 @@ export const billing: DocPage = {
     {
       heading: "Checkout",
       body: [
-        "Choose a plan in Settings, then Billing. You are sent to a Stripe Checkout page to pay. When payment succeeds you return to the app and your plan updates within seconds.",
+        "Choose a plan on the pricing page or in Billing in the app sidebar. You are sent to a Stripe Checkout page to pay. When payment succeeds you return to the app and your plan updates within seconds.",
       ],
     },
     {
       heading: "Customer portal",
       body: [
-        "Use the portal to change plan, update your card, download invoices and cancel at period end. Open it from Settings, then Billing, then Manage billing. A cancelled plan stays active until the end of the period you paid for.",
+        "Use the portal to change plan, update your card, download invoices and cancel at period end. Open it from Billing in the app sidebar, then Manage billing. A cancelled plan stays active until the end of the period you paid for.",
       ],
     },
     {

@@ -132,6 +132,9 @@ export function createAuth(db: BetterAuthOptions["database"], github: GithubOAut
           const url = `${base}/accept-invite/${data.id}`;
           const m = inviteEmail({ orgName: data.organization.name, inviter: data.inviter.user.name || data.inviter.user.email, url, role: data.role });
           await sendMailSafe({ to: data.email, ...m, category: "transactional" }, "invite");
+          // the member.invited event offered on the webhooks page; a failed delivery never blocks the invite
+          const { emitEvent } = await import("@/lib/webhooks/outbound");
+          await emitEvent(data.organization.id, "member.invited", { invitationId: data.id, email: data.email, role: data.role }).catch(() => []);
         },
       }),
       apiKey({

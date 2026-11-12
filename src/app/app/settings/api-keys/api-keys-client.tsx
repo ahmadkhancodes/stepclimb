@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Field, Input } from "@/components/ui/field";
 import { EmptyState, ErrorState, Notice, Skeleton } from "@/components/ui/states";
 import { authClient } from "@/lib/auth/client";
+import { meCurl } from "@/content/docs/snippets";
 
 interface KeyRow { id: string; name: string | null; start: string | null; prefix: string | null; createdAt: string | Date; lastRequest: string | Date | null }
 
@@ -55,7 +56,7 @@ export function ApiKeysClient({ orgId, canManage }: { orgId: string; canManage: 
   return (
     <div className="flex flex-col gap-6">
       {!canManage ? <Notice title="Read only">Only owners and admins can create or delete API keys.</Notice> : null}
-      {created ? <SecretReveal title={`Key created: ${created.name}`} value={created.key} onDismiss={() => setCreated(null)} /> : null}
+      {created ? <SecretReveal title={`Key created: ${created.name}`} value={created.key} onDismiss={() => setCreated(null)} snippet={{ label: "Try it now: this request returns your organization id", code: meCurl(window.location.origin, created.key) }} /> : null}
 
       {canManage ? (
         <Panel title="Create a key">

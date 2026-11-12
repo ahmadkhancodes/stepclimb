@@ -8,6 +8,13 @@ export type PlanId = "free" | "solo" | "legacy_solo" | "studio" | "legacy_studio
 export type Interval = "month" | "year" | "half";
 export type MeterId = "repos" | "seats" | "extended_verify" | "public_prs";
 
+/** How a billing interval reads next to a price ("$74 every 6 months") and in a sentence ("billed every 6 months"). */
+export const INTERVAL_COPY: Record<Interval, { per: string; billed: string }> = {
+  month: { per: "per month", billed: "billed monthly" },
+  year: { per: "per year", billed: "billed yearly" },
+  half: { per: "every 6 months", billed: "billed every 6 months" },
+};
+
 /** Sentinels for "no practical limit". Over 200 repos or SSO is an Enterprise quote (brief). */
 export const MAX_REPOS = 200;
 export const MAX_SEATS = 1000;

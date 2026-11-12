@@ -9,8 +9,8 @@ export const gettingStarted: DocPage = {
     {
       heading: "Sign in with GitHub",
       body: [
-        `Go to ${p.url} and choose Inspect a repo free. You sign in with GitHub. Your first sign in creates an organization that holds your repos, members and billing.`,
-        `New accounts start on the ${p.plans[0]?.name ?? "Free"} plan. You can change plan from Settings, then Billing, at any time.`,
+        `Go to ${p.url} and choose Inspect a repo free. Sign in with GitHub or with a one time link by email, then name your organization. It creates an organization that holds your repos, members and billing.`,
+        `New accounts start on the ${p.plans[0]?.name ?? "Free"} plan. You can change plan from Billing in the app sidebar at any time.`,
       ],
     },
     {
@@ -28,13 +28,13 @@ export const gettingStarted: DocPage = {
     {
       heading: "Open a work order",
       body: [
-        "Pick the hop, for example 11 to 13. Stepclimb runs the recipes in an isolated sandbox, then composer install, your asset build and your tests. It opens a pull request with one commit per change, a work order in the body and the Verified check. Merging stays with you.",
+        "Open the inspection and press Start work order. A work order moves one major at a time, for example 11 to 12; start the next hop after you merge. Stepclimb runs the recipes in an isolated sandbox, then composer install, your asset build and your tests. It opens a pull request with one commit per change, a work order in the body and the Verified check. Merging stays with you.",
       ],
     },
     {
       heading: "Next steps",
       body: [
-        "Read the authentication guide to add two factor sign in and API keys. See the billing guide for plans and per repo pricing.",
+        "Invite teammates in Settings, then Members. Read the authentication guide to add two factor sign in and API keys. See the billing guide for plans and per repo pricing.",
       ],
     },
   ],
