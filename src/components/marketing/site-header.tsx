@@ -6,12 +6,16 @@ import { product } from "@/config/product";
 import { buttonClass } from "@/components/ui/button";
 import { BrandLockup } from "./demo/brand-lockup";
 import { cn } from "@/components/ui/cn";
+import { sessionCta } from "./session-labels";
+import { useSignedIn } from "./use-signed-in";
 
 const STAGGER_MS = 60;
 
 /** Masthead: full width ruled bar, sticky. Mobile: full-height panel, staggered links (60ms, 24px rise, <= 400ms total). */
 export function SiteHeader() {
   const pathname = usePathname();
+  const signedIn = useSignedIn();
+  const main = sessionCta(signedIn, { href: "/sign-in", label: "Inspect a repo free" });
   // The menu counts as open only on the page it was opened on, so navigating closes it without an effect.
   const [openFor, setOpenFor] = useState<string | null>(null);
   const open = openFor === pathname;
@@ -70,8 +74,8 @@ export function SiteHeader() {
 
   const panelItems = [
     ...navLinks.map((n) => ({ ...n, kind: "link" as const })),
-    { href: "/sign-in", label: "Sign in", kind: "link" as const },
-    { href: "/sign-in", label: "Inspect a repo free", kind: "cta" as const },
+    ...(signedIn ? [] : [{ href: "/sign-in", label: "Sign in", kind: "link" as const }]),
+    { ...main, kind: "cta" as const },
   ];
 
   return (
@@ -88,8 +92,9 @@ export function SiteHeader() {
           ))}
         </nav>
         <div className="flex items-center gap-4">
-          <Link href="/sign-in" className="button-sm hidden min-h-11 items-center text-text-subtle hover:text-text focus-visible:focus-ring md:inline-flex">Sign in</Link>
-          <Link href="/sign-in" className={cn(buttonClass("secondary", "md"), "button-sm max-sm:hidden")}>Inspect a repo free</Link>
+          {/* Space is reserved while signed in (invisible, not removed) so nothing shifts when the label swaps. */}
+          <Link href="/sign-in" aria-hidden={signedIn || undefined} tabIndex={signedIn ? -1 : undefined} className={cn("button-sm hidden min-h-11 items-center text-text-subtle hover:text-text focus-visible:focus-ring md:inline-flex", signedIn && "md:invisible")}>Sign in</Link>
+          <Link href={main.href} className={cn(buttonClass(signedIn ? "primary" : "secondary", "md"), "button-sm max-sm:hidden")}>{main.label}</Link>
           <button
             ref={toggleRef}
             type="button"
