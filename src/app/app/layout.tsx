@@ -18,7 +18,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
     <AppShell
       org={{ id: ctx.org.id, name: ctx.org.name }}
       user={{ name: ctx.user.name, email: ctx.user.email }}
-      isAdmin={isFounderAdmin(ctx.user.email)}
+      isAdmin={isFounderAdmin(ctx.user)}
       productName={product.name}
       banners={<UsageBanner usage={usage} entitlement={ent} />}
     >

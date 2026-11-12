@@ -22,7 +22,7 @@ const ERRORS: Record<string, string> = {
 /** Founder only (ADMIN_EMAILS). One click manifest flow: this form POSTs the manifest to GitHub. Nothing is pasted anywhere. */
 export default async function SetupGithubAppPage({ searchParams }: { searchParams: Promise<{ org?: string; done?: string; error?: string }> }) {
   const s = await getSession();
-  if (!s || !isFounderAdmin(s.user.email)) notFound();
+  if (!s || !isFounderAdmin(s.user)) notFound();
   const sp = await searchParams;
   const db = await getDb();
   const existing = await hasAppCredentials(db);

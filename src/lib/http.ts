@@ -78,7 +78,14 @@ export function withApi<C = unknown>(handler: Handler<C>, opts: { csrf?: boolean
   };
 }
 
-/** Client IP from Vercel/proxy headers. */
+/**
+ * Client IP for rate limits and audit. The left of `x-forwarded-for` is whatever the client sent (Next's own server keeps a
+ * client supplied header), so it is only trusted on Vercel, whose edge overwrites the header and sets `x-real-ip`. Anywhere
+ * else (VPS behind nginx/Caddy) the entry our own proxy appended is used: `TRUSTED_PROXY_HOPS` from the right (default 1).
+ */
 export function clientIp(req: Request): string {
-  return (req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || req.headers.get("x-real-ip") || "0.0.0.0").slice(0, 64);
+  const xff = (req.headers.get("x-forwarded-for") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (process.env.VERCEL) return (req.headers.get("x-real-ip")?.trim() || xff[0] || "0.0.0.0").slice(0, 64);
+  const hops = Math.max(1, Math.floor(Number(process.env.TRUSTED_PROXY_HOPS ?? 1)) || 1);
+  return (xff[Math.max(0, xff.length - hops)] || "0.0.0.0").slice(0, 64);
 }

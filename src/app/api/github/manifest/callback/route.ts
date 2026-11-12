@@ -14,7 +14,7 @@ const back = (q: string) => NextResponse.redirect(`${appUrl()}/setup/github-app?
 /** Manifest flow step 2: GitHub redirects here with ?code&state. Founder only, one time, credentials stored encrypted. */
 export async function GET(req: Request) {
   const s = await getSession(req.headers);
-  if (!s || !isFounderAdmin(s.user.email)) return new NextResponse("Not found", { status: 404 });
+  if (!s || !isFounderAdmin(s.user)) return new NextResponse("Not found", { status: 404 });
   const url = new URL(req.url);
   const secret = env().BETTER_AUTH_SECRET ?? "dev-only-secret-dev-only-secret-0000";
   if (!(await verifyState(secret, url.searchParams.get("state")))) return back("error=state");

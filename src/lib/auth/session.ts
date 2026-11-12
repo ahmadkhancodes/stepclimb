@@ -75,7 +75,12 @@ export function requirePermission(ctx: OrgContext, resource: keyof typeof statem
   if (!can(ctx.role, resource, action)) throw new HttpError(403, "forbidden");
 }
 
-export const isFounderAdmin = (email: string | null | undefined) => !!email && adminEmails().includes(email.toLowerCase());
+/**
+ * Founder = an ADMIN_EMAILS address the user has proven they own. `emailVerified` matters: a GitHub sign in can carry an
+ * address GitHub never verified, and that must not open the founder console.
+ */
+export const isFounderAdmin = (u: { email?: string | null; emailVerified?: boolean | null } | null | undefined) =>
+  !!u?.email && u.emailVerified === true && adminEmails().includes(u.email.toLowerCase());
 
 /** Founder console needs TOTP in production (off only for the e2e suite, which sets E2E_OUTBOX=1 and never runs on Vercel). */
 export const founderNeeds2fa = (u: { twoFactorEnabled?: boolean | null }) => isProd() && !e2eMode() && !u.twoFactorEnabled;
@@ -83,7 +88,7 @@ export const founderNeeds2fa = (u: { twoFactorEnabled?: boolean | null }) => isP
 /** Founder only API guard: 404 for everyone else (the console does not exist for them), 403 until TOTP is on. */
 export async function requireFounder() {
   const s = await requireUser();
-  if (!isFounderAdmin(s.user.email)) throw new HttpError(404, "not_found");
+  if (!isFounderAdmin(s.user)) throw new HttpError(404, "not_found");
   if (founderNeeds2fa(s.user)) throw new HttpError(403, "two_factor_required");
   return s;
 }
@@ -95,7 +100,7 @@ export async function requireFounder() {
  */
 export async function requireFounderPage(path = "/admin") {
   const s = await requireUser({ redirectTo: path });
-  if (!isFounderAdmin(s.user.email) || founderNeeds2fa(s.user)) notFound();
+  if (!isFounderAdmin(s.user) || founderNeeds2fa(s.user)) notFound();
   return s;
 }
 

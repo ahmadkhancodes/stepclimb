@@ -28,7 +28,10 @@ export const DELETE = withApi<Ctx>(async (_req, { params }) => {
   const ctx = await requireOrg();
   requirePermission(ctx, "webhook", "manage");
   const { id } = await params;
-  await (await getDb()).deleteWebhookEndpoint(ctx.org.id, id);
+  const db = await getDb();
+  // another org's id (or a guess) is a 404 and leaves no false "deleted" line in this org's audit log
+  if (!(await db.getWebhookEndpoint(ctx.org.id, id))) throw new HttpError(404, "not_found");
+  await db.deleteWebhookEndpoint(ctx.org.id, id);
   await audit({ orgId: ctx.org.id, actorId: ctx.user.id, action: "webhook.deleted", target: id });
   return json({ deleted: true });
 });

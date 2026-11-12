@@ -13,7 +13,7 @@ const nav = [{ href: "/admin", label: "Overview" }, { href: "/admin/runs", label
 
 export default async function AdminLayout({ children }: { children: ReactNode }) {
   const s = await requireUser({ redirectTo: "/admin" });
-  if (!isFounderAdmin(s.user.email)) notFound();
+  if (!isFounderAdmin(s.user)) notFound();
   const needs2fa = founderNeeds2fa(s.user);
   return (
     <div className="flex min-h-dvh flex-col bg-surface">
