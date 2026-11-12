@@ -236,3 +236,19 @@
 @media (max-width: 767px) {
   :where(p, li, dd, footer) a:not([class*="min-h-"]):not([class*="py-"]) { padding-block: 4px; }
 }
+
+/* Tailwind v4 no longer sets a pointer cursor on buttons. Anything you can click shows the hand. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  summary,
+  select,
+  label[for],
+  input:is([type="checkbox"], [type="radio"], [type="submit"], [type="button"], [type="file"]):not(:disabled) {
+    cursor: pointer;
+  }
+  button:disabled,
+  [aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}

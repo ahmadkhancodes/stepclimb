@@ -10,7 +10,7 @@ export function securityHeaders(): { key: string; value: string }[] {
     "connect-src 'self' https://vitals.vercel-insights.com https://va.vercel-scripts.com",
     "worker-src 'self' blob:",
     "frame-ancestors 'none'",
-    "form-action 'self' https://checkout.stripe.com https://billing.stripe.com",
+    "form-action 'self' https://checkout.stripe.com https://billing.stripe.com https://github.com",
     "base-uri 'self'",
     "object-src 'none'",
     ...(dev ? [] : ["upgrade-insecure-requests"]),
