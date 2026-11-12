@@ -37,20 +37,20 @@ export function InspectionReport({ report, repoId, returnTo }: { report: ScanRep
                 <h2 className="title-2 text-text">{a.path ? a.path : "Root app"}</h2>
                 <p className="mono-data body-6 text-text-subtle">Laravel {a.app.laravelVersion ?? "unknown"} · PHP {a.app.phpConstraint ?? "unspecified"} · {TEST_LABEL[a.app.testFramework]}</p>
               </div>
-              <div className="flex items-center gap-3"><span className="caption-3 uppercase tracking-wider text-text-subtle">Effort</span><EffortBadge band={a.effort} /></div>
+              <div className="flex items-center gap-3"><span className="label-log text-text-subtle">Effort</span><EffortBadge band={a.effort} /></div>
             </div>
             <p className="body-6 text-text-subtle">{EFFORT_TEXT[a.effort]}</p>
             <dl className="grid gap-4 sm:grid-cols-3">
               <div>
-                <dt className="caption-3 uppercase tracking-wider text-text-subtle">Versions behind</dt>
+                <dt className="label-log text-text-subtle">Versions behind</dt>
                 <dd className="mt-1 flex items-center gap-2"><RunwayBar behind={a.behind} /><span className="body-6">{a.behind === 0 ? "Current" : `${a.behind} ${a.behind === 1 ? "major" : "majors"}`}</span></dd>
               </div>
               <div>
-                <dt className="caption-3 uppercase tracking-wider text-text-subtle">Security support</dt>
+                <dt className="label-log text-text-subtle">Security support</dt>
                 <dd className="mt-1 flex items-center gap-2"><DateChip tone={eol.tone}>{eol.text}</DateChip><span className="body-6 text-text-subtle">{a.eol.securityEnd ? formatDate(a.eol.securityEnd) : "date not published"}</span></dd>
               </div>
               <div>
-                <dt className="caption-3 uppercase tracking-wider text-text-subtle">Frontend</dt>
+                <dt className="label-log text-text-subtle">Frontend</dt>
                 <dd className="body-6 mt-1">{a.app.frontendStack.replace("_", " ")}{a.app.tailwindVersion ? ` · Tailwind ${a.app.tailwindVersion}` : ""}{a.app.livewireVersion ? ` · Livewire ${a.app.livewireVersion}` : ""}</dd>
               </div>
             </dl>
@@ -91,7 +91,7 @@ export function InspectionReport({ report, repoId, returnTo }: { report: ScanRep
         <h2 id="eol-h" className="title-2 text-text">EOL calendar</h2>
         <p className="body-6 mt-1 text-text-subtle">End of security fixes. Dates are reviewed by hand; a blank means the date is not published yet.</p>
         <table className="mt-4 w-full border-collapse">
-          <thead><tr><th scope="col" className="caption-3 border-b border-border py-2 text-left uppercase tracking-wider text-text-subtle">Release</th><th scope="col" className="caption-3 border-b border-border py-2 text-left uppercase tracking-wider text-text-subtle">Security fixes end</th><th scope="col" className="caption-3 border-b border-border py-2 text-left uppercase tracking-wider text-text-subtle">Status</th></tr></thead>
+          <thead><tr><th scope="col" className="label-log border-b border-border py-2 text-left text-text-subtle">Release</th><th scope="col" className="label-log border-b border-border py-2 text-left text-text-subtle">Security fixes end</th><th scope="col" className="label-log border-b border-border py-2 text-left text-text-subtle">Status</th></tr></thead>
           <tbody>
             {report.calendar.map((c) => {
               const e = eolText(c);

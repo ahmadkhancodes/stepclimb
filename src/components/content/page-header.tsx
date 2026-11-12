@@ -19,19 +19,21 @@ export function Breadcrumbs({ items }: { items: Crumb[] }) {
   );
 }
 
-/** Page header for content pages: breadcrumb, h1, one lede, dated line, actions. Solid ink, flat. */
+/** Page header for content pages: breadcrumb, then a ruled two column head (title left, lede and actions right). */
 export function PageHeader({
   crumbs, title, lede, meta, actions,
 }: { crumbs?: Crumb[]; title: ReactNode; lede?: ReactNode; meta?: ReactNode; actions?: ReactNode }) {
   return (
-    <header className="border-b border-border bg-surface">
-      <Container className="py-12 md:py-20">
-        <div className="flex max-w-2xl flex-col items-start gap-4">
-          {crumbs ? <Breadcrumbs items={crumbs} /> : null}
-          <h1 className="heading-3 md:heading-2 text-text">{title}</h1>
-          {lede ? <p className="body-3 text-text-subtle md:title-1">{lede}</p> : null}
-          {meta ? <p className="mono-data caption-4 text-text-muted">{meta}</p> : null}
-          {actions ? <div className="flex flex-wrap items-center gap-4 pt-2">{actions}</div> : null}
+    <header className="bg-surface">
+      <Container className="pb-4 pt-6 md:pb-6 md:pt-8">
+        {crumbs ? <Breadcrumbs items={crumbs} /> : null}
+        <div className="rule-double mt-4 grid gap-6 pt-8 lg:grid-cols-12 lg:gap-12">
+          <h1 className="heading-3 md:heading-1 text-text lg:col-span-7">{title}</h1>
+          <div className="flex flex-col items-start gap-4 lg:col-span-5 lg:pt-2">
+            {lede ? <p className="body-3 text-text-subtle">{lede}</p> : null}
+            {meta ? <p className="mono-data caption-4 text-text-muted">{meta}</p> : null}
+            {actions ? <div className="flex flex-wrap items-center gap-4">{actions}</div> : null}
+          </div>
         </div>
       </Container>
     </header>

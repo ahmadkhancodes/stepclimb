@@ -9,12 +9,12 @@ export function Skeleton({ className }: { className?: string }) {
 /** Composed getting-started view that teaches the next action. */
 export function EmptyState({ title, body, action, visual }: { title: string; body: ReactNode; action?: ReactNode; visual?: ReactNode }) {
   return (
-    <div className="flex flex-col items-start gap-4 rounded-lg border border-border bg-surface-raised p-8">
-      {visual}
+    <div className="flex flex-col items-start gap-6 border border-border bg-surface-raised p-6 md:p-8">
       <div className="flex max-w-xl flex-col gap-2">
-        <h3 className="heading-6 text-text">{title}</h3>
+        <h3 className="heading-5 text-text">{title}</h3>
         <div className="body-6 text-text-subtle">{body}</div>
       </div>
+      {visual}
       {action}
     </div>
   );

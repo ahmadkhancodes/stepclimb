@@ -15,7 +15,7 @@ const statusStamp = (s: RunStatus) => {
 
 const behindText = (n: number) => (n === 0 ? "current" : `${n} ${n === 1 ? "major" : "majors"} behind`);
 
-const th = "caption-3 whitespace-nowrap border-b border-border bg-surface px-3 py-2 text-left uppercase tracking-wider text-text-subtle";
+const th = "label-log whitespace-nowrap border-b border-border bg-surface px-3 py-2 text-left text-text-subtle";
 const td = "h-10 whitespace-nowrap border-b border-border px-3 group-last:border-b-0";
 
 function Row({ r }: { r: HangarRow }) {
@@ -63,7 +63,7 @@ export function HangarBoard() {
       <dl className="mx-4 grid grid-cols-2 border border-border bg-surface-raised md:grid-cols-4">
         {stats.map((s, i) => (
           <div key={s.k} className={`px-4 py-3 ${i % 2 === 1 ? "border-l border-border" : ""} ${i > 1 ? "border-t border-border md:border-t-0" : ""} ${i > 0 ? "md:border-l" : ""}`}>
-            <dt className="caption-3 uppercase tracking-wider text-text-subtle">{s.k}</dt>
+            <dt className="label-log text-text-subtle">{s.k}</dt>
             <dd className="mono-data heading-4 mt-1">{s.v}{s.s ? <small className="caption-5 ml-1 font-sans text-text-subtle">{s.s}</small> : null}</dd>
           </div>
         ))}

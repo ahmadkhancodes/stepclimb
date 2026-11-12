@@ -36,10 +36,10 @@ export function TaglineReveal({ text, label }: { text: string; label?: string })
   }, [words.length]);
 
   return (
-    <Section>
+    <Section rhythm="open">
       <TorqueTick className="mb-6" />
       {label ? <p className="caption-3 mb-6 text-text-subtle">{label}</p> : null}
-      <p ref={ref} className="heading-3 lg:heading-2 max-w-3xl text-text">
+      <p ref={ref} className="heading-3 lg:heading-1 max-w-4xl text-text">
         {words.map((w, i) => (
           <span key={i} className="kit-word" data-on={i < active}>
             {w}{" "}

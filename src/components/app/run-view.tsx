@@ -26,7 +26,7 @@ export function LogPanel({ logs, live }: { logs: { id: string; stream: string; t
   return (
     <section aria-label="Run log" className="border border-border bg-surface-sunken">
       <div className="flex items-center justify-between border-b border-border px-3 py-2">
-        <h2 className="caption-3 uppercase tracking-wider text-text-subtle">Log</h2>
+        <h2 className="label-log text-text-subtle">Log</h2>
         {live ? <span className="caption-5 text-text-subtle" aria-live="polite">Live</span> : null}
       </div>
       <div
@@ -126,7 +126,7 @@ export function RunView({ runId }: { runId: string }) {
             {steps.map((s) => (
               <li key={s.id} className="flex items-center justify-between gap-3 border-b border-border py-2 last:border-b-0">
                 <span className="mono-data body-6">{s.name}</span>
-                <span className={`caption-3 uppercase tracking-wider ${STEP_TONE[s.status] ?? "text-text"}`}>{s.status.replace("_", " ")}{s.durationMs ? ` · ${(s.durationMs / 1000).toFixed(1)}s` : ""}</span>
+                <span className={`label-log ${STEP_TONE[s.status] ?? "text-text"}`}>{s.status.replace("_", " ")}{s.durationMs ? ` · ${(s.durationMs / 1000).toFixed(1)}s` : ""}</span>
               </li>
             ))}
           </ol>
@@ -141,7 +141,7 @@ export function RunView({ runId }: { runId: string }) {
           <ul className="mt-3 flex flex-col gap-3">
             {squawks.map((s) => (
               <li key={s.id} className="border border-border bg-surface-raised p-3">
-                <p className="body-5"><span className="caption-3 mr-2 uppercase tracking-wider text-text-subtle">{SEV[s.severity]}</span>{s.title}{s.file ? <span className="mono-data caption-5 ml-2 text-text-subtle">{s.file}{s.line ? `:${s.line}` : ""}</span> : null}</p>
+                <p className="body-5"><span className="label-log mr-2 text-text-subtle">{SEV[s.severity]}</span>{s.title}{s.file ? <span className="mono-data caption-5 ml-2 text-text-subtle">{s.file}{s.line ? `:${s.line}` : ""}</span> : null}</p>
                 <details className="mt-2">
                   <summary className="body-6 cursor-pointer text-action focus-visible:focus-ring">Details and agent prompt</summary>
                   <p className="body-6 mt-2 whitespace-pre-wrap text-text-subtle">{s.bodyMd}</p>

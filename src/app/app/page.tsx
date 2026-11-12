@@ -16,6 +16,20 @@ import { getDb } from "@/lib/db";
 
 export const metadata = { title: "Hangar" };
 
+/** What a row will look like once a repo is installed. Fictional, and labelled as such. */
+function ExampleRow() {
+  return (
+    <figure className="w-full max-w-2xl border border-dashed border-border-strong bg-surface p-3" aria-label="Example airframe row, fictional">
+      <figcaption className="label-log text-text-muted">Example, fictional repo</figcaption>
+      <div className="mt-2 grid grid-cols-[1fr_auto] items-baseline gap-x-4 gap-y-1 sm:grid-cols-[1fr_auto_auto]">
+        <span className="body-5 text-text">northgate/billing-portal</span>
+        <span className="mono-data caption-1 text-text">Laravel 11.45</span>
+        <span className="caption-4 text-danger col-span-2 sm:col-span-1">Security fixes ended 12 Mar 2026</span>
+      </div>
+    </figure>
+  );
+}
+
 export default async function OverviewPage({ searchParams }: { searchParams: Promise<{ installed?: string; link?: string }> }) {
   const { installed, link } = await searchParams;
   const ctx = await requireOrg({ page: true });
@@ -53,6 +67,7 @@ export default async function OverviewPage({ searchParams }: { searchParams: Pro
         ) : hangar.rows.length === 0 ? (
           <EmptyState
             title="No airframes yet"
+            visual={<ExampleRow />}
             body="Install the Stepclimb GitHub App on the repos you choose. Each one gets a free inspection that reads composer.json, composer.lock and package.json only, so no code is cloned."
             action={
               installHref ? <Link href={installHref} className={buttonClass("primary")}>Install the GitHub App</Link>
@@ -63,9 +78,9 @@ export default async function OverviewPage({ searchParams }: { searchParams: Pro
         ) : <HangarBoard hangar={hangar} />}
       </div>
       <div className="grid gap-6 lg:grid-cols-3">
-        <section aria-labelledby="plan-h" className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6">
+        <section aria-labelledby="plan-h" className="flex flex-col gap-4 border border-border bg-surface-raised p-6">
           <div className="flex items-center justify-between gap-2">
-            <h2 id="plan-h" className="title-4 text-text-subtle">Current plan</h2>
+            <h2 id="plan-h" className="label-log text-text-subtle">Current plan</h2>
             {ent?.status === "past_due" ? <Badge tone="warning">Payment failed</Badge> : ent?.cancelAtPeriodEnd ? <Badge tone="warning">Ends soon</Badge> : <Badge tone="success">Active</Badge>}
           </div>
           <p className="heading-4 text-text">{plan.name}</p>
@@ -74,8 +89,8 @@ export default async function OverviewPage({ searchParams }: { searchParams: Pro
             {plan.id === "free" ? "See plans" : "Manage plan"}
           </Link>
         </section>
-        <section aria-labelledby="usage-h" className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6 lg:col-span-2">
-          <h2 id="usage-h" className="title-4 text-text-subtle">Usage</h2>
+        <section aria-labelledby="usage-h" className="flex flex-col gap-4 border border-border bg-surface-raised p-6 lg:col-span-2">
+          <h2 id="usage-h" className="label-log text-text-subtle">Usage</h2>
           <div className="flex flex-col gap-6">
             {usage.map((u) => <Meter key={u.meter} state={u} />)}
           </div>

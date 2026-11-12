@@ -10,23 +10,23 @@
   --font-sans-family: var(--font-sc-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono-family: var(--font-sc-mono), ui-monospace, monospace;
 
-  /* raw ramp: cool neutral, ink to paper (docs/DESIGN.md section 5) */
-  --n-0: #ffffff;
-  --n-50: #f7f9fa;
-  --n-100: #edf1f3;
-  --n-200: #d5dce0;
-  --n-300: #b8c3c9;
-  --n-400: #8a979e;
-  --n-500: #66737a;
-  --n-600: #4e5a61;
-  --n-700: #36424a;
-  --n-800: #232c31;
-  --n-900: #14191c;
-  --n-1000: #0b0f11;
-  --accent-500: #0b5d6b; /* inspection teal */
-  --accent-600: #084a55;
+  /* raw ramp: warm logbook paper to carbon ink (docs/design-brief.md section 4) */
+  --n-0: #fffdf8;
+  --n-50: #f4f1ea;
+  --n-100: #eae5d9;
+  --n-200: #d6cfbf;
+  --n-300: #8f8572;
+  --n-400: #7a7262;
+  --n-500: #6b6458;
+  --n-600: #4f4a40;
+  --n-700: #3a362e;
+  --n-800: #2a2721;
+  --n-900: #1c1a16;
+  --n-1000: #12110e;
+  --accent-500: #b23c0e; /* flight recorder orange */
+  --accent-600: #8e2f0a;
 
-  /* role tokens: light ("paper") */
+  /* role tokens: light ("logbook paper") */
   --surface: var(--n-50);
   --surface-raised: var(--n-0);
   --surface-sunken: var(--n-100);
@@ -40,20 +40,20 @@
   --action: var(--accent-500);
   --action-hover: var(--accent-600);
   --action-text: #ffffff;
-  --action-soft: #e6f1f3;
+  --action-soft: #f7e3d6;
   --focus: var(--accent-500);
-  --success: #1f7a3e;
-  --success-surface: #e5f2e9;
+  --success: #2f6b3a;
+  --success-surface: #e2eddc;
   --warning: #7a5200;
-  --warning-surface: #fbf0d3;
-  --amber: #e8a200; /* fills only: squawk and torque tick; ink text on top, never white */
-  --danger: #b42318;
-  --danger-surface: #fbe7e5;
-  --info: #2f5c8a;
-  --info-surface: #e6eef6;
+  --warning-surface: #f8ebc9;
+  --amber: #d99a1e; /* fills only: squawk and torque tick; ink text on top, never white */
+  --danger: #a12a1f;
+  --danger-surface: #f6e0db;
+  --info: #3d5466;
+  --info-surface: #e4e8e8;
   --hero-from: var(--text);
-  --hero-to: var(--text); /* solid hero heading: DESIGN.md section 12 override 3 */
-  --shadow-color: 205 20% 9%;
+  --hero-to: var(--text);
+  --shadow-color: 40 15% 9%;
   color-scheme: light;
 }
 
@@ -118,14 +118,14 @@
   --spacing-160: 640px;
   --spacing-176: 704px;
 
-  /* Radius personality: sharp (DESIGN.md section 7). Sheets and tables use rounded-none. */
+  /* Radius: 0 on every surface, 2px on buttons and inputs only (design-brief section 4). */
   --radius-xs: 2px;
   --radius-sm: 2px;
-  --radius-md: 4px;
-  --radius-lg: 4px;
-  --radius-xl: 6px;
-  --radius-2xl: 6px;
-  --radius-3xl: 6px;
+  --radius-md: 2px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-2xl: 0px;
+  --radius-3xl: 0px;
 
   --ease-out-kit: cubic-bezier(0.22, 1, 0.36, 1);
   --default-transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
@@ -133,12 +133,14 @@
 }
 
 /* ---- Named type styles (playbook §5). Use these, never loose size+weight pairs. ---- */
-@utility heading-1 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 3.75rem; line-height: 1; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; }
-@utility heading-2 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 3rem; line-height: 1; font-weight: 700; letter-spacing: -0.02em; text-wrap: balance; }
-@utility heading-3 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 2.25rem; line-height: 2.5rem; font-weight: 700; letter-spacing: -0.015em; text-wrap: balance; }
-@utility heading-4 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 1.875rem; line-height: 2.25rem; font-weight: 700; letter-spacing: -0.01em; text-wrap: balance; }
-@utility heading-5 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 1.5rem; line-height: 2rem; font-weight: 700; text-wrap: balance; }
-@utility heading-6 { font-family: var(--font-display-family); font-variation-settings: "wdth" 90; font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; text-wrap: balance; }
+/* Display (text-7xl step): hero only. */
+@utility display-1 { font-family: var(--font-display-family); font-size: 4.5rem; line-height: 1; font-weight: 500; letter-spacing: -0.025em; text-wrap: balance; }
+@utility heading-1 { font-family: var(--font-display-family); font-size: 3.75rem; line-height: 1; font-weight: 500; letter-spacing: -0.02em; text-wrap: balance; }
+@utility heading-2 { font-family: var(--font-display-family); font-size: 3rem; line-height: 1; font-weight: 500; letter-spacing: -0.02em; text-wrap: balance; }
+@utility heading-3 { font-family: var(--font-display-family); font-size: 2.25rem; line-height: 2.5rem; font-weight: 500; letter-spacing: -0.015em; text-wrap: balance; }
+@utility heading-4 { font-family: var(--font-display-family); font-size: 1.875rem; line-height: 2.25rem; font-weight: 500; letter-spacing: -0.01em; text-wrap: balance; }
+@utility heading-5 { font-family: var(--font-display-family); font-size: 1.5rem; line-height: 2rem; font-weight: 500; text-wrap: balance; }
+@utility heading-6 { font-family: var(--font-display-family); font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; text-wrap: balance; }
 @utility title-1 { font-size: 1.25rem; line-height: 1.75rem; font-weight: 500; }
 @utility title-2 { font-size: 1.125rem; line-height: 1.75rem; font-weight: 500; }
 @utility title-3 { font-size: 1rem; line-height: 1.5rem; font-weight: 500; }
@@ -159,6 +161,12 @@
 @utility caption-3 { font-size: 0.75rem; line-height: 1rem; font-weight: 600; }
 @utility caption-4 { font-size: 0.75rem; line-height: 1rem; font-weight: 500; }
 @utility caption-5 { font-size: 0.75rem; line-height: 1rem; font-weight: 400; }
+
+/* Logbook label: printed form field caption (uppercase, tracked). */
+@utility label-log { font-family: var(--font-sans-family); font-size: 0.75rem; line-height: 1rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+/* Logbook rules: a double ink rule opens a section; hairlines separate entries. */
+@utility rule-double { border-top: 3px double var(--text); }
+@utility rule-hair { border-top: 1px solid var(--border); }
 
 /* Stamp double rule (inner outline). */
 @utility stamp-rule { outline-width: 1.5px; outline-style: solid; outline-offset: -5px; border-width: 1.5px; }
@@ -184,16 +192,17 @@
 /* Scroll reveal (rise 32px + fade, once). Reduced motion: opacity only. */
 .kit-reveal { opacity: 0; transform: translateY(32px); transition: opacity 700ms var(--ease-out-kit), transform 700ms var(--ease-out-kit); }
 .kit-reveal[data-visible="true"] { opacity: 1; transform: none; }
-.kit-word { opacity: 0.3; transition: opacity 500ms var(--ease-out-kit); }
-.kit-word[data-on="true"] { opacity: 1; }
+/* Unlit words use the strong rule colour (3.2:1 on paper, AA for large text) instead of low opacity. */
+.kit-word { color: var(--border-strong); transition: color 500ms var(--ease-out-kit); }
+.kit-word[data-on="true"] { color: var(--text); }
 @media (prefers-reduced-motion: reduce) {
   .kit-reveal { transform: none; transition: opacity 300ms var(--ease-out-kit); }
-  .kit-word { opacity: 1; transition: none; }
+  .kit-word { color: var(--text); transition: none; }
   *, *::before, *::after { animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
 
 /* Stamp and numerals (signature element, DESIGN.md section 8). */
-@utility stamp-text { font-family: var(--font-display-family); font-variation-settings: "wdth" 87.5; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; line-height: 1rem; }
+@utility stamp-text { font-family: var(--font-mono-family); font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; font-size: 0.75rem; line-height: 1rem; }
 @utility mono-data { font-family: var(--font-mono-family); font-variant-numeric: tabular-nums; }
 @keyframes stamp-in { from { transform: rotate(-2deg) scale(1.06); opacity: 0; } to { transform: rotate(-2deg) scale(1); opacity: 1; } }
 .sc-stamp-in { animation: stamp-in 160ms cubic-bezier(0.3, 1.4, 0.6, 1) 400ms both; }

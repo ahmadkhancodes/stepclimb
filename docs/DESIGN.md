@@ -1,5 +1,7 @@
 # DESIGN: Stepclimb by BufferSol
 
+> **Superseded 12 Nov 2026:** the visual system (palette, type, radius, layout) now lives in `docs/design-brief.md` ("the logbook"). Sections 5 to 8 below are historical; the ICP card and copy rules still apply.
+
 Status: Phase 0 proposal, awaiting orchestrator approval. Proof: `docs/design/mock.html` (+ `mock-1440.png`, `mock-375.png`). Competitor captures: `docs/design/refs/`.
 
 ## 1. ICP card

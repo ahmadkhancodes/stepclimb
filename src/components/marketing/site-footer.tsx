@@ -48,18 +48,18 @@ export function SiteFooter() {
           <div className="grid grid-cols-2 gap-x-6 gap-y-8 md:col-span-8 md:grid-cols-4">
             {columns.slice(0, 2).map((col) => (
               <nav key={col.title} aria-label={col.title} className="flex flex-col">
-                <p className="caption-3 mb-2 uppercase tracking-wider text-text">{col.title}</p>
+                <p className="label-log mb-2 text-text">{col.title}</p>
                 {col.links.map((l) => <Link key={l.href} href={l.href} className={linkClass}>{l.label}</Link>)}
               </nav>
             ))}
             <nav aria-label="Company" className="flex flex-col">
-              <p className="caption-3 mb-2 uppercase tracking-wider text-text">Company</p>
+              <p className="label-log mb-2 text-text">Company</p>
               <a href={product.companyUrl} className={linkClass}>{product.company}</a>
               <a href={`mailto:${product.supportEmail}`} className={linkClass}>Contact support</a>
             </nav>
             {columns.slice(2).map((col) => (
               <nav key={col.title} aria-label={col.title} className="flex flex-col">
-                <p className="caption-3 mb-2 uppercase tracking-wider text-text">{col.title}</p>
+                <p className="label-log mb-2 text-text">{col.title}</p>
                 {col.links.map((l) => <Link key={l.href} href={l.href} className={linkClass}>{l.label}</Link>)}
               </nav>
             ))}
