@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { cadenceCopy, product } from "@/config/product";
 import { ButtonLink } from "@/components/ui/button";
+import { CheckBox } from "@/components/ui/check-box";
+import { cn } from "@/components/ui/cn";
 import { Container, Section } from "@/components/ui/layout";
 import {
   CompareTable,
@@ -58,11 +60,11 @@ const faqs: FaqItem[] = [
   { q: "How does billing and cancelling work?", a: "Payments run through Stripe, and invoices carry your VAT or GST ID. You can cancel at period end or pause for up to 3 months." },
 ];
 
-/** One logbook entry: numbered margin, text, then the real product fragment. Hairline between entries, no card. */
+/** One checklist entry: boxed number in the margin, text, then the real product fragment. Hairline between entries, no card. */
 function Entry({ n, title, fragment, children }: { n: number; title: string; fragment: ReactNode; children: ReactNode }) {
   return (
     <li className="grid gap-6 border-t border-border py-10 first:border-t-0 lg:grid-cols-12 lg:gap-8">
-      <p className="mono-data caption-1 text-action lg:col-span-1">{String(n).padStart(2, "0")}</p>
+      <p className="lg:col-span-1"><span className="mono-data caption-3 inline-block border border-text px-2 py-1 text-text">{String(n).padStart(2, "0")}</span></p>
       <div className="lg:col-span-4">
         <h3 className="heading-5 text-text">{title}</h3>
         <p className="body-6 mt-3 max-w-md text-text-subtle">{children}</p>
@@ -72,7 +74,7 @@ function Entry({ n, title, fragment, children }: { n: number; title: string; fra
   );
 }
 
-/** Procedure step in a newspaper column: vertical rule between columns on desktop, hairline on phones. */
+/** Procedure step in a column: vertical rule between columns on desktop, hairline on phones. */
 function Step({ n, title, fragment, children }: { n: number; title: string; fragment: ReactNode; children: ReactNode }) {
   return (
     <li className="flex flex-col gap-6 border-t border-border pt-6 lg:border-l lg:border-t-0 lg:px-8 lg:pt-0 lg:first:border-l-0 lg:first:pl-0 lg:last:pr-0">
@@ -86,42 +88,69 @@ function Step({ n, title, fragment, children }: { n: number; title: string; frag
   );
 }
 
-/** Section head: double rule, then the heading. The logbook's way of opening a new page. */
+/** Section head: a 2px navy drawing line with the section tab hanging from it, then the heading. */
 function Head({ id, label, children, className }: { id: string; label: string; children: ReactNode; className?: string }) {
   return (
     <div className={className}>
-      <p className="label-log rule-double pt-3 text-text">{label}</p>
+      <p className="rule-double"><span className="label-log inline-block bg-surface-inverse px-2 py-1 text-text-inverse">{label}</span></p>
       <h2 id={id} className="heading-4 md:heading-2 mt-6 max-w-3xl text-text">{children}</h2>
     </div>
   );
 }
 
-const link = "text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring";
+const link = "text-link underline underline-offset-4 hover:text-link-hover focus-visible:focus-ring";
 
 export default function Home() {
   return (
     <>
-      {/* Hero */}
-      <section aria-labelledby="hero-title" className="bg-surface pb-16 pt-12 md:pb-24 md:pt-16">
+      {/* Hero: a framed drawing sheet. Checklist left, the work order on drafting film right, title block below. */}
+      <section aria-labelledby="hero-title" className="bg-surface pb-16 pt-8 md:pb-24 md:pt-12">
         <Container>
-          <div className="grid items-start gap-12 lg:grid-cols-12 lg:gap-12">
-            <div className="lg:col-span-5 lg:pt-8">
-              <p className="label-log text-text-subtle">Verified upgrades for Laravel 10, 11 and 12</p>
-              <h1 id="hero-title" className="heading-2 xl:heading-1 mt-6 text-text">
-                Laravel upgrade PRs that prove they work
-              </h1>
-              <p className="body-3 mt-8 max-w-lg text-text-subtle">
-                One commit per change. composer install, your build and your tests run in our sandbox before the pull request opens. No AI service touches your code. From <span className="mono-data text-text">$9.99</span> per upgrade.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
-                <ButtonLink href={CTA} size="lg">Inspect a repo free</ButtonLink>
-                <a href="#sample" className="button-md inline-flex min-h-11 items-center text-text underline decoration-border-strong underline-offset-4 hover:decoration-action focus-visible:focus-ring">See an example work order</a>
+          <div className="border-2 border-text bg-surface-raised">
+            <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b-2 border-text px-4 py-2 md:px-6">
+              <p className="label-log text-text">Verified upgrades for Laravel 10, 11 and 12</p>
+              <p className="mono-data caption-4 text-text-subtle">10 → 11 · 11 → 12 · 12 → 13</p>
+            </div>
+            <div className="grid lg:grid-cols-12">
+              <div className="px-4 py-8 md:px-10 md:py-12 lg:col-span-6">
+                <h1 id="hero-title" className="heading-2 sm:heading-1 xl:display-1 uppercase text-text">
+                  Laravel upgrade PRs that prove they work
+                </h1>
+                <ul className="mt-8 grid max-w-xl gap-3">
+                  {[
+                    "One commit per change.",
+                    "composer install, your build and your tests run in our sandbox before the pull request opens.",
+                    "No AI service touches your code.",
+                  ].map((line) => (
+                    <li key={line} className="body-3 flex items-start gap-3 text-text">
+                      <CheckBox className="mt-1" />
+                      <span>{line}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-3">
+                  <ButtonLink href={CTA} size="lg">Inspect a repo free</ButtonLink>
+                  <a href="#sample" className="button-md inline-flex min-h-11 items-center text-link underline underline-offset-4 hover:text-link-hover focus-visible:focus-ring">See an example work order</a>
+                </div>
+                <p className="caption-2 mt-4 max-w-md text-text-muted">{RISK}</p>
               </div>
-              <p className="caption-2 mt-4 max-w-md text-text-muted">{RISK}</p>
+              <div className="bg-drafting border-t-2 border-text px-4 py-10 md:px-10 lg:col-span-6 lg:border-l-2 lg:border-t-0 lg:px-8 lg:py-12">
+                <WorkOrderSheet id="sample" className="scroll-mt-24" />
+              </div>
             </div>
-            <div className="lg:col-span-7">
-              <WorkOrderSheet id="sample" className="scroll-mt-24" />
-            </div>
+            <dl className="grid grid-cols-2 border-t-2 border-text md:grid-cols-4">
+              {[
+                ["Price", <>From <span className="mono-data">$9.99</span> per upgrade</>],
+                ["Inspection", "Free, no code cloned"],
+                ["AI on your code", "None"],
+                ["Merge", "Always yours, never auto"],
+              ].map(([k, v], i) => (
+                <div key={String(k)} className={cn("px-4 py-3 md:px-6", i % 2 === 1 && "border-l border-border", i >= 2 && "border-t border-border md:border-t-0", i === 2 && "md:border-l")}>
+                  <dt className="label-log text-text-subtle">{k}</dt>
+                  <dd className="body-5 mt-1 text-text">{v}</dd>
+                </div>
+              ))}
+            </dl>
           </div>
         </Container>
       </section>
@@ -139,7 +168,7 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* What is in every PR: a numbered ledger, not cards */}
+      {/* What is in every PR: a numbered checklist, not cards */}
       <Section labelledBy="benefits-title" rhythm="open">
         <Head id="benefits-title" label="In every pull request">Five things you can check before you merge</Head>
         <ol className="mt-12">
@@ -162,9 +191,9 @@ export default function Home() {
       </Section>
 
       {/* Tagline */}
-      <TaglineReveal text="Every upgrade is a work order. Every change is a logbook entry. Nothing returns to service until it is signed off." />
+      <TaglineReveal text="Every upgrade is a work order. Every change is a checklist item. Nothing returns to service until it is signed off." />
 
-      {/* How it works: three newspaper columns with vertical rules */}
+      {/* How it works: three procedure columns with vertical rules */}
       <Section tone="raised" labelledBy="how-title">
         <Head id="how-title" label="Procedure">How it works</Head>
         <ol className="mt-12 grid gap-10 lg:grid-cols-3 lg:gap-0">
@@ -239,7 +268,7 @@ export default function Home() {
                 "We do not retain customer code. Logs are kept 30 days with secrets redacted.",
               ].map((line, i) => (
                 <li key={line} className="grid grid-cols-[2rem_1fr] gap-4 border-b border-border py-4">
-                  <span className="mono-data caption-1 text-action">{String(i + 1).padStart(2, "0")}</span>
+                  <span className="mono-data caption-1 text-link">{String(i + 1).padStart(2, "0")}</span>
                   <span className="body-3 text-text">{line}</span>
                 </li>
               ))}

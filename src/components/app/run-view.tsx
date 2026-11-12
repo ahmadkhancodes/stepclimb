@@ -112,7 +112,7 @@ export function RunView({ runId }: { runId: string }) {
           <p className="body-5 text-text-subtle" role="status">{STATUS_TEXT[run.status] ?? run.status}</p>
         </div>
         <div className="flex items-center gap-2">
-          {run.prUrl ? <a href={run.prUrl} className="button-sm inline-flex min-h-11 items-center gap-1 text-action focus-visible:focus-ring" target="_blank" rel="noreferrer">Open PR #{run.prNumber}<ArrowSquareOut size={16} weight="regular" aria-hidden /></a> : null}
+          {run.prUrl ? <a href={run.prUrl} className="button-sm inline-flex min-h-11 items-center gap-1 text-link focus-visible:focus-ring" target="_blank" rel="noreferrer">Open PR #{run.prNumber}<ArrowSquareOut size={16} weight="regular" aria-hidden /></a> : null}
           {live ? <Button size="sm" variant="secondary" loading={canceling} onClick={cancel}><X size={16} weight="regular" aria-hidden />Cancel run</Button> : null}
         </div>
       </div>
@@ -143,7 +143,7 @@ export function RunView({ runId }: { runId: string }) {
               <li key={s.id} className="border border-border bg-surface-raised p-3">
                 <p className="body-5"><span className="label-log mr-2 text-text-subtle">{SEV[s.severity]}</span>{s.title}{s.file ? <span className="mono-data caption-5 ml-2 text-text-subtle">{s.file}{s.line ? `:${s.line}` : ""}</span> : null}</p>
                 <details className="mt-2">
-                  <summary className="body-6 cursor-pointer text-action focus-visible:focus-ring">Details and agent prompt</summary>
+                  <summary className="body-6 cursor-pointer text-link focus-visible:focus-ring">Details and agent prompt</summary>
                   <p className="body-6 mt-2 whitespace-pre-wrap text-text-subtle">{s.bodyMd}</p>
                   <pre className="mono-data mt-2 overflow-auto whitespace-pre-wrap bg-surface-sunken p-3 text-sm">{s.agentPrompt}</pre>
                 </details>

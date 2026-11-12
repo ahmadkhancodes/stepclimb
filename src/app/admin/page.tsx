@@ -52,7 +52,7 @@ export default async function AdminPage() {
             ))}
           </DataTable>
           <p className="caption-2 text-text-subtle">
-            {fmt(usage.runs.total)} runs from {fmt(usage.accounts)} accounts, {fmt(Math.round(usage.runs.computeSeconds / 60))} compute minutes. Billing: {Object.entries(usage.runs.byBilling).map(([k, v]) => `${k} ${v}`).join(", ") || "none"}. <Link href="/admin/runs" className="text-action focus-visible:focus-ring">Open the run inspector</Link>.
+            {fmt(usage.runs.total)} runs from {fmt(usage.accounts)} accounts, {fmt(Math.round(usage.runs.computeSeconds / 60))} compute minutes. Billing: {Object.entries(usage.runs.byBilling).map(([k, v]) => `${k} ${v}`).join(", ") || "none"}. <Link href="/admin/runs" className="text-link focus-visible:focus-ring">Open the run inspector</Link>.
           </p>
         </section>
 

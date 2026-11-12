@@ -13,8 +13,8 @@ export default function NotFound() {
       <main id="main" className="pt-20">
         <Section labelledBy="nf-title">
           <div className="flex min-h-96 max-w-2xl flex-col items-start justify-center gap-6">
-            <p className="caption-3 text-text-subtle">Error 404</p>
-            <h1 id="nf-title" className="heading-3 md:heading-1 text-text">This page did not arrive</h1>
+            <p className="rule-double w-full"><span className="label-log inline-block bg-surface-inverse px-2 py-1 text-text-inverse">Error 404</span></p>
+            <h1 id="nf-title" className="heading-3 md:heading-1 uppercase text-text">This page did not arrive</h1>
             <p className="body-3 text-text-subtle">The link may be old or mistyped. Head back home, or read the docs.</p>
             <div className="flex flex-wrap items-center gap-4">
               <ButtonLink href="/" size="lg">Back to home</ButtonLink>

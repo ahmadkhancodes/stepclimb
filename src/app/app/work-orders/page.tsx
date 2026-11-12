@@ -11,7 +11,7 @@ import { workOrderNo } from "@/lib/runs/work-order";
 export const metadata = { title: "Work orders" };
 export const dynamic = "force-dynamic";
 
-const th = "label-log whitespace-nowrap border-b border-border-strong bg-surface-sunken px-3 py-2 text-left text-text-subtle";
+const th = "label-log whitespace-nowrap bg-surface-inverse px-3 py-2 text-left text-text-inverse";
 const td = "h-10 whitespace-nowrap border-b border-border px-3";
 
 export default async function WorkOrdersPage() {
@@ -44,7 +44,7 @@ export default async function WorkOrdersPage() {
                 const label = r.status === "succeeded" ? (r.checkConclusion === "success" ? "Verified" : r.checkConclusion === "failure" ? "Failed" : "Unverified") : r.status.replace("_", " ");
                 return (
                   <tr key={r.id}>
-                    <td className={td}><Link href={`/app/work-orders/${r.id}`} className="mono-data text-action focus-visible:focus-ring">#{workOrderNo(r.id)}</Link></td>
+                    <td className={td}><Link href={`/app/work-orders/${r.id}`} className="mono-data text-link focus-visible:focus-ring">#{workOrderNo(r.id)}</Link></td>
                     <td className={`${td} body-4`}>{r.fullName}</td>
                     <td className={`${td} body-6`}>{r.kind === "autopilot" ? "Dependency update" : `Laravel ${r.hopFrom} to ${r.hopTo}`}</td>
                     <td className={td}><Stamp tone={tone}>{label[0]!.toUpperCase() + label.slice(1)}</Stamp></td>

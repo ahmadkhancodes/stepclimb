@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Check } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
+import { CheckBox } from "@/components/ui/check-box";
 import { product, plans, oneOffs, type Interval, type Plan, type PlanPrice } from "@/config/product";
 import { buttonClass } from "@/components/ui/button";
 import { cn } from "@/components/ui/cn";
@@ -43,11 +44,11 @@ function PlanRow({ plan, interval }: { plan: Plan; interval: Interval }) {
   const includes = plan.highlights.filter((h) => !h.startsWith("$"));
   const featured = !!plan.featured;
   return (
-    <li className={cn("relative", featured ? "border-2 border-action bg-action-soft" : "border-t border-border bg-surface-raised first:border-t-0")}>
-      {featured ? <span className="stamp-text absolute -top-3 left-6 bg-action px-2 text-action-text">Best for agencies</span> : null}
+    <li className={cn("relative", featured ? "border-y-2 border-text bg-action-soft" : "border-t border-border bg-surface-raised first:border-t-0")}>
+      {featured ? <span className="stamp-text absolute -top-3 left-6 bg-surface-inverse px-2 text-text-inverse">Best for agencies</span> : null}
       <div className={rowGrid}>
         <div className="md:col-span-3">
-          <h3 className="heading-6 text-text">{plan.name}</h3>
+          <h3 className="heading-5 uppercase text-text">{plan.name}</h3>
           <p className="body-6 mt-1 text-text-subtle">{plan.tagline}</p>
         </div>
         <div className="md:col-span-3">
@@ -60,7 +61,7 @@ function PlanRow({ plan, interval }: { plan: Plan; interval: Interval }) {
         <ul className="grid gap-1 md:col-span-4">
           {includes.map((h) => (
             <li key={h} className="body-6 flex items-start gap-2 text-text">
-              <Check size={16} weight="regular" aria-hidden className="mt-0.5 shrink-0 text-success" />
+              <CheckBox tone="success" className="mt-0.5" />
               <span>{h}</span>
             </li>
           ))}
@@ -87,15 +88,15 @@ export function PricingTable({ id = "pricing", title, intro }: { id?: string; ti
 
   return (
     <div id={id}>
-      <div className={cn("grid gap-6 md:grid-cols-12 md:items-end md:gap-x-6", title && "rule-double pt-3")}>
+      <div className={cn("grid gap-6 md:grid-cols-12 md:items-end md:gap-x-6", title && "rule-double")}>
         <div className="md:col-span-7">
-          {title ? <p className="label-log text-text">Rate card</p> : null}
+          {title ? <p><span className="label-log inline-block bg-surface-inverse px-2 py-1 text-text-inverse">Rate card</span></p> : null}
           {title ? <h2 id={`${id}-title`} className="heading-4 md:heading-2 mt-6 text-text">{title}</h2> : <h2 className="sr-only">Rate card</h2>}
           {intro ? <p className="body-3 mt-4 max-w-xl text-text-subtle">{intro}</p> : null}
         </div>
         {saving ? (
           <div className={cn("flex flex-col gap-2 md:col-span-5", title ? "md:items-end" : "md:col-span-12 md:flex-row md:items-center md:gap-6")}>
-            <div role="group" aria-label="Billing interval" className="inline-flex w-fit border border-border bg-surface-raised p-1">
+            <div role="group" aria-label="Billing interval" className="inline-flex w-fit border-2 border-text bg-surface-raised p-1">
               {options.map((o) => (
                 <button
                   key={o.id}
@@ -104,7 +105,7 @@ export function PricingTable({ id = "pricing", title, intro }: { id?: string; ti
                   onClick={() => setBilling(o.id)}
                   className={cn(
                     "button-sm min-h-11 px-4 transition-colors duration-300 ease-out-kit focus-visible:focus-ring",
-                    interval === o.id ? "bg-action text-action-text" : "text-text-subtle hover:text-text",
+                    interval === o.id ? "bg-surface-inverse text-text-inverse" : "text-text-subtle hover:text-text",
                   )}
                 >
                   {o.label}
@@ -118,8 +119,8 @@ export function PricingTable({ id = "pricing", title, intro }: { id?: string; ti
         ) : null}
       </div>
 
-      <div className="mt-8 border border-border-strong bg-surface md:mt-10">
-        <div aria-hidden="true" className={cn(colHead, "hidden border-b border-border bg-surface px-6 py-2 md:grid md:grid-cols-12 md:gap-x-6")}>
+      <div className="mt-8 border-2 border-text bg-surface md:mt-10">
+        <div aria-hidden="true" className="label-log hidden bg-surface-inverse px-6 py-2 text-text-inverse md:grid md:grid-cols-12 md:gap-x-6">
           <span className="col-span-3">Plan</span>
           <span className="col-span-3">Price in USD</span>
           <span className="col-span-4">Includes</span>
@@ -128,11 +129,11 @@ export function PricingTable({ id = "pricing", title, intro }: { id?: string; ti
         <ul>
           {free.map((p) => <PlanRow key={p.id} plan={p} interval={interval} />)}
         </ul>
-        <p className={cn(colHead, "border-y border-border bg-surface px-4 py-2 md:px-6")}>Subscriptions, billed in USD</p>
+        <p className={cn(colHead, "border-y-2 border-text bg-surface-sunken px-4 py-2 md:px-6")}>Subscriptions, billed in USD</p>
         <ul className="grid gap-0">
           {paid.map((p) => <PlanRow key={p.id} plan={p} interval={interval} />)}
         </ul>
-        <p className={cn(colHead, "border-y border-border bg-surface px-4 py-2 md:px-6")}>One time upgrades</p>
+        <p className={cn(colHead, "border-y-2 border-text bg-surface-sunken px-4 py-2 md:px-6")}>One time upgrades</p>
         <ul className="bg-surface-raised">
           {oneOffs.map((o) => (
             <li key={o.kind} className="grid gap-x-6 gap-y-1 border-b border-border px-4 py-3 last:border-b-0 md:grid-cols-12 md:items-baseline md:px-6">
@@ -142,7 +143,7 @@ export function PricingTable({ id = "pricing", title, intro }: { id?: string; ti
               <span className="md:col-span-2 md:justify-self-end">
                 <Link
                   href={`/sign-in?credit=${o.kind}`}
-                  className="button-sm inline-flex min-h-11 items-center gap-1 rounded-sm text-action transition-colors duration-300 ease-out-kit hover:text-action-hover focus-visible:focus-ring"
+                  className="button-sm inline-flex min-h-11 items-center gap-1 rounded-sm text-link transition-colors duration-300 ease-out-kit hover:text-link-hover focus-visible:focus-ring"
                 >
                   Open upgrade PR<ArrowRight size={16} weight="regular" aria-hidden />
                 </Link>
@@ -150,7 +151,7 @@ export function PricingTable({ id = "pricing", title, intro }: { id?: string; ti
             </li>
           ))}
         </ul>
-        <div className="grid gap-x-6 gap-y-3 border-t border-border bg-surface px-4 py-6 md:grid-cols-12 md:items-center md:px-6">
+        <div className="grid gap-x-6 gap-y-3 border-t-2 border-text bg-surface px-4 py-6 md:grid-cols-12 md:items-center md:px-6">
           <div className="md:col-span-6">
             <h3 className="heading-6 text-text">Enterprise</h3>
             <p className="body-6 mt-1 text-text-subtle">Over 200 repos, or you need SSO. We quote it.</p>

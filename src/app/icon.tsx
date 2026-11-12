@@ -14,12 +14,12 @@ export default function Icon() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
-          background: "#1c1a16",
-          color: "#f4f1ea",
-          borderBottom: "3px solid #b23c0e",
+          background: "#0d2236",
+          color: "#e8eef3",
+          borderBottom: "3px solid #f26a1b",
           fontSize: 22,
           fontWeight: 700,
-          borderRadius: 6,
+          borderRadius: 4,
         }}
       >
         {product.name.charAt(0)}

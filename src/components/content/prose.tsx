@@ -32,7 +32,7 @@ export function OL({ items, className }: { items: ReactNode[]; className?: strin
   );
 }
 
-const linkCls = "text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring";
+const linkCls = "text-link underline underline-offset-4 hover:text-link-hover focus-visible:focus-ring";
 
 /** Internal link in running text. */
 export function A({ href, children }: { href: string; children: ReactNode }) {

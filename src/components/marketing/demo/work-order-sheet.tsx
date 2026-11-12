@@ -1,5 +1,6 @@
 import { Check, Eye, Warning } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@/components/ui/cn";
+import { CheckBox } from "@/components/ui/check-box";
 import { ReturnStamp } from "./stamp";
 import { sampleTasks, type TaskState } from "./data";
 
@@ -21,7 +22,7 @@ function StateChip({ state }: { state: TaskState }) {
   );
 }
 
-const headCell = "px-4 py-3";
+const headCell = "px-4 py-2";
 const dt = "label-log whitespace-nowrap text-text-subtle";
 const dd = "body-4 mt-1 break-words";
 
@@ -32,16 +33,16 @@ export function WorkOrderSheet({ className, id }: { className?: string; id?: str
       id={id}
       aria-label="Example work order"
       className={cn(
-        "relative border border-border bg-surface-raised shadow-[0_1px_0_rgba(28,26,22,0.06),0_12px_32px_-16px_rgba(28,26,22,0.22)]",
+        "relative border border-text bg-surface-raised",
         className,
       )}
     >
       <span className="stamp-text absolute -top-3 left-6 bg-surface-inverse px-2 text-text-inverse">Example, fictional repo</span>
-      <dl className="grid grid-cols-2 border-b border-border sm:grid-cols-[auto_1fr_auto_auto]">
+      <dl className="grid grid-cols-2 border-b-2 border-text sm:grid-cols-3">
+        <div className={cn(headCell, "col-span-2 border-b border-border sm:col-span-3")}><dt className={dt}>Airframe</dt><dd className={cn(dd, "mono-data")}>northgate/billing-portal</dd></div>
         <div className={headCell}><dt className={dt}>Work order</dt><dd className={cn(dd, "mono-data")}>No. 4821</dd></div>
-        <div className={cn(headCell, "border-l border-border")}><dt className={dt}>Airframe</dt><dd className={dd}>northgate/billing-portal</dd></div>
-        <div className={cn(headCell, "border-t border-border sm:border-l sm:border-t-0")}><dt className={dt}>Hop</dt><dd className={cn(dd, "mono-data")}>11.45 → 13.x</dd></div>
-        <div className={cn(headCell, "border-l border-t border-border sm:border-t-0")}><dt className={dt}>Opened</dt><dd className={cn(dd, "mono-data")}>05 Nov 2026</dd></div>
+        <div className={cn(headCell, "border-l border-border")}><dt className={dt}>Hop</dt><dd className={cn(dd, "mono-data")}>11.45 → 13.x</dd></div>
+        <div className={cn(headCell, "col-span-2 border-t border-border sm:col-span-1 sm:border-l sm:border-t-0")}><dt className={dt}>Opened</dt><dd className={cn(dd, "mono-data")}>05 Nov 2026</dd></div>
       </dl>
       <div className="flex items-baseline justify-between gap-4 px-4 pb-2 pt-4">
         <h2 className="heading-5 text-text">Upgrade to Laravel 13</h2>
@@ -65,12 +66,12 @@ export function WorkOrderSheet({ className, id }: { className?: string; id?: str
           </li>
         ))}
       </ol>
-      <div className="flex flex-col items-start justify-between gap-4 border-t border-border bg-surface p-4 sm:flex-row sm:items-center">
+      <div className="flex flex-col items-start justify-between gap-4 border-t-2 border-text bg-surface p-4 sm:flex-row sm:items-center">
         <ul className="grid gap-1">
           {["composer install", "npm run build"].map((c) => (
-            <li key={c} className="body-6 flex items-center gap-2"><Check size={16} weight="regular" aria-hidden className="text-success" />{c}</li>
+            <li key={c} className="body-6 flex items-center gap-2"><CheckBox tone="success" />{c}</li>
           ))}
-          <li className="body-6 flex items-center gap-2"><Check size={16} weight="regular" aria-hidden className="text-success" /><span className="mono-data">214 tests passed</span></li>
+          <li className="body-6 flex items-center gap-2"><CheckBox tone="success" /><span className="mono-data">214 tests passed</span></li>
         </ul>
         <ReturnStamp className="self-center" />
       </div>

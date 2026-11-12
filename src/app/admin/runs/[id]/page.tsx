@@ -27,7 +27,7 @@ export default async function AdminRunPage({ params }: { params: Promise<{ id: s
   ];
   return (
     <>
-      <PageHeader title={`Work order #${workOrderNo(run.id)}`} description={<><Link href="/admin/runs" className="text-action focus-visible:focus-ring">All runs</Link> · {run.id}</>} actions={<Badge tone={run.status === "succeeded" ? "success" : run.status === "failed" || run.status === "timed_out" ? "danger" : "info"}>{run.status.replace("_", " ")}</Badge>} />
+      <PageHeader title={`Work order #${workOrderNo(run.id)}`} description={<><Link href="/admin/runs" className="text-link focus-visible:focus-ring">All runs</Link> · {run.id}</>} actions={<Badge tone={run.status === "succeeded" ? "success" : run.status === "failed" || run.status === "timed_out" ? "danger" : "info"}>{run.status.replace("_", " ")}</Badge>} />
       <div className="flex flex-col gap-8" data-testid="admin-run" data-status={run.status}>
         <dl className="grid gap-x-8 gap-y-2 sm:grid-cols-2">
           {rows.map(([k, v]) => <div key={k} className="flex flex-col"><dt className="caption-3 text-text-subtle">{k}</dt><dd className="body-6 break-all text-text">{v}</dd></div>)}

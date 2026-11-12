@@ -47,7 +47,7 @@ export function SquawkDrawer() {
     }
   };
   return (
-    <figure aria-label="Example squawk drawer" className="border border-border bg-surface-raised shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)]">
+    <figure aria-label="Example squawk drawer" className="border border-border bg-surface-raised">
       <div className="flex items-center justify-between gap-4 border-b border-border px-4 py-3">
         <p className="body-4 text-text">Squawks <span className="mono-data body-6 text-text-subtle">3 open</span></p>
         <span className="caption-4 text-text-subtle">Example, fictional repo</span>
@@ -68,7 +68,7 @@ export function SquawkDrawer() {
           <button
             type="button"
             onClick={copy}
-            className="button-sm inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-action transition-colors duration-300 ease-out-kit hover:bg-action-soft focus-visible:focus-ring active:scale-[0.98]"
+            className="button-sm inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-link transition-colors duration-300 ease-out-kit hover:bg-action-soft focus-visible:focus-ring active:scale-[0.98]"
           >
             {copied ? <Check size={16} weight="regular" aria-hidden /> : <Copy size={16} weight="regular" aria-hidden />}
             {copied ? "Copied" : "Copy prompt"}

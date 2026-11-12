@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 
 export function PageHeader({ title, description, actions }: { title: string; description?: ReactNode; actions?: ReactNode }) {
   return (
-    <header className="flex flex-col gap-4 pb-6 sm:flex-row sm:items-end sm:justify-between">
+    <header className="mb-6 flex flex-col gap-4 border-b-2 border-text pb-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="flex max-w-2xl flex-col gap-2">
-        <h1 className="heading-4 md:heading-3 text-text">{title}</h1>
+        <h1 className="heading-4 md:heading-3 uppercase text-text">{title}</h1>
         {description ? <p className="body-6 text-text-subtle">{description}</p> : null}
       </div>
       {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}

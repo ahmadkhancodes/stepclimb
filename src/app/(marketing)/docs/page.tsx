@@ -30,9 +30,9 @@ export default function DocsIndexPage() {
                 {g.docs.map((d) => (
                   <li key={d.slug} className="border-b border-border last:border-b-0">
                     <Link href={`/docs/${d.slug}`} className="group grid min-h-11 gap-1 py-4 focus-visible:focus-ring md:grid-cols-[1fr_auto] md:items-baseline md:gap-6">
-                      <span className="heading-6 text-text group-hover:text-action">{d.title}</span>
+                      <span className="heading-6 text-text group-hover:text-link">{d.title}</span>
                       <span className="body-6 text-text-subtle md:col-start-1">{d.description}</span>
-                      <ArrowRight size={16} weight="regular" aria-hidden className="hidden text-action md:row-start-1 md:col-start-2 md:block" />
+                      <ArrowRight size={16} weight="regular" aria-hidden className="hidden text-link md:row-start-1 md:col-start-2 md:block" />
                     </Link>
                   </li>
                 ))}

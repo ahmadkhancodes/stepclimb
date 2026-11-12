@@ -22,15 +22,15 @@ export default async function AdminRunsPage({ searchParams }: { searchParams: Pr
     <>
       <PageHeader title="Run inspector" description="Every run across all accounts, newest first. Open one for steps, logs, squawks and the refund tool." />
       <nav aria-label="Filter by status" className="mb-4 flex flex-wrap gap-2">
-        <Link href="/admin/runs" className="inline-flex min-h-11 items-center px-2 body-6 text-action focus-visible:focus-ring" aria-current={!filter ? "page" : undefined}>All</Link>
-        {RUN_STATUSES.map((s) => <Link key={s} href={`/admin/runs?status=${s}`} className="inline-flex min-h-11 items-center px-2 body-6 text-action focus-visible:focus-ring" aria-current={filter === s ? "page" : undefined}>{s.replace("_", " ")}</Link>)}
+        <Link href="/admin/runs" className="inline-flex min-h-11 items-center px-2 body-6 text-link focus-visible:focus-ring" aria-current={!filter ? "page" : undefined}>All</Link>
+        {RUN_STATUSES.map((s) => <Link key={s} href={`/admin/runs?status=${s}`} className="inline-flex min-h-11 items-center px-2 body-6 text-link focus-visible:focus-ring" aria-current={filter === s ? "page" : undefined}>{s.replace("_", " ")}</Link>)}
       </nav>
       {runs.length === 0 ? <p className="body-6 text-text-subtle" data-testid="admin-runs-empty">No runs match.</p> : (
         <div data-testid="admin-runs">
           <DataTable caption="Runs" columns={[{ key: "o", label: "Order" }, { key: "r", label: "Repository" }, { key: "k", label: "Kind" }, { key: "h", label: "Hop" }, { key: "b", label: "Billing" }, { key: "s", label: "Status" }, { key: "t", label: "Started" }]}>
             {runs.map((r) => (
               <tr key={r.id}>
-                <Td><Link href={`/admin/runs/${r.id}`} className="mono-data text-action focus-visible:focus-ring">#{workOrderNo(r.id)}</Link></Td>
+                <Td><Link href={`/admin/runs/${r.id}`} className="mono-data text-link focus-visible:focus-ring">#{workOrderNo(r.id)}</Link></Td>
                 <Td>{r.fullName}</Td>
                 <Td muted>{r.kind}</Td>
                 <Td muted>{r.kind === "autopilot" ? "deps" : `${r.hopFrom} to ${r.hopTo}`}</Td>
