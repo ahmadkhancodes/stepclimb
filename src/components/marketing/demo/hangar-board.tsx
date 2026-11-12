@@ -54,11 +54,11 @@ export function HangarBoard() {
       <span className="stamp-text absolute -top-3 left-6 bg-surface-inverse px-2 text-text-inverse">Example, fictional agency</span>
       <div className="flex items-center justify-between gap-4 border-b border-border bg-surface-raised px-4 py-3">
         <p className="body-4 text-text">Kestrel Digital <span className="body-6 text-text-subtle">· Agency plan</span></p>
-        <span className="button-sm inline-flex min-h-8 items-center rounded-md bg-action px-3 text-action-text" aria-hidden="true">New work order</span>
+        <span className="button-sm inline-flex min-h-8 items-center rounded-sm bg-action px-3 text-action-text" aria-hidden="true">New work order</span>
       </div>
-      <div role="note" className="body-6 m-4 flex items-start gap-3 rounded-md border border-amber bg-warning-surface p-3 text-text">
+      <div role="note" className="body-6 m-4 flex items-start gap-3 rounded-sm border border-amber bg-warning-surface p-3 text-text">
         <Warning size={16} weight="regular" aria-hidden className="mt-0.5 shrink-0" />
-        <p><b className="font-bold">Service bulletin.</b> Laravel 12 security support ends 24 Feb 2027, in {e12} days. {left} airframes in this hangar are affected.</p>
+        <p><b className="font-semibold">Service bulletin.</b> Laravel 12 security support ends 24 Feb 2027, in {e12} days. {left} airframes in this hangar are affected.</p>
       </div>
       <dl className="mx-4 grid grid-cols-2 border border-border bg-surface-raised md:grid-cols-4">
         {stats.map((s, i) => (

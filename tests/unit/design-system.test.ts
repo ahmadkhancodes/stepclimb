@@ -62,12 +62,15 @@ describe("design system", () => {
     const hits = files.filter((f) => old.test(readFileSync(f, "utf8")));
     expect(hits).toEqual([]);
   });
-  it("surfaces are square: large radii are zero", () => {
-    for (const r of ["lg", "xl", "2xl", "3xl"]) expect(css).toMatch(new RegExp(`--radius-${r}:\\s*0px`));
+  it("radius uses Tailwind's own scale (no redefined radius tokens) and surfaces stay square", () => {
+    expect(css).not.toMatch(/--radius-[a-z0-9]+:/);
+    const hits = ui.filter((f) => /\brounded-(lg|xl|2xl|3xl)\b/.test(readFileSync(f, "utf8")));
+    expect(hits).toEqual([]);
   });
-  it("no gradients, glass or glow in the UI", () => {
+  it("no gradients, glass or glow in the UI (nav excepted)", () => {
     const re = /bg-gradient|linear-gradient|radial-gradient|backdrop-blur|blur-3xl/;
-    const hits = ui.filter((f) => re.test(readFileSync(f, "utf8")));
+    // The floating nav bar and its mobile panel are the one translucent blurred surface (skill B7).
+    const hits = ui.filter((f) => !f.endsWith("site-header.tsx") && re.test(readFileSync(f, "utf8")));
     expect(hits).toEqual([]);
   });
   it("no pill badges or vague hype words in the UI", () => {

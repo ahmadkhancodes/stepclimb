@@ -68,7 +68,7 @@ export function SquawkDrawer() {
           <button
             type="button"
             onClick={copy}
-            className="button-sm inline-flex min-h-11 items-center gap-1 rounded-md px-2 text-link transition-colors duration-300 ease-out-kit hover:bg-action-soft focus-visible:focus-ring active:scale-[0.98]"
+            className="button-sm inline-flex min-h-11 items-center gap-1 rounded-sm px-2 text-link transition-colors duration-300 ease-out-kit hover:bg-action-soft focus-visible:focus-ring active:scale-[0.98]"
           >
             {copied ? <Check size={16} weight="regular" aria-hidden /> : <Copy size={16} weight="regular" aria-hidden />}
             {copied ? "Copied" : "Copy prompt"}

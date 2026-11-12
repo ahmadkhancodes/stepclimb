@@ -36,7 +36,7 @@ function NavLink({ item, pathname, onNavigate }: { item: NavItem; pathname: stri
       onClick={onNavigate}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex min-h-11 items-center gap-3 rounded-sm px-3 py-2 body-5 transition-colors duration-300 focus-visible:focus-ring",
+        "flex min-h-11 items-center gap-3 rounded-xs px-3 py-2 body-5 transition-colors duration-300 focus-visible:focus-ring",
         active ? "bg-action-soft text-text [&>svg]:text-link" : "text-text-subtle hover:bg-surface-sunken hover:text-text",
       )}
     >
@@ -81,7 +81,7 @@ function SidebarBody({ org, user, isAdmin, pathname, onNavigate }: { org: { id: 
             await authClient.signOut();
             hardNavigate("/");
           }}
-          className="flex min-h-11 items-center gap-3 rounded-sm px-3 py-2 body-5 text-text-subtle transition-colors duration-300 hover:bg-surface-sunken hover:text-text focus-visible:focus-ring disabled:opacity-50"
+          className="flex min-h-11 items-center gap-3 rounded-xs px-3 py-2 body-5 text-text-subtle transition-colors duration-300 hover:bg-surface-sunken hover:text-text focus-visible:focus-ring disabled:opacity-50"
         >
           <SignOut size={20} weight="regular" aria-hidden />
           {signingOut ? "Signing out" : "Sign out"}
@@ -133,7 +133,7 @@ export function AppShell({ org, user, isAdmin, productName, banners, children }:
           aria-expanded={open}
           aria-controls="mobile-menu"
           onClick={() => setOpen(true)}
-          className="inline-flex size-11 items-center justify-center rounded-md text-text transition-colors duration-300 hover:bg-surface-raised focus-visible:focus-ring"
+          className="inline-flex size-11 items-center justify-center rounded-sm text-text transition-colors duration-300 hover:bg-surface-raised focus-visible:focus-ring"
         >
           <List size={24} weight="regular" aria-hidden />
         </button>
@@ -153,7 +153,7 @@ export function AppShell({ org, user, isAdmin, productName, banners, children }:
             type="button"
             aria-label="Close menu"
             onClick={() => setOpen(false)}
-            className="inline-flex size-11 items-center justify-center rounded-md text-text transition-colors duration-300 hover:bg-surface-raised focus-visible:focus-ring"
+            className="inline-flex size-11 items-center justify-center rounded-sm text-text transition-colors duration-300 hover:bg-surface-raised focus-visible:focus-ring"
           >
             <X size={24} weight="regular" aria-hidden />
           </button>

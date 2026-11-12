@@ -23,7 +23,7 @@ export function InspectionReport({ report, repoId, returnTo }: { report: ScanRep
     <div className="flex flex-col gap-6" data-testid="inspection-report">
       <p className="caption-5 text-text-subtle">Branch <span className="mono-data">{report.branch}</span> · scanned {report.scannedAt.slice(0, 10)} · latest Laravel major {report.latestMajor}</p>
       {report.apps.length === 0 ? (
-        <section className="rounded-lg border border-border bg-surface-raised p-6">
+        <section className="rounded-none border border-border bg-surface-raised p-6">
           <h2 className="title-2 text-text">No Laravel app found</h2>
           <p className="body-6 mt-2 text-text-subtle">No composer.json with laravel/framework was found in this repository, so there is nothing to upgrade.</p>
         </section>

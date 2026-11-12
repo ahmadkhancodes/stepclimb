@@ -42,7 +42,7 @@ export default async function AdminRunPage({ params }: { params: Promise<{ id: s
         </section>
         <section aria-labelledby="log-h" className="flex flex-col gap-2">
           <h2 id="log-h" className="title-2 text-text">Log (last {logs.length} chunks, secrets already redacted)</h2>
-          <pre role="log" aria-label="Run log" className="max-h-96 overflow-auto rounded-lg border border-border bg-surface-raised p-4 mono-data whitespace-pre-wrap">{logs.map((l) => l.text).join("\n") || "No log output."}</pre>
+          <pre role="log" aria-label="Run log" className="max-h-96 overflow-auto rounded-none border border-border bg-surface-raised p-4 mono-data whitespace-pre-wrap">{logs.map((l) => l.text).join("\n") || "No log output."}</pre>
         </section>
         <section aria-labelledby="refund-h" className="flex flex-col gap-3">
           <h2 id="refund-h" className="title-2 text-text">Refund</h2>

@@ -29,7 +29,7 @@ export function Meter({ state }: { state: UsageState }) {
         aria-valuemin={0}
         aria-valuemax={state.limit}
         aria-valuenow={Math.min(state.used, state.limit)}
-        className="h-2 w-full overflow-hidden rounded-sm bg-surface-sunken"
+        className="h-2 w-full overflow-hidden rounded-xs bg-surface-sunken"
       >
         <div
           className={`h-full w-full origin-left transition-transform duration-500 ease-out-kit ${bar[state.level]}`}

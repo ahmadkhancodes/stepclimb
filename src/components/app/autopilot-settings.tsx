@@ -28,7 +28,7 @@ export function AutopilotSettings({ repoId, subscriber }: { repoId: string; subs
       {err ? <Notice tone="warning">{err}</Notice> : null}
       {!subscriber && !v.weekly ? <Notice>Weekly autopilot needs a paid plan. Work orders stay pay per run.</Notice> : null}
       {v.quietSuggested && !v.quietMode ? <Notice tone="warning" title="Three pull requests in a row were closed" action={<Button size="sm" variant="secondary" loading={busy} onClick={() => save({ quietMode: true })}>Turn on quiet mode</Button>}>Autopilot keeps going until you say otherwise. Quiet mode pauses it.</Notice> : null}
-      <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
+      <div className="flex flex-col gap-3 rounded-none border border-border p-4">
         <p className="title-4 text-text">Weekly dependency pull request</p>
         <p className="body-6 text-text-subtle">Monday 06:00 in the zone below. One verified PR, refreshed while it stays open.{v.openPr ? ` Open now: #${v.openPr}.` : ""}</p>
         <div>

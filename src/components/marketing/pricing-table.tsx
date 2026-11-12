@@ -43,7 +43,7 @@ function UpgradeLink({ kind }: { kind: string }) {
   return (
     <Link
       href={cta.href}
-      className="button-sm inline-flex min-h-11 items-center gap-1 rounded-sm text-link transition-colors duration-300 ease-out-kit hover:text-link-hover focus-visible:focus-ring"
+      className="button-sm inline-flex min-h-11 items-center gap-1 rounded-xs text-link transition-colors duration-300 ease-out-kit hover:text-link-hover focus-visible:focus-ring"
     >
       {cta.label}<ArrowRight size={16} weight="regular" aria-hidden />
     </Link>
