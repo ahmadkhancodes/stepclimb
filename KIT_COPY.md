@@ -17,7 +17,7 @@ Keep your repo's own `CLAUDE.md`, `docs/brief.md` and memory files. Take `docs/f
 1. `src/config/product.ts`: `slug` (lowercase, also the DB name, cookie prefix and Stripe lookup-key prefix), `name`, `fullName`, `host`, `url`, `mailFrom`, `description`, `tagline`, `legal`, `subProcessors`, `plans` (real prices in cents, limits per meter, highlights), `graceDays`, `flags`, `nav`. Keep every plan's `lookupKey` shape `${slug}_${plan}_${monthly|annual}` (the `price()` helper does it).
    If your meters differ, edit the `MeterId` union at the top.
 2. `package.json` `name` = slug. `infra/cron-worker/wrangler.toml` `name` and `APP_URL`.
-3. Visual system from your `docs/DESIGN.md`: replace ONLY the values in the two `:root` blocks of `src/app/globals.css` (raw ramp, accent, role tokens for light and dark) and the two font lines in `src/app/fonts.ts`. Components reference role tokens only.
+3. Visual system from your `docs/DESIGN.md`: replace ONLY the values in the two `:root` blocks of `src/app/globals.css` (raw ramp, accent, role tokens for light) and the two font lines in `src/app/fonts.ts`. Components reference role tokens only.
 4. Replace the sample landing `src/app/(marketing)/page.tsx` and the demo `src/components/marketing/demo/*` with your product's sections and real UI. Replace `src/app/app/page.tsx` with your main screen. Update `src/content/compare.ts`, `src/content/docs/*`.
 5. `grep -rn "postslot\|Postslot" src scripts infra` must only hit `product.ts` (and your own content).
 

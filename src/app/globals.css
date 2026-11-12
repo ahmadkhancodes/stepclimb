@@ -57,39 +57,6 @@
   color-scheme: light;
 }
 
-:root[data-theme="dark"] {
-  --surface: #0f1417;
-  --surface-raised: #172026;
-  --surface-sunken: #0b0f11;
-  --surface-inverse: #e7edf0;
-  --text: #e7edf0;
-  --text-subtle: #9aa8b0;
-  --text-muted: #7f8d95;
-  --text-inverse: #0f1417;
-  --border: #2a363d;
-  --border-strong: #3a4952;
-  --action: #4fb3c3;
-  --action-hover: #79c7d3;
-  --action-text: #0f1417;
-  --action-soft: #14323a;
-  --focus: #4fb3c3;
-  --success: #4cc27a;
-  --success-surface: #14301f;
-  --warning: #f5b935;
-  --warning-surface: #3a2d0c;
-  --amber: #f5b935;
-  --danger: #f0645a;
-  --danger-surface: #3a1816;
-  --info: #7fa8d6;
-  --info-surface: #16283a;
-  --hero-from: var(--text);
-  --hero-to: var(--text);
-  --shadow-color: 0 0% 0%;
-  color-scheme: dark;
-}
-
-@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
-
 @theme inline {
   --font-display: var(--font-display-family);
   --font-sans: var(--font-sans-family);

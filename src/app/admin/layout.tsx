@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { ThemeToggle } from "@/components/theme";
 import { Notice } from "@/components/ui/states";
 import { product } from "@/config/product";
 import { founderNeeds2fa, isFounderAdmin, requireUser } from "@/lib/auth/session";
@@ -31,7 +30,6 @@ export default async function AdminLayout({ children }: { children: ReactNode })
             Back to app
           </Link>
         </div>
-        <ThemeToggle />
       </header>
       <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
         {needs2fa ? (

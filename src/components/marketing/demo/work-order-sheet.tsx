@@ -32,7 +32,7 @@ export function WorkOrderSheet({ className, id }: { className?: string; id?: str
       id={id}
       aria-label="Example work order"
       className={cn(
-        "relative border border-border bg-surface-raised shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)] dark:shadow-none",
+        "relative border border-border bg-surface-raised shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)]",
         className,
       )}
     >

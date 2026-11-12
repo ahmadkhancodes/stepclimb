@@ -50,7 +50,7 @@ export function HangarBoard() {
     { k: "Open squawks", v: "7", s: "2 must fix" },
   ];
   return (
-    <figure aria-label="Example hangar board" className="relative border border-border bg-surface shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)] dark:shadow-none">
+    <figure aria-label="Example hangar board" className="relative border border-border bg-surface shadow-[0_1px_0_rgba(20,25,28,0.06),0_8px_24px_-12px_rgba(20,25,28,0.18)]">
       <span className="stamp-text absolute -top-3 left-6 bg-surface-inverse px-2 text-text-inverse">Example, fictional agency</span>
       <div className="flex items-center justify-between gap-4 border-b border-border bg-surface-raised px-4 py-3">
         <p className="body-4 text-text">Kestrel Digital <span className="body-6 text-text-subtle">· Agency plan</span></p>

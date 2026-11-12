@@ -1,6 +1,6 @@
 # ROADMAP: Stepclimb by BufferSol (full workbook MVP)
 
-P0 numbers refer to `docs/brief.md` MVP scope and `docs/ARCHITECTURE.md` section 6. Each milestone ends with: lint, typecheck, tests, build green; deployed; Playwright screenshots (375/1440, light/dark) in `docs/qa/`; `docs/PROGRESS.md` updated; PR merged to main; one line to the orchestrator.
+P0 numbers refer to `docs/brief.md` MVP scope and `docs/ARCHITECTURE.md` section 6. Each milestone ends with: lint, typecheck, tests, build green; deployed; Playwright screenshots (375/1440, light) in `docs/qa/`; `docs/PROGRESS.md` updated; PR merged to main; one line to the orchestrator.
 
 | Milestone | Scope | P0s | Exit gate |
 |---|---|---|---|

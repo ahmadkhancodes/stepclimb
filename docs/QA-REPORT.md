@@ -16,7 +16,7 @@ Run against the production build (`next start`, memory DB, outbox mail, fixture 
 - Delete-account dialog: confirm disabled until typed, Escape closes, nothing deleted.
 - Hostile JSON (empty, 20k chars, script tags, bad enums, malformed JSON) to 7 endpoints: never 500.
 - 404s for unknown repo, run, inspection; admin and founder pages closed to normal users; signed-out `/app*` redirect to sign-in; sign-out ends the session.
-- All 13 public pages at 375 and 1440, light and dark: 200, no console errors or hydration warnings, no failed requests, no horizontal scroll, no unnamed controls, no dead internal links.
+- All 13 public pages at 375 and 1440, light: 200, no console errors or hydration warnings, no failed requests, no horizontal scroll, no unnamed controls, no dead internal links.
 - All 9 signed-in app pages at 375 and 1440: same checks.
 - Keyboard: first Tab lands on a control with a visible focus ring; every enabled button and link shows the pointer cursor.
 

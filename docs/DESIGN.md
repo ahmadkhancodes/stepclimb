@@ -1,6 +1,6 @@
 # DESIGN: Stepclimb by BufferSol
 
-Status: Phase 0 proposal, awaiting orchestrator approval. Proof: `docs/design/mock.html` (+ `mock-1440.png`, `mock-375.png`, dark variants). Competitor captures: `docs/design/refs/`.
+Status: Phase 0 proposal, awaiting orchestrator approval. Proof: `docs/design/mock.html` (+ `mock-1440.png`, `mock-375.png`). Competitor captures: `docs/design/refs/`.
 
 ## 1. ICP card
 Tech lead or owner at a 5 to 75 person Laravel agency (or senior dev on a 3 to 15 dev SaaS team). Buys self serve on a company card under about $1,200 a year, after a free scan. Fears: a bot PR that breaks a client app, code leaving their control, a surprise bill. Already loves: GitHub PR UI, Pest output, Pint, Laravel docs, Tailwind. Reads in an editor and a browser side by side, scans tables, distrusts marketing gloss. A second reader, the account manager, must be able to show a page to a client.
@@ -27,7 +27,7 @@ Shared category defaults: a big friendly headline, one saturated accent (red or 
 
 Mood: exacting, calm, legible, mechanical, signed off. Never playful, magical or "supercharged".
 
-## 5. Color (role tokens, light and dark)
+## 5. Color (role tokens, light only)
 Two layers: raw ramps are not needed beyond these; components use role tokens only. CSS variables `--sc-*`, mapped into Tailwind v4 `@theme`. Dark under `[data-theme="dark"]` and `prefers-color-scheme: dark`, with a manual toggle.
 
 | Role | Light | Dark "night shift" | Use |
@@ -129,4 +129,4 @@ Don't:
 Stamp, WorkOrderSheet, TaskRow, SquawkBadge, RunwayBar, EolChip, FleetTable, LogPanel (virtualized), RateCard (ruled table), TorqueDivider, BrandLockup, CopyButton, Drawer, ServiceBulletin, TaglineReveal, PlateIllustration. Screens: marketing home, pricing, upgrade path pages (`/laravel-12-to-13`), guides, compare, security; app Hangar, Inspection report, Work order, Squawk drawer, Recipes catalogue, Repo settings, Billing (credits as tear off tickets), Team, Client report builder (v1), internal Ops console; generated PR body; emails.
 
 ## 15. QA
-Scorecard from DESIGN_PLAYBOOK Section 9 at 375 and 1440, light and dark, results in `docs/design-qa.md`. Hard fail greps from the playbook run in CI.
+Scorecard from DESIGN_PLAYBOOK Section 9 at 375 and 1440, light, results in `docs/design-qa.md`. Hard fail greps from the playbook run in CI.

@@ -1,6 +1,6 @@
 # Design scorecard, M5 (DESIGN_PLAYBOOK section 9)
 
-Date: 7 Nov 2026. Build on `main` plus the M5 review fixes. Screenshots: `docs/qa/2026-11-07-m5/` (`/`, `/pricing`, `/security`, `/compare/laravelshift`, `/guides`, `/laravel-12-to-13`, `/sign-in`, 404; 375 and 1440; light and dark), made with `npx tsx scripts/screenshots.ts`. Previous card: `docs/design-qa.md` (M1, 43/50).
+Date: 7 Nov 2026. Build on `main` plus the M5 review fixes. Screenshots: `docs/qa/2026-11-07-m5/` (`/`, `/pricing`, `/security`, `/compare/laravelshift`, `/guides`, `/laravel-12-to-13`, `/sign-in`, 404; 375 and 1440; light), made with `npx tsx scripts/screenshots.ts`. Previous card: `docs/design-qa.md` (M1, 43/50).
 Accessibility is now measured, not eyeballed: `tests/e2e/a11y.spec.ts` (axe-core WCAG 2.1 A and AA on 7 pages in both themes, 44 px targets at 375, skip link and visible focus) passes.
 
 | # | Category | Score | Worst problem now |
@@ -11,7 +11,7 @@ Accessibility is now measured, not eyeballed: `tests/e2e/a11y.spec.ts` (axe-core
 | 4 | Structure and rhythm | 4 | `InspectionReport` still appears twice on the home page. |
 | 5 | Typography | 4 | Hero H1 wraps to four lines at 1440. |
 | 6 | Spacing and radius | 4 | Pricing intro link "See the price by price comparison" sits loose under the lede. |
-| 7 | Color and contrast | 5 | axe contrast passes on the real tokens in light and dark (was "checked by eye"). |
+| 7 | Color and contrast | 5 | axe contrast passes on the real tokens in light (was "checked by eye"). |
 | 8 | Motion and states | 4 | Reduced motion respected (axe run uses it); signed in error and loading states are not in the screenshot set. |
 | 9 | Content honesty | 5 | Claims that the code did not back were fixed (test counts, token life, what the inspection reads, an unsourced competitor citation); see `docs/REVIEW.md` P1-3. |
 | 10 | Responsive and ship | 4 | 44 px targets fixed (breadcrumbs, small buttons, table actions); Lighthouse not run here (no network). |
