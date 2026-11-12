@@ -127,5 +127,9 @@ export async function revokeCreditsForPayment(db: Db, paymentIntentId: string): 
 }
 export async function refundCredit(db: Db, creditId: string): Promise<void> {
   const c = await db.docs.get<CreditDoc>("credits", creditId);
-  if (c) await db.docs.put("credits", creditId, { remaining: c.remaining + 1 });
+  if (!c) return;
+  const spent = (c as CreditDoc & { spent?: number }).spent ?? 0;
+  // one give back per spend (P2-3): a repeated call for the same spend loses the unique claim and changes nothing
+  if (!(await db.docs.insert("credit_claims", `${c.id}:refund:${spent}`, { creditId: c.id, accountId: c.accountId, at: new Date(), refund: true }))) return;
+  await db.docs.put("credits", creditId, { remaining: c.remaining + 1 });
 }

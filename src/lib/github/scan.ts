@@ -148,4 +148,13 @@ export async function latestScan(db: Db, repoId: string): Promise<(ScanDoc & { i
   return s ?? null;
 }
 
+/** Latest scan of many repos in one query (list screens: no N+1). */
+export async function latestScans(db: Db, repoIds: string[]): Promise<Map<string, ScanDoc & { id: string }>> {
+  const out = new Map<string, ScanDoc & { id: string }>();
+  if (!repoIds.length) return out;
+  const all = await db.docs.find<ScanDoc>("scans", {}, { in: { field: "repoId", values: repoIds }, sort: { field: "createdAt", dir: -1 } });
+  for (const s of all) if (!out.has(s.repoId)) out.set(s.repoId, s);
+  return out;
+}
+
 export { repoDocId };

@@ -58,17 +58,25 @@ Context that shapes the ranking: real sandbox runs are switched off in code (`ge
 - Stripe webhook re-read for out-of-order and duplicate delivery: events are recorded only after success, every subscription and invoice event recomputes from Stripe, unknown event types answer 200 and are logged, checkout success never depends on the redirect (the credit is granted by the webhook). Fixed the two real gaps above (refund of a credit, early refund).
 - Mail: magic link, invitations and founder alerts used `sendMail` directly, so a Resend rejection (bad address, 429) threw out of the auth handler or the alert loop. They now go through `sendMailSafe` (logs the status only, never the provider text, never throws). Run, receipt and weekly mail already swallowed failures.
 
+### Battle hardening pass (2026-11-12)
+- **Usefulness:** the Hangar exports as CSV (`GET /api/repos/export`, button "Export CSV"): one row per airframe, UTF-8 with BOM for Excel, spreadsheet formulas defused, own organisation only, rate limited. This is what Agency Alex hands to the account manager.
+- **Abuse controls:** signed webhooks (Stripe, GitHub, Resend) have a per IP flood guard (300 a minute, fails open if the limiter is down); member invitations are limited to 3 per address and 30 per IP per hour (no mail bombing a victim); no-op probe closed (P2-1).
+- **Operations:** `/api/health` now returns `deps` (db ok/down, billing and mail configured/missing) and the DB latency, without hostnames, keys or error text; only the DB sets the status code. The Hangar no longer queries once per repo (`latestScans`, one query).
+- **Secrets:** `npm run scan:bundle` scans `.next/static` for key shapes and the live values of secret env vars; run clean on this build.
+- **CSP:** a real browser run records every `securitypolicyviolation` on 7 public and 9 app pages: none, except a bundled `is-generator-function` probe on `/sign-in` that is refused by design and caught in a `try`.
+- Tests: `tests/unit/battle.test.ts` (CSV, one query list, refund once, invite and webhook limits, Stripe bad signature, bundle scan) and `tests/e2e/qa/battle.spec.ts` (CSP, CSV tenant isolation, health, revoked session, hostile input, cross-site POST).
+
 ## P2
 
 | # | Finding | Where | Note |
 |---|---|---|---|
-| P2-1 | `kind: "noop"` is open to every user and costs nothing | `src/app/api/runs/route.ts` | opens a draft PR on their own repo; rate limited 10 a minute. Restrict to founder or first run per repo. |
-| P2-2 | Squawks are stored sanitized, so the run page shows `&lt;` where output had `<` outside fences | `service.ts` finalize | cosmetic; store the redacted raw text for the UI and sanitize only for GitHub |
-| P2-3 | `refundCredit` is read then write | `store.ts` | only called once per run behind `creditRefunded`; make it a claim like spends |
-| P2-4 | Global and per account concurrency are counted by reading all runs | `service.ts` startRun | fine at launch volume; becomes slow and racy at scale (use counters) |
-| P2-5 | Installation tokens are not revoked at the end of a run | `git-host.ts` | they expire within an hour (claim now says so); `DELETE /installation/token` after finalize would shorten it |
-| P2-6 | The Laravel Daily observation in the compare FAQ has no source line in `docs/brief.md` | `src/content/compare.ts:87` | add the URL and date to the brief sources or drop the answer |
-| P2-7 | Lint warnings (5, pre-existing) | `.github/claude/run.mjs`, engine tests, `auth/client.ts` | harmless |
+| P2-1 | `kind: "noop"` is open to every user and costs nothing | `src/app/api/runs/route.ts` | **Done** (2026-11-12 hardening pass): founder only, 403 for everyone else. Test: `battle.spec.ts` |
+| P2-2 | **Open, one line:** touching the GitHub-facing sanitizer risks the P0 fixes for a cosmetic gain. Squawks are stored sanitized, so the run page shows `&lt;` where output had `<` outside fences | `service.ts` finalize | cosmetic; store the redacted raw text for the UI and sanitize only for GitHub |
+| P2-3 | `refundCredit` is read then write | `store.ts` | **Done**: one unique claim `<credit>:refund:<spent>` per spend. Test: `battle.test.ts` |
+| P2-4 | **Open, one line:** needs a counters collection and a migration; irrelevant below a few hundred runs a day. Global and per account concurrency are counted by reading all runs | `service.ts` startRun | fine at launch volume; becomes slow and racy at scale (use counters) |
+| P2-5 | **Open, one line:** cannot be verified without the real GitHub App (MANUAL_STEPS 1). Installation tokens are not revoked at the end of a run | `git-host.ts` | they expire within an hour (claim now says so); `DELETE /installation/token` after finalize would shorten it |
+| P2-6 | **Open, one line:** the brief names the review but has no URL and there is no internet here; the FAQ labels it third party. The Laravel Daily observation in the compare FAQ has no source line in `docs/brief.md` | `src/content/compare.ts:87` | add the URL and date to the brief sources or drop the answer |
+| P2-7 | Lint warnings (5, pre-existing) | `.github/claude/run.mjs`, engine tests, `auth/client.ts` | **Done** for 4 (unused imports and variable removed, intentional full reload documented); the `.github/claude/run.mjs` one stays: that directory is off limits to feature tasks |
 
 ## Reviewed and found sound
 - GitHub webhook: HMAC over the raw body, constant time, delivery id dedupe recorded after apply, 5 MB cap (`src/lib/github/webhook.ts`).

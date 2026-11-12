@@ -30,3 +30,12 @@ The CSP and form-action class of bug is already covered by `tests/unit/csp-form-
 - **Low:** dev-only font preload warnings ("preloaded but not used") on the 404 and sign-in pages; wasteful preloads of fonts those pages do not use.
 - **Low:** passkey button with no passkey shows "Auth cancelled", which reads as an error; copy could say no passkey was found.
 - Not testable here: real Stripe checkout and portal, real GitHub App install, real sandbox runs (MANUAL_STEPS 5, 6).
+
+## Battle hardening round (12 Nov 2026, second pass)
+Added `tests/e2e/qa/battle.spec.ts` (6 tests; whole suite 51 Playwright tests) and `tests/unit/battle.test.ts`; unit 344 tests; lint (only the off-limits `.github/claude/run.mjs` warning), typecheck, build green. Not deployed.
+- **CSP in a real browser:** `securitypolicyviolation` is recorded on every public page and every app page; the only report is a refused `eval` probe from a bundled library on `/sign-in`, caught by the library, nothing visible depends on it. Security headers asserted.
+- **Tenant isolation:** Hangar CSV for org B is the header only after org A seeded repos; signed out is refused. Earlier specs already cover runs, inspections and cancel across organisations.
+- **Resilience:** session cleared mid use gives 401 JSON for APIs and the sign-in page for pages; huge ids, HTML and `../` in run bodies give 4xx JSON, never 500; cross-site POST gives 403; the no-op probe gives 403.
+- **Webhooks and abuse:** Stripe bad signature records nothing (duplicates and out-of-order refunds were already in `hardening.test.ts`); webhook flood and invite limits unit tested.
+- **Secrets:** `npm run scan:bundle` found nothing in 38 client files, and a unit test proves it detects key shapes and live env values.
+- **Not covered here:** database slow or down in the browser (the memory DB cannot be stopped; `/api/health` returns 503 within 2 s by design), real Stripe/Resend timeouts (Resend rejections never throw: `sendMailSafe`), clock skew on magic links (Better Auth owns expiry, 10 minutes; a skewed clock gives the standard "link expired" and the sign-in form is one click away), concurrent edits (credit spend, refund and first-run are claim based and tested; settings are last write wins).

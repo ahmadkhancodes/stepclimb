@@ -53,7 +53,7 @@ export default async function OverviewPage({ searchParams }: { searchParams: Pro
       <PageHeader
         title="Hangar"
         description={`${ctx.org.name}. Every repo as an airframe: Laravel version, how far behind, when support ends.`}
-        actions={installHref ? <Link href={installHref} className={buttonClass("secondary", "md")}>Add repositories</Link> : null}
+        actions={<span className="flex flex-wrap items-center gap-3">{hangar && hangar.rows.length > 0 ? <a href="/api/repos/export" download className={buttonClass("tertiary", "md")}>Export CSV</a> : null}{installHref ? <Link href={installHref} className={buttonClass("secondary", "md")}>Add repositories</Link> : null}</span>}
       />
       {installed && link === "github" ? <div className="mb-6"><Notice tone="warning" title="Sign in with GitHub to link this installation">We link an installation only when GitHub confirms you can see it. Sign in with GitHub, then open the app on GitHub and press Configure: GitHub sends you back here and we link it.</Notice></div> : null}
       {installed && link !== "github" ? <div className="mb-6"><Notice tone="success" title="GitHub App installed">Repositories sync in the background. Run a free scan on any airframe.</Notice></div> : null}

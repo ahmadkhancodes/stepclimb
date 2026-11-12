@@ -2,6 +2,7 @@ import { fixturesMode } from "@/lib/env";
 import { after } from "next/server";
 import { getDb } from "@/lib/db";
 import { json } from "@/lib/http";
+import { webhookFlood } from "@/lib/security/ratelimit";
 import { log } from "@/lib/logger";
 import { recordWebhookFailure } from "@/lib/ops/alerts";
 import { loadAppCredentials } from "@/lib/github/app-store";
@@ -15,6 +16,7 @@ export const maxDuration = 60;
 
 /** GitHub App webhook. No CSRF/session: authenticity is the HMAC over the raw body (X-Hub-Signature-256). */
 export async function POST(req: Request) {
+  if (await webhookFlood(req)) return json({ error: "rate_limited" }, 429);
   const raw = await req.text();
   if (raw.length > 5_000_000) return json({ error: "body_too_large" }, 413);
   const db = await getDb();

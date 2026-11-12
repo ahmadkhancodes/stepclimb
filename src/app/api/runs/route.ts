@@ -1,6 +1,6 @@
 import { after } from "next/server";
 import { z } from "zod";
-import { requireOrg, requirePermission } from "@/lib/auth/session";
+import { isFounderAdmin, requireOrg, requirePermission } from "@/lib/auth/session";
 import { getDb } from "@/lib/db";
 import type { RepoDoc } from "@/lib/github/sync";
 import { HttpError, json, readJson, withApi } from "@/lib/http";
@@ -28,6 +28,7 @@ export const POST = withApi(async (req) => {
   const ctx = await requireOrg();
   requirePermission(ctx, "data", "write");
   const body = await readJson(req, Body);
+  if (body.kind === "noop" && !isFounderAdmin(ctx.user.email)) throw new HttpError(403, "forbidden"); // P2-1: the no-op probe opens a PR for free
   const db = await getDb();
   if ((await db.hitRateLimit(`runs:${ctx.org.id}`, 60_000)) > 10) throw new HttpError(429, "rate_limited");
   const repo = await db.docs.get<RepoDoc>("repos", body.repoId);

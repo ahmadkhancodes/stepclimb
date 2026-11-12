@@ -9,7 +9,6 @@ import {
 
 const RULES_DIR = resolve(process.cwd(), 'repair-rules');
 const rules = loadRules(RULES_DIR);
-const byKey = (k: string) => rules.find((r) => r.key === k)!;
 
 const composerJson = (req: Record<string, string>, dev: Record<string, string> = {}) =>
   JSON.stringify({ name: 'acme/portal', require: req, 'require-dev': dev }, null, 4) + '\n';
