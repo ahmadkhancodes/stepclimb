@@ -5,8 +5,9 @@ import { product } from "@/config/product";
 import { BrandLockup } from "@/components/marketing/demo/brand-lockup";
 import { eolEntries } from "@/components/marketing/dateline";
 import { formatIso } from "@/content/dates";
+import { CheckBox } from "@/components/ui/check-box";
 
-/** What happens after sign in, as a short logbook procedure. Facts only, no numbers we cannot back. */
+/** What happens after sign in, as a short work order checklist. Facts only, no numbers we cannot back. */
 const STEPS = [
   "Install the GitHub App on the repos you choose.",
   "Each repo gets a free inspection from composer.json, composer.lock and package.json. No code is cloned.",
@@ -30,12 +31,12 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           </Link>
         </footer>
       </div>
-      <aside aria-label="What happens next" className="hidden flex-col justify-center border-l border-border-strong bg-surface-raised px-10 py-16 lg:col-span-5 lg:flex xl:px-16">
-        <p className="label-log rule-double pt-3 text-text">What happens next</p>
+      <aside aria-label="What happens next" className="bg-drafting hidden flex-col justify-center border-l-2 border-text px-10 py-16 lg:col-span-5 lg:flex xl:px-16">
+        <p className="rule-double"><span className="label-log inline-block bg-surface-inverse px-2 py-1 text-text-inverse">What happens next</span></p>
         <ol className="mt-8 flex flex-col">
-          {STEPS.map((s, i) => (
-            <li key={s} className="grid grid-cols-[2.5rem_1fr] gap-2 border-b border-border py-4 first:border-t first:border-t-text">
-              <span className="mono-data caption-1 text-action">{String(i + 1).padStart(2, "0")}</span>
+          {STEPS.map((s) => (
+            <li key={s} className="grid grid-cols-[2rem_1fr] gap-2 border-b border-border py-4 first:border-t first:border-t-text">
+              <CheckBox checked={false} className="mt-0.5" />
               <span className="body-6 text-text">{s}</span>
             </li>
           ))}

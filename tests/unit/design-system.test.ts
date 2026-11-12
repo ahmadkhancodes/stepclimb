@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { eolEntries } from "@/components/marketing/dateline";
 import { EOL_CALENDAR } from "@/lib/engine/detect/eol";
 
-// Guards for the "logbook" redesign (docs/design-brief.md). Fails if the generic AI tells come back.
+// Guards for the "work order" identity (docs/design-brief.md). Fails if the generic AI tells come back.
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((n) => {
     const p = join(dir, n);
@@ -34,19 +34,33 @@ describe("EOL dateline", () => {
 });
 
 describe("design system", () => {
-  it("uses the logbook type pairing, loaded with next/font", () => {
-    expect(fonts).toMatch(/Newsreader/);
-    expect(fonts).toMatch(/Schibsted_Grotesk/);
-    expect(fonts).toMatch(/JetBrains_Mono/);
+  it("uses the work order type pairing, loaded with next/font", () => {
+    expect(fonts).toMatch(/Barlow_Condensed/);
+    expect(fonts).toMatch(/IBM_Plex_Sans/);
+    expect(fonts).toMatch(/IBM_Plex_Mono/);
     expect(fonts).not.toMatch(/style:\s*\[[^\]]*italic/);
   });
   it("no banned fonts anywhere in the UI", () => {
     const hits = ui.filter((f) => /\b(Inter|Geist|Roboto|Arial|Helvetica|Open Sans)\b/.test(readFileSync(f, "utf8")));
     expect(hits).toEqual([]);
   });
-  it("accent is recorder orange, not the old teal or a default blue or indigo", () => {
-    expect(css).toMatch(/--accent-500:\s*#b23c0e/i);
+  it("palette is drafting paper, navy ink and safety orange; orange is a fill with navy text on it", () => {
+    expect(css).toMatch(/--n-50:\s*#e8eef3/i);
+    expect(css).toMatch(/--n-900:\s*#0d2236/i);
+    expect(css).toMatch(/--safety-500:\s*#f26a1b/i);
+    expect(css).toMatch(/--action:\s*var\(--safety-500\)/);
+    expect(css).toMatch(/--action-text:\s*var\(--n-900\)/);
     expect(css).not.toMatch(/#0b5d6b|#6366f1|#4f46e5|#3b82f6/i);
+  });
+  it("orange is never used as text colour (2.6:1 on paper)", () => {
+    const hits = ui.filter((f) => /(^|[\s"'`:])text-action(?!-text)/.test(readFileSync(f, "utf8")));
+    expect(hits).toEqual([]);
+  });
+  it("old logbook brand tokens and fonts are gone everywhere (UI, emails, OG image, icons)", () => {
+    const files = walk("src").filter((f) => /\.(tsx?|css)$/.test(f));
+    const old = /#(b23c0e|8e2f0a|f4f1ea|fffdf8|eae5d9|d6cfbf|8f8572|1c1a16|4f4a40|6b6458|f7e3d6)\b|Newsreader|Schibsted|JetBrains|\blogbook\b|stamp-rule|sc-stamp-in/i;
+    const hits = files.filter((f) => old.test(readFileSync(f, "utf8")));
+    expect(hits).toEqual([]);
   });
   it("surfaces are square: large radii are zero", () => {
     for (const r of ["lg", "xl", "2xl", "3xl"]) expect(css).toMatch(new RegExp(`--radius-${r}:\\s*0px`));

@@ -1,6 +1,6 @@
 import { cn } from "@/components/ui/cn";
 
-/** Ink stair mark with the recorder orange step. Colour comes from `currentColor` plus the action token. */
+/** Navy stair mark with the safety orange top step. Colour comes from `currentColor` plus the action token. */
 export function BrandMark({ size = 24, className }: { size?: number; className?: string }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" className={cn("shrink-0 text-text", className)}>

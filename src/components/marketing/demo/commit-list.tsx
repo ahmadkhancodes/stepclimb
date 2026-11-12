@@ -15,7 +15,7 @@ export function CommitList({ className }: { className?: string }) {
       <ol>
         {commits.map((c) => (
           <li key={c.sha} className="grid grid-cols-[auto_1fr] items-baseline gap-x-3 border-b border-border px-4 py-2 last:border-b-0">
-            <span className="mono-data caption-3 text-action">{c.sha}</span>
+            <span className="mono-data caption-3 text-link">{c.sha}</span>
             <span className="body-6 text-text">{c.msg}</span>
             <span />
             <span className={cn("mono-data caption-5", c.repair ? "text-info" : "text-text-subtle")}>{c.recipe}</span>

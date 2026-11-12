@@ -47,7 +47,7 @@ export default function GuidesPage() {
                     <span className="body-6 text-text-subtle">{g.description}</span>
                     <span className="mono-data caption-4 text-text-muted">Checked {g.updated.label}</span>
                   </span>
-                  <span className="body-6 flex items-center gap-1 text-action md:col-span-2 md:justify-self-end">
+                  <span className="body-6 flex items-center gap-1 text-link md:col-span-2 md:justify-self-end">
                     Read<ArrowRight size={16} weight="regular" aria-hidden />
                   </span>
                 </Link>
@@ -61,13 +61,13 @@ export default function GuidesPage() {
           <ul className="flex max-w-2xl flex-col gap-2">
             {comparisons.map((c) => (
               <li key={c.slug}>
-                <Link href={`/compare/${c.slug}`} className="body-3 text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring">
+                <Link href={`/compare/${c.slug}`} className="body-3 text-link underline underline-offset-4 hover:text-link-hover focus-visible:focus-ring">
                   {c.title}
                 </Link>
               </li>
             ))}
             <li>
-              <Link href="/compare/ai-agents" className="body-3 text-action underline underline-offset-4 hover:text-action-hover focus-visible:focus-ring">
+              <Link href="/compare/ai-agents" className="body-3 text-link underline underline-offset-4 hover:text-link-hover focus-visible:focus-ring">
                 {product.fullName} compared with AI coding agents
               </Link>
             </li>

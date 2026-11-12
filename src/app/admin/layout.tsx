@@ -33,7 +33,7 @@ export default async function AdminLayout({ children }: { children: ReactNode })
       </header>
       <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 lg:px-10 lg:py-12">
         {needs2fa ? (
-          <Notice tone="warning" title="Turn on two-factor sign in first" action={<Link href="/app/settings/security" className="button-sm inline-flex min-h-11 items-center text-action focus-visible:focus-ring">Open security settings</Link>}>
+          <Notice tone="warning" title="Turn on two-factor sign in first" action={<Link href="/app/settings/security" className="button-sm inline-flex min-h-11 items-center text-link focus-visible:focus-ring">Open security settings</Link>}>
             The admin console is open to founder accounts with an authenticator app only.
           </Notice>
         ) : children}

@@ -84,7 +84,7 @@ export default function PricingPage() {
         meta={`Prices compared on ${COMPARED.label}`}
         actions={<Link href="/compare/laravelshift" className="button-md inline-flex min-h-11 items-center text-text underline decoration-border-strong underline-offset-4 hover:decoration-action focus-visible:focus-ring">See the price by price comparison</Link>}
       />
-      <Container className="flex flex-col gap-16 pb-16 pt-8 md:pb-24 md:pt-12">
+      <Container className="flex flex-col gap-16 pb-16 pt-4 md:pb-24 md:pt-12">
         <PricingTable id="rate-card" />
 
         <ArticleSection id="limits" title="Plan limits">

@@ -37,7 +37,7 @@ function NavLink({ item, pathname, onNavigate }: { item: NavItem; pathname: stri
       aria-current={active ? "page" : undefined}
       className={cn(
         "flex min-h-11 items-center gap-3 rounded-sm px-3 py-2 body-5 transition-colors duration-300 focus-visible:focus-ring",
-        active ? "bg-action-soft text-text [&>svg]:text-action" : "text-text-subtle hover:bg-surface-sunken hover:text-text",
+        active ? "bg-action-soft text-text [&>svg]:text-link" : "text-text-subtle hover:bg-surface-sunken hover:text-text",
       )}
     >
       <Icon size={20} weight="regular" aria-hidden />

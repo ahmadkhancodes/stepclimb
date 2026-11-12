@@ -89,7 +89,7 @@ export function SiteHeader() {
         </nav>
         <div className="flex items-center gap-4">
           <Link href="/sign-in" className="button-sm hidden min-h-11 items-center text-text-subtle hover:text-text focus-visible:focus-ring md:inline-flex">Sign in</Link>
-          <Link href="/sign-in" className={cn(buttonClass("primary", "md"), "button-sm max-sm:hidden")}>Inspect a repo free</Link>
+          <Link href="/sign-in" className={cn(buttonClass("secondary", "md"), "button-sm max-sm:hidden")}>Inspect a repo free</Link>
           <button
             ref={toggleRef}
             type="button"
@@ -132,7 +132,7 @@ export function SiteHeader() {
                 open ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0",
                 item.kind === "cta"
                   ? cn(buttonClass("primary", "lg"), "mt-8")
-                  : "heading-4 flex min-h-12 items-center border-b border-border py-2 text-text aria-[current=page]:text-action",
+                  : "heading-4 flex min-h-12 items-center border-b border-border py-2 text-text aria-[current=page]:text-link",
               )}
             >
               {item.label}

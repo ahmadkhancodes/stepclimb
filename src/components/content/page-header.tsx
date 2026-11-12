@@ -28,7 +28,7 @@ export function PageHeader({
       <Container className="pb-4 pt-6 md:pb-6 md:pt-8">
         {crumbs ? <Breadcrumbs items={crumbs} /> : null}
         <div className="rule-double mt-4 grid gap-6 pt-8 lg:grid-cols-12 lg:gap-12">
-          <h1 className="heading-3 md:heading-1 text-text lg:col-span-7">{title}</h1>
+          <h1 className="heading-3 md:heading-1 uppercase text-text lg:col-span-7">{title}</h1>
           <div className="flex flex-col items-start gap-4 lg:col-span-5 lg:pt-2">
             {lede ? <p className="body-3 text-text-subtle">{lede}</p> : null}
             {meta ? <p className="mono-data caption-4 text-text-muted">{meta}</p> : null}

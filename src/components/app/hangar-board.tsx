@@ -6,7 +6,7 @@ import { Stamp } from "@/components/marketing/demo/stamp";
 import { eolText, formatDate, serviceBulletin, TEST_LABEL, type Hangar, type HangarRow } from "@/lib/github/hangar";
 import { ScanButton } from "./scan-button";
 
-const th = "label-log whitespace-nowrap border-b border-border-strong bg-surface-sunken px-3 py-2 text-left text-text-subtle";
+const th = "label-log whitespace-nowrap bg-surface-inverse px-3 py-2 text-left text-text-inverse";
 const td = "h-12 whitespace-nowrap border-b border-border px-3 py-1 group-last:border-b-0";
 const behindText = (n: number) => (n === 0 ? "current" : `${n} ${n === 1 ? "major" : "majors"} behind`);
 
@@ -21,7 +21,7 @@ function Action({ r, table }: { r: HangarRow; table?: boolean }) {
   if (r.kind === "not_laravel") return <ScanButton repoId={r.repoId} label="Rescan" variant="tertiary" />;
   return (
     <span className="inline-flex flex-nowrap items-center gap-x-4">
-      <Link href={`/app/inspections/${encodeURIComponent(r.scanId!)}`} className="button-sm inline-flex min-h-11 items-center gap-1 text-action focus-visible:focus-ring">
+      <Link href={`/app/inspections/${encodeURIComponent(r.scanId!)}`} className="button-sm inline-flex min-h-11 items-center gap-1 text-link focus-visible:focus-ring">
         Open inspection<ArrowRight size={16} weight="regular" aria-hidden />
       </Link>
       {table ? null : <Link href={`/app/repos/${encodeURIComponent(r.repoId)}`} className="button-sm inline-flex min-h-11 items-center text-text-subtle hover:text-text focus-visible:focus-ring">Autopilot</Link>}
@@ -34,7 +34,7 @@ function Name({ r, link }: { r: HangarRow; link?: boolean }) {
   return (
     <>
       {link && r.kind === "laravel" ? (
-        <Link href={`/app/repos/${encodeURIComponent(r.repoId)}`} title="Repo settings and autopilot" className="mono-data caption-1 block whitespace-nowrap text-text underline decoration-border underline-offset-4 hover:decoration-action focus-visible:focus-ring">{r.repo}</Link>
+        <Link href={`/app/repos/${encodeURIComponent(r.repoId)}`} title="Repo settings and autopilot" className="mono-data caption-1 block whitespace-nowrap text-text underline decoration-border underline-offset-4 hover:decoration-link focus-visible:focus-ring">{r.repo}</Link>
       ) : (
         <span className="mono-data caption-1 block whitespace-nowrap text-text">{r.repo}</span>
       )}
@@ -64,7 +64,7 @@ export function HangarStats({ rows, repoCount }: { rows: HangarRow[]; repoCount:
     { k: "Not scanned", v: String(rows.filter((r) => r.kind === "unscanned").length), s: "" },
   ];
   return (
-    <dl className="grid grid-cols-2 border border-border bg-surface-raised md:grid-cols-4">
+    <dl className="grid grid-cols-2 border-2 border-text bg-surface-raised md:grid-cols-4">
       {stats.map((s, i) => (
         <div key={s.k} className={`px-4 py-3 ${i % 2 === 1 ? "border-l border-border" : ""} ${i > 1 ? "border-t border-border md:border-t-0" : ""} ${i > 0 ? "md:border-l" : ""}`}>
           <dt className="label-log text-text-subtle">{s.k}</dt>
@@ -82,7 +82,7 @@ export function HangarBoard({ hangar }: { hangar: Hangar }) {
     <div className="flex flex-col gap-4" data-testid="hangar-board">
       <ServiceBulletin rows={rows} />
       <HangarStats rows={rows} repoCount={hangar.repoCount} />
-      <div className="hidden overflow-x-auto border border-border bg-surface-raised md:block">
+      <div className="hidden overflow-x-auto border-2 border-text bg-surface-raised md:block">
         <table className="w-full border-collapse">
           <caption className="sr-only">Airframes</caption>
           <thead>
@@ -106,7 +106,7 @@ export function HangarBoard({ hangar }: { hangar: Hangar }) {
           </tbody>
         </table>
       </div>
-      <ul aria-label="Airframes" className="border border-border bg-surface-raised md:hidden">
+      <ul aria-label="Airframes" className="border-2 border-text bg-surface-raised md:hidden">
         {rows.map((r) => (
           <li key={r.key} className="grid grid-cols-[1fr_auto] gap-x-2 gap-y-1 border-b border-border p-3 last:border-b-0">
             <span><Name r={r} /></span>

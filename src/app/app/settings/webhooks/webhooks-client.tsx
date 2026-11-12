@@ -104,7 +104,7 @@ export function WebhooksClient({ canManage, events }: { canManage: boolean; even
               <div className="flex flex-wrap gap-x-6 gap-y-2">
                 {events.map((ev) => (
                   <label key={ev} className="flex min-h-11 items-center gap-2 body-6 text-text">
-                    <input type="checkbox" checked={picked.includes(ev)} onChange={() => toggleEvent(ev)} className="size-4 accent-action" />
+                    <input type="checkbox" checked={picked.includes(ev)} onChange={() => toggleEvent(ev)} className="size-4 accent-link" />
                     <code>{ev === "*" ? "* (all events)" : ev}</code>
                   </label>
                 ))}
