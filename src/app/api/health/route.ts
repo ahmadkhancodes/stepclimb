@@ -23,7 +23,7 @@ export async function GET() {
   const deps = {
     db: dbOk ? "ok" : "down",
     billing: e.STRIPE_SECRET_KEY && e.STRIPE_WEBHOOK_SECRET ? "configured" : "missing",
-    mail: e.MAIL_PROVIDER === "none" ? "off" : e.RESEND_API_KEY || e.MAIL_PROVIDER === "console" || e.MAIL_PROVIDER === "smtp" ? "configured" : "missing",
+    mail: e.MAIL_PROVIDER === "none" ? "off" : (e.MAIL_GATEWAY_URL && e.MAIL_GATEWAY_KEY) || e.RESEND_API_KEY || e.MAIL_PROVIDER === "console" || e.MAIL_PROVIDER === "smtp" ? "configured" : "missing",
   };
   const body = { ok: dbOk, db: dbDriver(), dbOk, deps, dbLatencyMs: dbOk ? Date.now() - t0 : null, version: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? "dev", at: new Date().toISOString() };
   return json(body, dbOk ? 200 : 503);

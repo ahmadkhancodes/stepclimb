@@ -48,7 +48,7 @@ export const terms: LegalDoc = {
       title: "Cancellation and refunds",
       body: [
         "You can cancel from the customer portal in Settings, then Billing. Your plan stays active until the end of the period you paid for.",
-        "Refunds: a paid plan or pack can be refunded in full within 14 days of the first payment, on request to contact@buffersoltech.com. After that, fees already paid for a billing period are not refunded, except where the law requires it. You can cancel at any time and the plan stays active until the end of the paid period. If a run fails, its credit is returned automatically.",
+        "Refunds: a paid plan or pack can be refunded in full within 14 days of the first payment, on request to stepclimb@buffersoltech.com. After that, fees already paid for a billing period are not refunded, except where the law requires it. You can cancel at any time and the plan stays active until the end of the paid period. If a run fails, its credit is returned automatically.",
       ],
     },
     {

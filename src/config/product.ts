@@ -61,7 +61,7 @@ export const product = {
   companyUrl: "https://buffersoltech.com",
   host: "stepclimb.buffersoltech.com",
   url: process.env.NEXT_PUBLIC_APP_URL ?? "https://stepclimb.buffersoltech.com",
-  supportEmail: "contact@buffersoltech.com",
+  supportEmail: "stepclimb@buffersoltech.com",
   legalEmail: "contact@buffersoltech.com",
   mailFrom: "Stepclimb by BufferSol <no-reply@stepclimb.buffersoltech.com>",
   description:
