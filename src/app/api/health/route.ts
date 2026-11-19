@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { getDb } from "@/lib/db";
 import { dbDriver, env, fixturesMode } from "@/lib/env";
 import { reconcileOnce } from "@/lib/github/reconcile";
@@ -20,8 +21,8 @@ export async function GET() {
   try {
     await withTimeout(getDb().then((db) => db.docs.get("health", "ping")), 2_000);
     dbOk = true;
-    // self healing after a deploy: pick up installations whose webhook was lost (not awaited, never affects the status)
-    if (!fixturesMode() && process.env.VERCEL_ENV === "production") void getDb().then((db) => reconcileOnce(db));
+    // self healing after a deploy: pick up installations whose webhook was lost (runs after the response, never affects the status)
+    if (!fixturesMode() && process.env.VERCEL_ENV === "production") after(async () => { await reconcileOnce(await getDb()); });
   } catch { /* reported as dbOk: false */ }
   const deps = {
     db: dbOk ? "ok" : "down",
