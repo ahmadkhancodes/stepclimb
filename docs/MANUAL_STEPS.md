@@ -28,12 +28,13 @@ Click **Upgrade to Pro** and add the card. You will see the plan as Pro on that 
 ## 4. Before public launch (legal, M5)
 Formal trademark clearance for "Stepclimb" (USPTO, UKIPO, CIPO classes 9 and 42) and a counsel check of the "not affiliated with Laravel" footer line. Not a blocker for the build.
 
-## 5. Turn on real runs (before the first paid run)
-1. Add `@vercel/sandbox` (named in ARCHITECTURE.md) and write the `SandboxDriver` adapter **to the safety contract in docs/REVIEW.md (P0-5, P1-6) and D-35**: the sandbox token is read only, commits come back as a bundle and the orchestrator pushes only the expected `stepclimb/*` branch; customer commands run as a separate user without `EVENT_SECRET` in their env. Then write the adapter (`create`, `runDetached`, `stop`, `list`) next to `src/lib/runs/sandbox-runner.ts`; return it from `getRunDeps` in `src/lib/runs/runtime.ts` using `realTokens(creds)`. Until then `POST /api/runs` answers 503 `runner_unavailable` before any credit is taken.
-2. Build the runner snapshot `stepclimb-runner-v1` (PHP 8.2 to 8.5 from packages.sury.org or static PHP, Composer, Node 24, Rector, Pint, the `stepclimb-agent` entrypoint). It needs the Vercel token (`VERCEL_TOKEN_NEW_ACCOUNT`) and Pro plan (item 2).
-3. Stripe: create the webhook endpoint for `<host>/api/stripe/webhook` with `checkout.session.completed` included, so paid one time work orders grant their credit. Link: https://dashboard.stripe.com/test/webhooks
-4. Cron: call `/api/cron/reap` every minute (Cloudflare worker with `CRON_SECRET`).
-5. Mongo (when `MONGODB_URI` exists): run `npm run db:indexes` after adding indexes for `runs` (accountId+createdAt, status), `run_steps` (runId+seq), `run_logs` (runId+seq), `credits` (accountId+kind).
+## 5. Turn on real runs (done 19 Nov 2026 except the items marked OPEN)
+1. ~~SandboxDriver adapter~~ **Done** (D-39, D-40): `src/lib/runs/sandbox/vercel-driver.ts`, `agent-main.ts`, `handback.ts`; `getRunDeps` returns it when the GitHub App credentials exist and `RUNNER_SNAPSHOT_ID` is set. No Vercel token in the app: the SDK uses the project's OIDC token.
+2. ~~Runner snapshot~~ **Done**: `snap_f7evsJvPabKuIRIFxDNtWhq6QCqR` (PHP 8.3, Composer, `stepclimb-run`), set as `RUNNER_SNAPSHOT_ID` on the Vercel project (production + preview). Rebuild with `VERCEL_TEAM_ID=team_rbOXRpz6zmliuGsw8eIh3YDw VERCEL_PROJECT_ID=prj_EhsJQAA5N2Mnbc5LNyLVJEfjMFsN npm run runner:snapshot` and replace the env var (needed only to change PHP or tools; snapshots do not expire).
+3. **OPEN, owner: one real PR on a throwaway repo.** The session may only read and write `ahmadkhancodes/stepclimb`, so it could not create a test repository. Do this once: (a) create a repo from a Laravel app that has `composer.lock` (for example fork `https://github.com/filamentphp/demo`), (b) install the Stepclimb GitHub App on it: `https://github.com/settings/installations`, (c) sign in at the app, open the repo, switch on weekly autopilot and press "Run now" (or call the hourly cron in the Monday window). Expected: a run reaches `succeeded` in 2 to 6 minutes and a PR from `stepclimb/autopilot` opens. Paste the PR link to the session if anything differs.
+4. Stripe: create the webhook endpoint for `<host>/api/stripe/webhook` with `checkout.session.completed` included, so paid one time work orders grant their credit. Link: https://dashboard.stripe.com/test/webhooks
+5. Cron: call `/api/cron/reap` every minute (Cloudflare worker with `CRON_SECRET`).
+6. Mongo (when `MONGODB_URI` exists): run `npm run db:indexes` after adding indexes for `runs` (accountId+createdAt, status), `run_steps` (runId+seq), `run_logs` (runId+seq), `credits` (accountId+kind).
 
 
 ## 6. Turn on M4 pieces (autopilot, mail, backups, alerts)
@@ -43,7 +44,7 @@ Formal trademark clearance for "Stepclimb" (USPTO, UKIPO, CIPO classes 9 and 42)
 4. **Founder two-factor**: the admin console at `/admin` refuses founder accounts without TOTP in production. Turn it on at `/app/settings/security` before first use.
 5. **Backups to R2**: needs the R2 bucket (created with the Cloudflare token). Write an R2 `BackupSink` next to `backupSink()` in `src/lib/cron/jobs.ts` and set its keys; until then the nightly job records only a manifest (counts and checksum), which the admin overview shows as "manifest only". Run the drill monthly: `MONGODB_URI=... npx tsx scripts/backup.ts` then `npx tsx scripts/restore-drill.ts backups/<file>.json.gz backups/<file>.json.gz.sha256` (restores into a scratch database and drops it).
 6. **Mongo indexes**: run `npm run db:indexes` again (new indexes for runs, credits, autopilot_state, webhook_failures).
-7. **Real autopilot runs** need the same sandbox adapter as item 5.1: `RunEnv.updateDeps` must run `composer update --no-scripts` inside the constraints and `npm update`, and `push` must force push `stepclimb/autopilot` so a refresh moves the open PR.
+7. ~~Real autopilot runs~~ **Built** (D-40): `composer update --no-scripts` and `npm update --ignore-scripts` run in the sandbox as the unprivileged user, the orchestrator force pushes `stepclimb/autopilot`. First real PR: item 5.3.
 8. **Stripe webhook events**: add `invoice.paid` to the endpoint (receipts for subscriptions) next to `checkout.session.completed`: https://dashboard.stripe.com/test/webhooks
 9. **GitHub App events**: the app must receive `pull_request` events (closed autopilot PRs feed quiet mode). They are already in `docs/manifests/github-app.json`; apps created before M4 need the event ticked at the app's settings page.
 
@@ -56,4 +57,4 @@ Formal trademark clearance for "Stepclimb" (USPTO, UKIPO, CIPO classes 9 and 42)
 
 ## Launch hardening note (2026-11-10)
 - Stripe webhook endpoint: also subscribe to `checkout.session.async_payment_succeeded` and `charge.refunded` (dashboard: https://dashboard.stripe.com/test/webhooks).
-- P1-6 and P1-7 remain open until the SandboxDriver adapter exists (item 5).
+- P1-6 and P1-7: the adapter now exists (D-39 to D-41); close them after the first real PR (item 5.3).

@@ -16,13 +16,19 @@
     "deny": "tsx scripts/deny-deps.ts",
     "scan:bundle": "tsx scripts/scan-bundle.ts",
     "backup": "tsx scripts/backup.ts",
-    "restore-drill": "tsx scripts/restore-drill.ts"
+    "restore-drill": "tsx scripts/restore-drill.ts",
+    "build:agent": "tsx scripts/build-agent.ts",
+    "prebuild": "tsx scripts/build-agent.ts",
+    "pretypecheck": "tsx scripts/build-agent.ts",
+    "pretest": "tsx scripts/build-agent.ts",
+    "runner:snapshot": "tsx scripts/runner-snapshot.ts"
   },
   "dependencies": {
     "@better-auth/api-key": "^1.7.17",
     "@better-auth/passkey": "^1.7.17",
     "@phosphor-icons/react": "^2.1.10",
     "@vercel/analytics": "^2.0.1",
+    "@vercel/sandbox": "^4.0.0",
     "altcha": "^3.5.0",
     "altcha-lib": "^2.8.0",
     "better-auth": "^1.7.17",
@@ -43,6 +49,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/semver": "^7.8.0",
+    "esbuild": "^0.28.2",
     "eslint": "^9",
     "eslint-config-next": "16.4.5",
     "tailwindcss": "^4",

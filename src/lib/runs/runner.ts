@@ -34,6 +34,8 @@ export interface RunnerBackend {
   readonly name: string;
   start(spec: RunSpec, deliver: DeliverEvent): Promise<RunnerHandle>;
   cancel(handle: RunnerHandle): Promise<void>;
+  /** the commits the run produced, as the raw handback JSON (backends that do not push themselves; null when absent) */
+  collect?(handle: RunnerHandle): Promise<string | null>;
   /** sandboxes that are not stopped (leak audit and watchdog) */
   listActive(): Promise<RunnerHandle[]>;
 }

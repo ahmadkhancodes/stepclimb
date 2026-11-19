@@ -6,6 +6,7 @@ import { getFlags } from "@/lib/flags";
 import { mailRunFailed, mailRunFinished } from "@/lib/mail/notify";
 import { isRepoDenied } from "@/lib/security/denylist";
 import { finalizeAutopilot } from "./autopilot-finalize";
+import { parseHandback, publishHandback } from "./handback";
 import { checkFreeTier, freeTierMessage } from "./free-tier";
 import { loadPins } from "./pins";
 import type { RunResult, RunnerEvent, SignedEvent } from "./events";
@@ -218,6 +219,12 @@ export async function finalizeRun(d: RunDeps, runId: string, rawResult: RunResul
     if (!run.branch) throw new Error("nothing_pushed");
     const branch = expectedBranch(run);
     const host = await d.host(run);
+    // a sandbox never pushes (D-35): the orchestrator collects what it handed back and writes it to OUR branch
+    if (d.runner.collect && run.sandboxId) {
+      const raw = await d.runner.collect({ backend: d.runner.name, id: run.sandboxId });
+      if (!raw) throw new Error("handback_missing");
+      await publishHandback(host, run.fullName, parseHandback(raw), { branch, baseBranch: run.baseBranch, force: run.kind === "autopilot" });
+    }
     // the check run goes on the commit GitHub reports for OUR branch, never on a sha the sandbox names (a forged sha could
     // put a green "Verified" check on any commit, including one on the default branch)
     const head = await host.branchHead(run.fullName, branch);

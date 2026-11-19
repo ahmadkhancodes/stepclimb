@@ -6,7 +6,13 @@ export interface GitHost {
   createBranch(fullName: string, branch: string, sha: string): Promise<void>;
   /** commit that reuses a tree (an empty commit when treeSha is the parent's tree) */
   createCommit(fullName: string, input: { message: string; treeSha: string; parentSha: string }): Promise<string>;
-  moveBranch(fullName: string, branch: string, sha: string): Promise<void>;
+  /** `force` only for branches Stepclimb owns and rebuilds (autopilot); a plain move never rewrites history */
+  moveBranch(fullName: string, branch: string, sha: string, force?: boolean): Promise<void>;
+  /** git data API pieces the orchestrator uses to publish what a sandbox handed back (D-35) */
+  createBlob(fullName: string, contentBase64: string): Promise<string>;
+  createTree(fullName: string, baseTreeSha: string, entries: { path: string; mode: "100644" | "100755"; sha: string | null }[]): Promise<string>;
+  /** tree sha of a commit, or null when the commit does not exist in the repo */
+  commitTree(fullName: string, commitSha: string): Promise<string | null>;
   openPr(fullName: string, input: { head: string; base: string; title: string; body: string; draft: boolean }): Promise<{ number: number; url: string }>;
   updatePr(fullName: string, number: number, input: { title?: string; body?: string; draft?: boolean }): Promise<void>;
   branchHead(fullName: string, branch: string): Promise<string | null>;
@@ -57,7 +63,13 @@ export function createGithubHost(getToken: () => Promise<string>, fetchImpl: typ
     },
     async createBranch(f, branch, sha) { await call("POST", `${repo(f)}/git/refs`, { ref: `refs/heads/${branch}`, sha }); },
     async createCommit(f, i) { return (await call<{ sha: string }>("POST", `${repo(f)}/git/commits`, { message: i.message, tree: i.treeSha, parents: [i.parentSha] }))!.sha; },
-    async moveBranch(f, branch, sha) { await call("PATCH", `${repo(f)}/git/refs/heads/${branch.split("/").map(encodeURIComponent).join("/")}`, { sha, force: false }); },
+    async moveBranch(f, branch, sha, force = false) { await call("PATCH", `${repo(f)}/git/refs/heads/${branch.split("/").map(encodeURIComponent).join("/")}`, { sha, force }); },
+    async createBlob(f, content) { return (await call<{ sha: string }>("POST", `${repo(f)}/git/blobs`, { content, encoding: "base64" }))!.sha; },
+    async createTree(f, base, entries) {
+      const tree = entries.map((e) => ({ path: e.path, mode: e.mode, type: "blob", sha: e.sha }));
+      return (await call<{ sha: string }>("POST", `${repo(f)}/git/trees`, { base_tree: base, tree }))!.sha;
+    },
+    async commitTree(f, sha) { return (await call<{ tree: { sha: string } }>("GET", `${repo(f)}/git/commits/${sha}`, undefined, [404, 422]))?.tree.sha ?? null; },
     async openPr(f, i) {
       const r = await call<{ number: number; html_url: string }>("POST", `${repo(f)}/pulls`, i);
       return { number: r!.number, url: r!.html_url };
