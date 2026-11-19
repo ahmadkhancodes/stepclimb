@@ -17,7 +17,7 @@ const PATH = "/home/vercel-sandbox/.local/bin:/vercel/runtimes/node24/bin:/usr/l
 /** Customer commands: separate user, scrubbed environment, hard timeout. Output is capped, so a chatty build cannot fill memory. */
 export const realExec: Exec = (cmd, o) => new Promise((resolve) => {
   const secs = Math.max(5, Math.ceil(o.timeoutMs / 1000));
-  const env = { HOME: `/home/${CUSTOMER}`, PATH, LANG: "C.UTF-8", CI: "1", COMPOSER_NO_INTERACTION: "1", COMPOSER_ALLOW_SUPERUSER: "0", COMPOSER_MEMORY_LIMIT: "-1", NPM_CONFIG_UPDATE_NOTIFIER: "false", ...(o.env ?? {}) };
+  const env = { HOME: `/home/${CUSTOMER}`, PATH, LANG: "C.UTF-8", CI: "1", COMPOSER_NO_INTERACTION: "1", COMPOSER_ALLOW_SUPERUSER: "0", COMPOSER_MEMORY_LIMIT: "-1", NPM_CONFIG_UPDATE_NOTIFIER: "false", GIT_CONFIG_COUNT: "1", GIT_CONFIG_KEY_0: "safe.directory", GIT_CONFIG_VALUE_0: "*", ...(o.env ?? {}) };
   const assigns = Object.entries(env).map(([k, v]) => `${k}=${v}`);
   const script = `umask 002; cd ${JSON.stringify(o.cwd)} && exec timeout -k 5 ${secs} bash -c ${JSON.stringify(cmd)}`;
   const p = spawn("sudo", ["-n", "-u", CUSTOMER, "-H", "env", "-i", ...assigns, "bash", "-c", script], { stdio: ["ignore", "pipe", "pipe"] });

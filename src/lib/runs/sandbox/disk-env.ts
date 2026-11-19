@@ -130,7 +130,7 @@ export function createDiskEnv(o: DiskEnvOptions): RunEnv & { loaded: () => numbe
       }
       if (stage === "tests") {
         const prep = existsSync(join(appDir, ".env")) || !existsSync(join(appDir, ".env.example")) ? "" : "cp .env.example .env && ";
-        const bin = existsSync(join(appDir, "vendor/bin/pest")) ? "vendor/bin/pest --no-interaction" : "vendor/bin/phpunit --no-interaction";
+        const bin = existsSync(join(appDir, "vendor/bin/pest")) ? "vendor/bin/pest" : "vendor/bin/phpunit --no-interaction";
         return done(await run(`${prep}${bin}`, 15 * 60_000, testEnv));
       }
       if (!existsSync(join(appDir, "vendor/bin/phpstan"))) return { passed: true, output: "no phpstan", stage };
