@@ -5,7 +5,7 @@ compatibility_date = "2026-10-01"
 [vars]
 APP_URL = "https://stepclimb.buffersoltech.com"
 JOBS = "reap,heartbeat,alerts,webhook-retries"
-HOURLY_JOBS = "autopilot"
+HOURLY_JOBS = "reconcile,autopilot"
 DAILY_JOBS = "backup,retention"
 
 [triggers]

@@ -1,7 +1,7 @@
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { runAgent } from "@/lib/runs/agent";
 import type { RunnerEvent } from "@/lib/runs/events";
 import { createFixtureHost } from "@/lib/runs/fixture-host";
@@ -196,5 +196,36 @@ describe("finalize with a collecting backend (D-35)", () => {
       expect(host.calls.prs).toHaveLength(0);
       expect(host.calls.commits).toHaveLength(0);
     }
+  });
+});
+
+// ───────── reconcile installations ─────────
+import { generateKeyPairSync } from "node:crypto";
+import { saveAppCredentials } from "@/lib/github/app-store";
+import { reconcileInstallations } from "@/lib/github/reconcile";
+
+describe("reconcile installations", () => {
+  it("fills missing installation and repo rows from GitHub, records a delivery summary without payloads, drops vanished installs", async () => {
+    vi.stubEnv("APP_ENCRYPTION_KEY", "k".repeat(32));
+    const db = createMemoryDb("stepclimb");
+    const pem = generateKeyPairSync("rsa", { modulusLength: 2048 }).privateKey.export({ type: "pkcs1", format: "pem" }).toString();
+    await saveAppCredentials(db, { id: 77, slug: "s", name: "S", html_url: "https://github.com/apps/s", client_id: "c", client_secret: "x", webhook_secret: "w", pem });
+    await db.docs.put("installations", "999", { provider: "github", externalId: "999", accountLogin: "gone", accountType: "User", accountId: null, suspendedAt: null, repoSelection: "all", updatedAt: new Date() });
+    const calls: string[] = [];
+    const fetchImpl = (async (url: string, init?: RequestInit) => {
+      calls.push(`${init?.method ?? "GET"} ${new URL(url).pathname}`);
+      const u = new URL(url);
+      if (u.pathname === "/app/installations") return Response.json([{ id: 42, account: { login: "owner", type: "User" }, repository_selection: "selected" }]);
+      if (u.pathname === "/app/installations/42/access_tokens") return Response.json({ token: "t", expires_at: new Date(Date.now() + 3_600_000).toISOString() });
+      if (u.pathname === "/installation/repositories") return Response.json({ repositories: [{ id: 1, full_name: "owner/demo", default_branch: "5.x", private: false, archived: false, pushed_at: null }] });
+      if (u.pathname === "/app/hook/deliveries") return Response.json([{ event: "installation", action: "created", status: "Not Found", status_code: 404, delivered_at: "2026-11-19T10:00:00Z", payload: "SECRET" }]);
+      return new Response("nope", { status: 404 });
+    }) as unknown as typeof fetch;
+    const rep = await reconcileInstallations(db, fetchImpl) as Awaited<ReturnType<typeof reconcileInstallations>> & { newInstallations: string[] };
+    expect(rep.newInstallations).toEqual(["42"]);
+    expect(await db.docs.get("installations", "42")).toMatchObject({ accountLogin: "owner", accountId: null });
+    expect(await db.docs.get("repos", "42:owner/demo")).toMatchObject({ fullName: "owner/demo", defaultBranch: "5.x" });
+    expect(await db.docs.get("installations", "999")).toBeNull();
+    expect(rep).toMatchObject({ failedDeliveries: 1 });
   });
 });

@@ -31,6 +31,11 @@ export const cronJobs: Record<string, () => Promise<unknown>> = {
     const deps = await getRunDeps(await getDb());
     return deps ? reapRuns(deps) : { skipped: "runner_unavailable" };
   },
+  /** hourly: installations and repos from GitHub, plus a webhook delivery summary in the audit log (self healing for lost webhooks) */
+  reconcile: async () => {
+    const { reconcileInstallations } = await import("@/lib/github/reconcile");
+    return reconcileInstallations(await getDb());
+  },
   /** hourly: weekly dependency PRs for repos whose local time is Monday 06:00 */
   autopilot: async () => {
     const deps = await getRunDeps(await getDb());
@@ -61,7 +66,7 @@ export const cronJobs: Record<string, () => Promise<unknown>> = {
  * another, inside a time budget below the function limit. A failing job never blocks the next.
  */
 const DAILY_BUDGET_MS = 50_000;
-const DAILY_ORDER = ["reap", "autopilot", "webhook-retries", "retention", "backup", "alerts"] as const;
+const DAILY_ORDER = ["reconcile", "reap", "autopilot", "webhook-retries", "retention", "backup", "alerts"] as const;
 cronJobs.daily = async () => {
   const started = Date.now();
   const out: Record<string, unknown> = {};

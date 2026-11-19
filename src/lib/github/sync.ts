@@ -28,6 +28,11 @@ export interface RepoDoc {
   quietMode?: boolean;
 }
 
+/** Upserts an installation row from what `GET /app/installations` returns (same shape as the webhook's `installation`). */
+export async function upsertInstallation(db: Db, i: NonNullable<InstallationPayload["installation"]>): Promise<void> {
+  await putInstallation(db, { installation: i }, i.suspended_at ? true : false);
+}
+
 export const repoDocId = (installationId: string, fullName: string) => `${installationId}:${fullName}`;
 
 interface InstallationPayload {

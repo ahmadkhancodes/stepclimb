@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import Link from "next/link";
 import { Meter } from "@/components/app/meter";
 import { METERS_SHOWN } from "@/components/app/labels";
@@ -8,7 +9,7 @@ import { HangarBoard } from "@/components/app/hangar-board";
 import { isFounderAdmin } from "@/lib/auth/session";
 import { hasAppCredentials } from "@/lib/github/app-store";
 import { loadHangar, type Hangar } from "@/lib/github/hangar";
-import { claimInstallations } from "@/lib/github/sync";
+import { linkInstallationsFor } from "@/lib/github/link";
 import { requireOrg, seatsInUse } from "@/lib/auth/session";
 import { effectivePlan } from "@/lib/billing/entitlement";
 import { currentUsage } from "@/lib/billing/usage";
@@ -42,7 +43,7 @@ export default async function OverviewPage({ searchParams }: { searchParams: Pro
   let hangar: Hangar | null = null;
   try {
     // installs made before this org existed are linked by GitHub login
-    await claimInstallations(db, ctx.org.id, { githubLogin: (ctx.user as unknown as { githubLogin?: string | null }).githubLogin ?? null });
+    await linkInstallationsFor(db, ctx.org.id, await headers(), (ctx.user as unknown as { githubLogin?: string | null }).githubLogin ?? null);
     hangar = await loadHangar(db, ctx.org.id);
   } catch {
     hangar = null;
