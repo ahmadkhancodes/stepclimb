@@ -74,17 +74,14 @@ export async function reconcileInstallations(db: Db, fetchImpl: typeof fetch = f
   return rep;
 }
 
-const g = globalThis as unknown as { __stepclimbReconcile?: Promise<unknown> };
-/** First request after a deploy (health check): one reconcile per instance, never more than one per 10 minutes overall. Failures are recorded, not swallowed. */
-export function reconcileOnce(db: Db): Promise<unknown> {
-  if (g.__stepclimbReconcile) return g.__stepclimbReconcile;
-  g.__stepclimbReconcile = (async () => {
+/** First request after a deploy (health check): at most one reconcile per 10 minutes overall (a doc in `ops`). Failures are recorded, not swallowed. */
+export async function reconcileOnce(db: Db): Promise<void> {
+  try {
     const last = await db.docs.get<{ at: number }>("ops", "reconcile_last");
     if (last && Date.now() - last.at < 10 * 60_000) return;
     await db.docs.put("ops", "reconcile_last", { at: Date.now() });
-    try { await reconcileInstallations(db); } catch (e) {
-      await audit({ orgId: null, actorId: null, action: "github.reconcile_failed", target: "github_app", meta: { error: String((e as Error).message).replace(/[A-Za-z0-9_\-]{32,}/g, "[redacted]").slice(0, 200) } });
-    }
-  })().catch(() => undefined);
-  return g.__stepclimbReconcile;
+    await reconcileInstallations(db);
+  } catch (e) {
+    await audit({ orgId: null, actorId: null, action: "github.reconcile_failed", target: "github_app", meta: { error: String((e as Error).message).replace(/[A-Za-z0-9_\-]{32,}/g, "[redacted]").slice(0, 200) } }).catch(() => undefined);
+  }
 }
